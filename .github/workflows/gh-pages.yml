@@ -10,7 +10,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
@@ -29,5 +28,3 @@ jobs:
       - name: Build and Deploy MkDocs
         run: poetry run mkdocs gh-deploy --force
         working-directory: docs
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
