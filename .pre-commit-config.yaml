@@ -1,0 +1,7 @@
+default_language_version:
+  python: python3.13
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.24.0
+    hooks:
+      - id: gitleaks
