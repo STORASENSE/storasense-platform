@@ -1,0 +1,64 @@
+site_name: Project
+site_url: https://github.com/INF2023AI-SE1-ARMP/Project
+repo_url: https://github.com/INF2023AI-SE1-ARMP/Project
+repo_name: "INF2023AI-SE1-ARMP/Project"
+
+theme:
+  name: "material"
+  language: "en"
+  feature:
+    navigation.indexes: true
+    navigation.sections: true
+    navigation.footer: true
+    navigation.top: true
+    navigation.tabs: true
+    navigation.instant: true
+    navigation.tracking: true
+  logo:
+    icon: "folder_open"
+  palette:
+    primary: "light blue"
+    accent: "light blue"
+    font:
+      text: Roboto
+      code: Roboto Mono
+
+markdown_extensions:
+    - admonition
+    - codehilite
+    - footnotes
+    - md_in_html
+    - meta
+    - toc:
+        permalink: true
+    - pymdownx.caret
+    - pymdownx.details
+    - pymdownx.arithmatex:
+        generic: true
+    - pymdownx.betterem:
+        smart_enable: all
+    - pymdownx.highlight:
+        anchor_linenums: true
+        line_spans: __span
+        pygments_style: "default"
+    - pymdownx.inlinehilite
+    - pymdownx.mark
+    - pymdownx.superfences:
+        custom_fences:
+          - name: mermaid
+            class: mermaid
+            format: !!python/name:pymdownx.superfences.fence_code_format
+    - pymdownx.tabbed:
+        alternate_style: true
+    - pymdownx.tasklist:
+        custom_checkbox: true
+    - pymdownx.tilde
+
+plugins:
+  - search
+  - minify:
+      minify_html: true
+
+nav:
+  - Home: index.md
+
