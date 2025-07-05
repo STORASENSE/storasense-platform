@@ -1,7 +1,8 @@
 # Project
 
+***
 ## Setup: 
-- Python version: **3.13** 
+- Python-version: **3.13** 
 - Setup a virtual environment:
 ```bash
 python -m venv .venv
@@ -24,6 +25,8 @@ pip install poetry
 ```bash
 poetry install
 ```
+***
+
 
 ## Development Workflow: 
 - Always use **dev** branch as the base branch for your pull requests.
