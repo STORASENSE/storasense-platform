@@ -43,11 +43,7 @@ markdown_extensions:
         pygments_style: "default"
     - pymdownx.inlinehilite
     - pymdownx.mark
-    - pymdownx.superfences:
-        custom_fences:
-          - name: mermaid
-            class: mermaid
-            format: !!python/name:pymdownx.superfences.fence_code_format
+
     - pymdownx.tabbed:
         alternate_style: true
     - pymdownx.tasklist:
@@ -61,4 +57,3 @@ plugins:
 
 nav:
   - Home: index.md
-
