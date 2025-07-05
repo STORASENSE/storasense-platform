@@ -2,7 +2,7 @@
 
 ***
 ## Setup: 
-- Python-version: **3.13** 
+- Python version: **3.13** 
 - Setup a virtual environment:
 ```bash
 python -m venv .venv
