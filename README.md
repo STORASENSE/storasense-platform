@@ -31,6 +31,7 @@ poetry install
 
 ## Development Workflow:
 - Always use **dev** branch as the base branch for your pull requests.
+- Try to "squash commit" before merging.
 - Create a new branch for your changes from **dev** branch:
 ```
 feature/<Ticket-ID>-<Short-Description>
