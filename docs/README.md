@@ -1,9 +1,8 @@
-# Project Docu
+# Project Documentation
 
-Test rendered output locally with: 
+Test rendered output locally with:
 
 ```bash
-poetry install 
+poetry install
 poetry rnun mkdocs serve
 ```
-
