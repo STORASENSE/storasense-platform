@@ -38,5 +38,8 @@ feature/<Ticket-ID>-<Short-Description>
 ```
 - Run pre-commit hooks locally:
 ```bash
+pre-commit install
+```
+```bash
 pre-commit run --all-files
 ```
