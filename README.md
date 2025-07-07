@@ -35,7 +35,9 @@ poetry install
 - Create a new branch for your changes from **dev** branch:
 ```
 feature/<Ticket-ID>-<Short-Description>
-```
+fix/<Ticket-ID>-<Short-Description>
+test/<Ticket-ID>-<Short-Description>
+````
 - Run pre-commit hooks locally:
 ```bash
 pre-commit install
