@@ -49,7 +49,7 @@ Die folgenden Szenarien beschreiben beispielhaft die wichtigsten Anwendungsfäll
 # Qualitätsziele
 Es lassen sich folgende Qualitätsziele, gestützt durch Qualitätsszenarien, definieren:
 
-## Erweiterbarkeit
+## Erweiterbarkeit:
 
 ### Szenario 1: Erweiterung des Platform-Teilsystems „Monitoring“
 Dieses Szenario definiert die Fähigkeit, die Funktionalität des bestehenden Monitoring-Moduls (bzw Teilsystems) zu erweitern, ohne das Kernsystem zu verändern. 
@@ -79,6 +79,62 @@ Dabei soll bestehende zentrale Funkktionalität wiederverwendet werden.
 | Umgebung      | System befindet sich in der Weiterentwicklung                                                                                                                                                                                                                                                                                                                                |
 | Reaktion      | Die Plattform-Architektur stellt klar definierte Erweiterungspunkte beziehungsweise eine offene API bereit.<br>Das neue Teilsystem kann als eigenständiges Modul oder Service entwickelt und in die Plattform integriert werden, ohne den Code der bestehenden Teilsysteme (z.B. "Monitoring") zu modifizieren.<br>Bestehende Plattformlogik (z.B. Benutzerverwaltung) wird wiederverwendet bzw. integriert. |
 | Reaktionsmaß  | Das neue Teilsystem kann ohne Ausfallzeit des Gesamtsystems ("Zero Downtime Deployment") in Betrieb genommen werden.<br>Der Entwicklungsaufwand für die reine Integration (Anbindung an die zentrale Navigation, Benutzerverwaltung, etc.) beträgt weniger als eine Woche.                                                            |
+
+
+## Performance:
+
+### Szenario: Alarmierungszeit ≤ 90 Sekunden ab Grenzwertüberschreitung
+Ein rasches Überschreiten oder Unterschreiten definierter Schwellenwerte der
+Umgebungsparameter – wie Temperatur, oder Luftfeuchtigkeit – kann potenziell erhebliche
+Schäden verursachen. Ziel des Alarmierungssystems ist es daher, eine zuständige Entität
+(z.B. eine Nutzerperson oder ein autonom agierendes IoT-System) innerhalb kürzester
+Zeit (90 Sekunden nach Detektion) zu informieren, um präventive oder mitigierende
+Maßnahmen einzuleiten.
+
+Die Benachrichtigung erfolgt dabei dual:
+* **Push-Benachrichtigung** an Endgeräte zur unmittelbaren menschlichen Wahrnehmung
+* **MQTT-Nachricht** an ein vordefiniertes Topic zur automatisierten Weiterverarbeitung durch angeschlossene Systeme
+
+| Attribut        | Beschreibung                                                                                                                                                                                                                      |
+|-----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Szenarioname    | Schnelles Alarmierungssystem                                                                                                                                                                                                      |
+| Quelle          | Sensorik / Arduino / Software-Plattform (z\.B\. App)                                                                                                                                                                             |
+| Stimulus        | Gemessene Temperatur unterschreitet den vereinbarten Grenzwert für länger als 30s\.                                                                                                        |
+| Artefakt        | Arduino mit Sensorik, die Software inklusive UI, Benachrichtigungssystem \(z\.B\. Email-Client\) und MQTT\-Publisher\.                                                                     |
+| Umgebung        | Das System befindet sich im produktiven Normalbetrieb\.                                                                                                                                    |
+| Reaktion        | Durch kontinuierliche Datenübertragung kann schnell ein abnormaler Zustand detektiert werden\. Daraufhin werden betreffende Entitäten alarmiert – Nutzer und ggf\. weitere Systeme\.        |
+| Reaktionsmaß    | Nach Detektion wird innerhalb von 90 Sekunden sowohl eine Push\-Benachrichtigung, als auch eine MQTT\-Nachricht versendet\.                                                                |
+
+## Sicherheit:
+
+### Szenario: Sichere Authentifizierung und Autorisierung
+Dieses Szenario stellt sicher, dass nur berechtigte Personen auf die Plattform zugreifen können und dort nur die Aktionen ausführen dürfen, die ihrer Rolle entsprechen.
+
+| Attribut        | Beschreibung                                                                                                                                                                                                                                   |
+|-----------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Szenarioname    | Authentifizierungs-, Autorisierungs- Service                                                                                                                                                                                                  |
+| Quelle          | Ein registrierter Nutzer (z\.B\. ein Lagerverantwortlicher oder Systemadministrator)\.                                                                                                                  |
+| Stimulus        | Der Nutzer versucht, sich über die Login\-Maske der Plattform am System anzumelden, um auf das Dashboard zuzugreifen oder Konfigurationen vorzunehmen\.                                                 |
+| Artefakt        | Authentifizierungs\-, Autorisierungs\-Service der Software\-Plattform\.                                                                                                                                 |
+| Umgebung        | Das System befindet sich im produktiven Normalbetrieb\.                                                                                                                                                 |
+| Reaktion        | Das System validiert die eingegebenen Anmeldedaten \(z\.B\. Benutzername und Passwort\) gegen die hinterlegte Datenbank\. Bei erfolgreicher Authentifizierung gewährt das System dem Nutzer Zugriff entsprechend seiner vordefinierten Rolle \(z\.B\. Lesezugriff für einen Auditor, Vollzugriff für einen Administrator\)\. Bei fehlerhafter Eingabe wird der Zugriff verweigert und der fehlgeschlagene Versuch sicher protokolliert\. |
+| Reaktionsmaß    | Die Anmeldung eines autorisierten Nutzers erfolgt in weniger als 2 Sekunden\.                                                                                                                          |
+
+## Verfügbarkeit:
+
+### Szenario: Fehlertoleranz und automatische Wiederherstellung
+Kritische Lagerbedingungen erfordern ein System, das möglichst durchgängig verfügbar ist, um eine lückenlose Echtzeitüberwachung sicherzustellen.
+Falls das System über einen längeren Zeitraum nicht verfügbar ist, ist der Zustand des Lagerguts unbekannt, und es könnten unbemerkte Schäden entstehen, wenn beispielsweise eine Temperaturschwelle überschritten wird.
+
+| Attribut      | Beschreibung                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Szenarioname  | System-Resilienz                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Quelle        | Ein interner Fehlerzustand                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Stimulus      | Ein unerwarteter Ausfall einer kritischen Komponente, z.B. der Absturz der Server-Anwendung, ein "Einfrieren" des Mikrocontrollers oder ein temporärer Verlust der Netzwerkverbindung.                                                                                                                                                                                                                                                                     |
+| Artefakt      | Die gesamte Systeminfrastruktur: Sensor-Einheit (Hardware), Software-Plattform (Backend) und die Kommunikationskanäle.                                                                                                                                                                                                                                                                                                                                                                            |
+| Umgebung      | Das System befindet sich im produktiven Normalbetrieb.                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| Reaktion      | Das System leitet automatisch Maßnahmen zur Wiederherstellung der vollen Funktionsfähigkeit ein. Diese Maßnahmen umfassen insbesondere:<br>- Automatisierte Neustarts: Software-Dienste werden durch Prozess-Manager (z.B. systemd) und Mikrocontroller durch Hardware-Watchdog-Timer bei einem Absturz sofort neu gestartet.<br>- Robuste Wiederverbindungslogik: Das System versucht bei einem Verbindungsabbruch (z.B. zum WLAN oder MQTT-Broker) proaktiv und in regelmäßigen Intervallen, die Verbindung wiederherzustellen.<br>- Zustandsüberwachung (Health Check): Intern lässt sich der Zustand der Anwendung überprüfen. |
+| Reaktionsmaß  | Kritische Systemkomponenten stellen ihre Funktionsfähigkeit nach einem behebbaren Ausfall automatisch und ohne manuellen Eingriff wieder her.<br>Ein Administrator wird über den Vorfall und die erfolgreiche Wiederherstellung informiert.                                                                                                                                                                                                                                                        |
 
 # Stakeholder
 | Stakeholder           | Beschreibung                                                                                                                                                                                                                      |
