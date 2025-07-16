@@ -74,6 +74,14 @@ Für optimale Performance bzw eine schnelle Abfrage der Sensordaten führt Mongo
 * **Bucketing**: MongoDB speichert nicht jeden einzelnen Messwert als separates Dokument auf der Festplatte. Stattdessen fasst es Messwerte, die in einem kurzen Zeitfenster anfallen und die exakt gleichen Metadaten haben (z.B. gleicher Lagerort, gleicher Sensortyp), automatisch in internen Buckets zusammen.
 * **Indexierung**: Indizes werden auf die Felder **timestamp** und **metadata** gesetzt.
 
+## 2. Speicherung von Systemdaten
+Dieser Teil des Systems bildet die organisatorische Grundlage für die strukturierte Verwaltung des Systems, wie z.B. Benutzerdaten, Rollen und Lagerorte.
+
+### Datenspeicher - SQL-Datenbank
+Für die Speicherung dieser Daten wird eine relationale SQL-Datenbank aus folgenden Gründen gewählt:
+
+
+
 
 Quellen:
 * [1] https://www.ionos.com/digitalguide/hosting/technical-matters/nosql/
