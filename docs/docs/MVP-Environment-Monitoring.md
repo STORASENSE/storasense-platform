@@ -1,4 +1,4 @@
-# MVP – Überwachungssystem für Temperatur und Luftfeuchtigkeit
+# MVP – STORASENSE
 
 ## Ziel des MVP
 
@@ -23,7 +23,7 @@ Die empfangenen Messwerte werden in einer permanenten Datenbank gespeichert und 
 
 - **Verfügbarkeit des Systems**:
     - Das System soll eine **Verfügbarkeit von 99% innerhlab eines Zeitraums von drei Tagen** aufweisen.
-    - Falls das System abstürzt, wird es versuchen, sich **automatisch bis zu drei Mal in kurzen Abständen neu zu starten**. 
+    - Falls das System abstürzt, wird es versuchen, sich **automatisch bis zu drei Mal in kurzen Abständen neu zu starten**.
 - **Sicherheit des Systems**: Authentifizierung und Autorisierung
 - **Performance des Systems**: Schnelles Alamierungssystem - Push-Benachrichtigung und MQTT-Benachrichtigung.
 
