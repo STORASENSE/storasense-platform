@@ -6,7 +6,7 @@ Ziel dieses Minimal Viable Products (MVP) ist die Entwicklung eines einfachen, f
 
 ## Systemüberblick
 
-Das System basiert auf einer Hardwarekomponente (z. B. Arduino mit angeschlossenen Sensoren), welche die gemessenen Umweltdaten regelmäßig über das MQTT-Protokoll an einen Server übermittelt.
+Das System basiert auf einer Hardwarekomponente (Arduino mit angeschlossenen Sensoren), welche die gemessenen Umweltdaten regelmäßig über das MQTT-Protokoll an einen Server übermittelt.
 
 Die empfangenen Messwerte werden in einer permanenten Datenbank gespeichert und über eine grafische Benutzeroberfläche visualisiert. Darüber hinaus kann der Benutzer individuelle Schwellenwerte für Temperatur definieren. Wird ein definierter Temperaturbereich überschritten oder unterschritten, so wird automatisch eine Warnung ausgegeben und an den MQTT-Broker gesendet. Bei Grenzwertüberschreitungen wird zudem ein neues MQTT-Topic veröffentlicht, das von anderen Komponenten abonniert werden kann, um z. B. automatisierte Reaktionen auszulösen.
 
@@ -25,7 +25,7 @@ Die empfangenen Messwerte werden in einer permanenten Datenbank gespeichert und 
     - Das System soll eine **Verfügbarkeit von 99% innerhlab eines Zeitraums von drei Tagen** aufweisen.
     - Falls das System abstürzt, wird es versuchen, sich **automatisch bis zu drei Mal in kurzen Abständen neu zu starten**.
 - **Sicherheit des Systems**: Authentifizierung und Autorisierung
-- **Performance des Systems**: Schnelles Alamierungssystem - Push-Benachrichtigung und MQTT-Benachrichtigung.
+- **Performance des Systems**: Schnelles Alamierungssystem - Push-Benachrichtigung und MQTT-Benachrichtigung innerhalb von 90 Sekunden.
 
 ## Optionale Erweiterungen
 
@@ -37,7 +37,7 @@ Die folgenden Funktionen sind nicht Bestandteil des MVPs, können jedoch zu eine
 
 ## System-FMEA Analyse
 Folgende SFMEA-Analyse dient der Identifizierung potenzieller Schwachstellen des Systems - insbesondere des oben beschriebenen MVPs:
-Zunächst wird das Gesamtsystem STORASENSE in seine Teilsysteme gegliedert und analysiert:
+Dafür wird das Gesamtsystem STORASENSE in seine Teilsysteme gegliedert und analysiert:
 
 ### 1. Teilsystem: Sensor-Einheit (Hardware):
 Verantwortlich für die Erfassung der physikalischen Messwerte.
