@@ -1,3 +1,3 @@
 # STORASENSE - Welcome to our systems documentation!
 
-![logo](images/icon01.png)
+<img src="images/icon01.png" alt="logo" width="150" />
