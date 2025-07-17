@@ -1,4 +1,4 @@
-# Project
+# STORASENSE
 ***
 ## Setup:
 - Python version: **3.13**
