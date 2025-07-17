@@ -31,7 +31,6 @@ Diese alle relevanten Informationen enthaltene Dokumente zeigen hier mehrere Vor
 
 <img src="images/data/mongodb_overview_2.drawio.png" alt="MongoDB-Datenmodell" width="500"/>
 
-
 Die Wahl fiel auf MongoDB als dokumentenbasierte NoSQL-Datenbank, da sie folgende Vorteile bietet [3]:
 * **Popularität**: MongoDB ist eine der am weitesten verbreiteten NoSQL-Datenbanken und hat eine große Community sowie umfangreiche Dokumentation. Für jede (praktische) Programmiersprache gibt es unterstützende Treiber - für Python beispielsweise den offiziellen Treiber **pymongo** [4].
 * **Abfragesprache**: Obwohl MongoDB schemalos ist, verfügt es über eine mächtige Abfragesprache: **MQL**. Mittels des "Aggregation Frameworks" lassen sich komplexere Datenverarbeitungs-Pipelines direkt auf der Datenbank auszuführen. Diese ermöglichen die historische Datenanalyse, indem beispielsweise Durchschnittswerte oder Minima/Maxima über Zeiträume berechnet werden können.
@@ -51,7 +50,7 @@ Fachlich gilt es folgende Informationen innerhalb eines Dokuments zu speichern:
 |----------------|-----------|----------------------------------------------------------------------------------------------|
 | timestamp      | DateTime  | (timeField) The exact timestamp of the measurement. Serves as the primary sorting criterion. |
 | metadata       | Object    | (metaField) Object that bundles all descriptive metadata of the data source.                 |
-| => location_id | String    | ID of the storage location (foreign key to the relational DB).                               |
+| => storage_id  | String    | ID of the storage location (foreign key to the relational DB).                               |
 | => sensor_type | String    | Type of sensor (e.g. "temperature", "humidity").                                             |
 | => unit        | String    | The associated unit of the measured value (e.g. "°C", "%").                                  |
 | value          | Float     | The recorded numerical value of the sensor.                                                  |
@@ -60,7 +59,7 @@ Beispiel eines Dokuments in der MongoDB-Datenbank:
 
 ```json
 {
-  "timestamp": ISODate("2023-10-01T12:00:00Z"),
+  "timestamp": 2023-10-01T12:00:000,
   "meta": {
     "location_id": "vinbasement_1",
     "sensor_type": "temperature",
@@ -78,10 +77,49 @@ Für optimale Performance bzw eine schnelle Abfrage der Sensordaten führt Mongo
 Dieser Teil des Systems bildet die organisatorische Grundlage für die strukturierte Verwaltung des Systems, wie z.B. Benutzerdaten, Rollen und Lagerorte.
 
 ### Datenspeicher - SQL-Datenbank
-Für die Speicherung dieser Daten wird eine relationale SQL-Datenbank aus folgenden Gründen gewählt:
+Für die Speicherung dieser Daten wird eine relationale SQL-Datenbank aufgrund folgender mit der Fachlichkeit verknüpften Vorteilen gewählt [9]:
 
+* **Strukturierte Daten und ihre Beziehungen**: Die Daten sind fachlich miteinander verknüpft. So haben Benutzer beispielsweise Zugriff auf Lagerorte. Ein relationales Modell stellt durch Fremdschlüssel-Beziehungen sicher, dass diese Verknüpfungen konsistent und valide bleiben.
+* **Transaktionale Sicherheit (ACID)**: Bei der Verwaltung von Nutzer- und Zugriffsrechten ist es wichtig, dass Änderungen entweder vollständig oder gar nicht durchgeführt werden. Dies garantieren die ACID-Eigenschaften relationaler Datenbanken.
+* **Komplexe Abfragen**: Die SQL-Sprache ermöglicht komplexe Abfragen und Datenmanipulationen, die für die Verwaltung von Benutzern und deren Rechten erforderlich sind. Hierzu zählen beispielsweise JOIN-Operationen, um Daten aus mehreren Tabellen zu kombinieren.
 
+### SQLite als ausgewählter Datenspeicher
+Als relationale Datenbank wird SQLite gewählt, da sie folgende Vorteile bietet [10]:
+* **Leichtgewichtig**: SQLite ist eine serverlose, eingebettete Datenbank, die keine separate Serverinstallation benötigt. Sie ist einfach zu integrieren und zu verwenden.
+* **Portabilität**: SQLite-Datenbanken sind in einer einzigen Datei gespeichert, was die Portabilität, einfache Sicherung (die auch mittels eines Rollback Journals und Write Ahead Logs gewährleistet wird) und Deployment der Datenbank erleichtert.
+* **SQL-Kompatibilität**: SQLite unterstützt die meisten SQL-Standards, was die Entwicklung und Wartung erleichtert. Es ist einfach, komplexe Abfragen zu formulieren und Daten zu manipulieren.
+* **Python-Unterstützung**: SQLite ist in Python über das Standardmodul `sqlite3` verfügbar, was die Integration in das Backend-System erleichtert. Weiter ist das populäre Python ORM(Object-Relational Mapping)-Toolkit SQLAlchemy mit SQLite kompatibel, was eine angenehme Umsetzung von Datenbankoperationen ermöglicht [11].
 
+### Datenmodell
+
+<img src="images/data/sql_er_diagram.png" alt="ER-Diagram" width="700"/>
+
+Die Schema der SQLite-Datenbank besteht aus drei Tabellen, die die Entitäten und ihre Beziehungen abbilden:
+
+**Tabelle: Storage**
+Definiert die physischen Lagerorte, die überwacht werden bnzw an denen die Sensoren platziert sind.
+| Field        | Data Type | Description                                 |
+|--------------|-----------|--------------------------------------|
+| storage_id  | String    | Primary key (PK)                     |
+| name         | String    | A name for the location (e.g. "wine basement") |
+
+**Tabelle: User**
+Enthält die Informationen zu den Nutzern der Plattform.
+| Field        | Data Type | Description                                                      |
+|--------------|-----------|-----------------------------------------------------------|
+| user_id      | String    | Primary key (PK)                                          |
+| username     | String    | Unique name for login                                     |
+| name         | String    | Full name of the user                                     |
+| password     | String    | Hashed password for authentication                        |
+| description  | String    | Optional description of the user                          |
+| role         | Enum user_role: Admin, User     | Defines the permission level ("Admin", "User")       |
+
+**Tabelle:User_Storage_Access**
+Verknüpft die Benutzer mit den Lagerorten, auf die sie Zugriff haben.
+| Field        | Data Type | Description                                         |
+|--------------|-----------|----------------------------------------------|
+| storage_id   | String    | Primary key (PK)    |
+| user_id      | String    | Primary key (PK)           |
 
 Quellen:
 * [1] https://www.ionos.com/digitalguide/hosting/technical-matters/nosql/
@@ -92,3 +130,6 @@ Quellen:
 * [6] https://www.mongodb.com/docs/atlas/getting-started/
 * [7] https://www.mongodb.com/docs/manual/core/timeseries-collections/
 * [8] https://www.mongodb.com/docs/manual/core/timeseries/timeseries-bucketing/
+* [9] https://www.theknowledgeacademy.com/blog/advantages-of-sql/
+* [10] https://www.ionos.com/digitalguide/websites/web-development/sqlite/
+* [11] https://realpython.com/python-sqlite-sqlalchemy/
