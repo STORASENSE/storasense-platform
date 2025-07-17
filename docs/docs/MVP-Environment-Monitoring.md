@@ -16,8 +16,7 @@ Die empfangenen Messwerte werden in einer permanenten Datenbank gespeichert und 
 - Die Messergebnisse werden in einer **permanenten Datenbank** gespeichert.
 - Der Benutzer kann über eine **grafische Benutzeroberfläche** einen **Temperatur-Mindestwert** und einen **Temperatur-Höchstwert** definieren.
 - Liegt die gemessene Temperatur **außerhalb des definierten Bereichs**, wird automatisch eine **Warnung** erzeugt.
-- Die Warnung wird über den **MQTT-Broker** veröffentlicht.
-- Bei einer Grenzwertverletzung wird ein neues **MQTT-Topic** erstellt, auf das andere Systeme oder Komponenten zugreifen können (z. B. zur Steuerung von Aktoren).
+- Die Warnung wird über den **MQTT-Broker** veröffentlicht: Bei einer Grenzwertverletzung wird eine Nachricht auf ein dafür vorgesehenes **MQTT-Topic** geschickt, auf das andere Systeme oder Komponenten zugreifen können (z. B. zur Steuerung von Aktoren).
 - Die Benutzeroberfläche stellt ein **aktives Dashboard** dar, das die aktuellen Sensordaten in Echtzeit visualisiert.
 
 ## Nicht-funktionale Anforderungen
