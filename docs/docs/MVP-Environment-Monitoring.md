@@ -35,6 +35,21 @@ Die folgenden Funktionen sind nicht Bestandteil des MVPs, können jedoch zu eine
 - **Ultraschallsensor zur Türüberwachung**, z. B. zur Anwesenheitserkennung oder Zutrittskontrolle
 - **Benachrichtigung per Push-Nachricht** bei Grenzwertüberschreitungen oder anderen definierten Ereignissen
 
+## System-FMEA Analyse
+Folgende SFMEA-Analyse dient der Identifizierung potenzieller Schwachstellen des Systems - insbesondere des oben beschriebenen MVPs:
+Zunächst wird das Gesamtsystem STORASENSE in seine Teilsysteme gegliedert und analysiert:
+
+### 1. Teilsystem: Sensor-Einheit (Hardware):
+Verantwortlich für die Erfassung der physikalischen Messwerte.
+
+| Fehlermöglichkeit                        | Fehlerfolge (Auswirkung)                                                                 | B  | Fehlerursache                                                     | A  | Maßnahmen                                                                                                                                     | E  | RPZ |
+|------------------------------------------|------------------------------------------------------------------------------------------|----|-------------------------------------------------------------------|----|-----------------------------------------------------------------------------------------------------------------------------------------------|----|-----|
+| Sensor liefert dauerhaft falsche Werte   | Falsche Daten werden gespeichert; Alarme werden fälschlicherweise ausgelöst oder unterbleiben. | 9  | Sensor defekt oder dekalibriert; Programmierfehler beim Auslesen. | 4  | Plausibilitäts-Checks im Backend (z\.B\. Temperatur springt nicht von 10°C auf 50°C). Implementierung von Algorithmen zur Ausreißer-Erkennung | 5  | 180 |
+| Mikrocontroller (Arduino) friert ein     | Keine neuen Messwerte werden mehr gesendet; Überwachung fällt komplett aus.              | 10 | Software-Bug (z.B. Endlosschleife); Speicherüberlauf.             | 3  | Hardware-Watchdog-Timer, der den Arduino automatisch neu startet (vgl. NF-Req Verfügbarkeit). Einsatz eines robusten Watchdog-Timers.         | 2  | 60  |
+| Verlust der WLAN-Verbindung              | Keine neuen Messwerte werden an den MQTT-Broker gesendet.                                | 8  | WLAN-Router ausgefallen; falsches Passwort; schwaches Signal.     | 5  | Implementierte Wiederverbindungs-Logik auf dem Mikrocontroller (vgl. NF-Req Verfügbarkeit). Backend überwacht den Zeitstempel der letzten Nachricht pro Sensor und löst einen "Verbindungsverlust"-Alarm aus.                                                  | 3  | 120 |
+
+### 2.
+
 ## Hinweise
 
 Da es sich um ein MVP handelt, liegt der Fokus zunächst auf der Umsetzung der Kernfunktionen (Datenaufnahme, Speicherung, Warnung). Erweiterte Funktionalitäten, Sicherheit auf Anwendungsebene sowie Skalierbarkeit sind nicht Bestandteil des ersten Releases, können aber im Rahmen weiterer Iterationen realisiert werden.
