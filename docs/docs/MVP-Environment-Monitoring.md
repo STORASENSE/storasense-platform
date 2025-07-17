@@ -6,7 +6,7 @@ Ziel dieses Minimal Viable Products (MVP) ist die Entwicklung eines einfachen, f
 
 ## Systemüberblick
 
-Das System basiert auf einer Hardwarekomponente (z. B. Arduino mit angeschlossenen Sensoren), welche die gemessenen Umweltdaten regelmäßig über das MQTT-Protokoll an einen Server übermittelt. Die Kommunikation zwischen Sensorgerät und MQTT-Server ist passwortgeschützt, um die Integrität und Sicherheit der übertragenen Daten zu gewährleisten.
+Das System basiert auf einer Hardwarekomponente (z. B. Arduino mit angeschlossenen Sensoren), welche die gemessenen Umweltdaten regelmäßig über das MQTT-Protokoll an einen Server übermittelt.
 
 Die empfangenen Messwerte werden in einer permanenten Datenbank gespeichert und über eine grafische Benutzeroberfläche visualisiert. Darüber hinaus kann der Benutzer individuelle Schwellenwerte für Temperatur definieren. Wird ein definierter Temperaturbereich überschritten oder unterschritten, so wird automatisch eine Warnung ausgegeben und an den MQTT-Broker gesendet. Bei Grenzwertüberschreitungen wird zudem ein neues MQTT-Topic veröffentlicht, das von anderen Komponenten abonniert werden kann, um z. B. automatisierte Reaktionen auszulösen.
 
@@ -21,9 +21,9 @@ Die empfangenen Messwerte werden in einer permanenten Datenbank gespeichert und 
 
 ## Nicht-funktionale Anforderungen
 
-- Die **Verfügbarkeit des Systems** soll mindestens **99 % innerhalb eines Zeitraums von drei Tagen** betragen.
-- Die Kommunikation zwischen Sensor und Server erfolgt **passwortgeschützt**, um unbefugten Zugriff zu verhindern.
-- Das System soll modular aufgebaut sein, um spätere Erweiterungen zu ermöglichen.
+- **Verfügbarkeit des Systems**: Das System soll mindestens **99 % innerhalb eines Zeitraums von drei Tagen** betragen. Falls das System abstürtzt, versucht es in wenigen Sekunden sich selbst 3 mal wieder hochzufahren.
+- **Sicherheit des Systems**: Authentifizierung und Autorisierung
+- **Performance des Systems**: Schnelles Alamierungssystem - Push-Benachrichtigung und MQTT-Benachrichtigung.
 
 ## Optionale Erweiterungen
 
