@@ -21,7 +21,9 @@ Die empfangenen Messwerte werden in einer permanenten Datenbank gespeichert und 
 
 ## Nicht-funktionale Anforderungen
 
-- **Verfügbarkeit des Systems**: Das System soll mindestens **99 % innerhalb eines Zeitraums von drei Tagen** betragen. Falls das System abstürtzt, versucht es in wenigen Sekunden sich selbst 3 mal wieder hochzufahren.
+- **Verfügbarkeit des Systems**:
+    - Das System soll eine **Verfügbarkeit von 99% innerhlab eines Zeitraums von drei Tagen** aufweisen.
+    - Falls das System abstürzt, wird es versuchen, sich **automatisch bis zu drei Mal in kurzen Abständen neu zu starten**. 
 - **Sicherheit des Systems**: Authentifizierung und Autorisierung
 - **Performance des Systems**: Schnelles Alamierungssystem - Push-Benachrichtigung und MQTT-Benachrichtigung.
 
