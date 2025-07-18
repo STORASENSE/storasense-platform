@@ -48,7 +48,7 @@ Dafür wird das Gesamtsystem STORASENSE in seine Teilsysteme gegliedert und anal
 
 **Risikoprioritätszahl (RPZ)**: B × A × E (hoher Wert = Handlungsbedarf)
 
-### 1. Teilsystem: Sensor-Einheit (Hardware):
+### 1. STORASENSE-SENSORIC: Sensor-Einheit (Hardware):
 Verantwortlich für die Erfassung der physikalischen Messwerte.
 
 | Fehlermöglichkeit                        | Fehlerauswirkung                                                                           | B  | Fehlerursache                                                        | A  | Maßnahmen                                                                                                                                     | E  | RPZ |
@@ -57,7 +57,7 @@ Verantwortlich für die Erfassung der physikalischen Messwerte.
 | Mikrocontroller (Arduino) friert ein     | Keine neuen Messwerte werden mehr gesendet und Überwachung fällt komplett aus.             | 10 | Software-Bug (z.B. Endlosschleife) oder Speicherüberlauf.            | 3  | Hardware-Watchdog-Timer, der den Arduino automatisch neu startet (vgl. NF-Req Verfügbarkeit). Einsatz eines robusten Watchdog-Timers.         | 2  | 60  |
 | Verlust der WLAN-Verbindung              | Keine neuen Messwerte werden an den MQTT-Broker gesendet.                                  | 8  | WLAN-Router ausgefallen oder falsches Passwort. | 5  | Implementierte Wiederverbindungs-Logik auf dem Mikrocontroller (vgl. NF-Req Verfügbarkeit). Backend überwacht den Zeitstempel der letzten Nachricht pro Sensor und löst einen "Verbindungsverlust"-Alarm aus.                                                  | 3  | 120 |
 
-### 2. Teilsystem: Backend (FastAPI-Anwendung)
+### 2. STORASENSE-PLATFORM: Backend (FastAPI-Anwendung)
 Verantwortlich für die Datenverarbeitung, Speicherung, Alarmierung und API-Bereitstellung.
 
 | Fehlermöglichkeit                        | Fehlerauswirkung                                                                                                                | B  | Fehlerursache                                                                                   | A  | Maßnahmen                                                                                                                                                                                                                                                     | E  | RPZ |
@@ -65,7 +65,8 @@ Verantwortlich für die Datenverarbeitung, Speicherung, Alarmierung und API-Bere
 | FastAPI-Anwendung stürzt ab              | Das gesamte System ist offline.                                                                                                 | 10 | Unbehandelter Fehler im Code (z.B. TypeError).                                                  | 4  | Einsatz eines Prozess-Managers (z.B. systemd), der die Anwendung bei einem Absturz automatisch neu startet. Implementierung eines zentralen Logging-Systems (zur Analyse der Absturzursache) und Einrichten eines HEALTH-API-Endpunktes.                      | 2  | 80  |
 | Verbindung zur Datenbank (MongoDB/SQLite) geht verloren | Eingehende Messwerte können nicht gespeichert werden; Nutzer können sich nicht anmelden oder Daten abrufen.                     | 8  | Datenbank-Server ist offline; Netzwerkproblem bzw Docker-Problem; falsche Zugangsdaten.         | 3  | Fehlerbehandlung (try-except Exception Handling) im Code; Wiederverbindungs-Logik im Datenbanktreiber. | 4  | 96  |
 | Alarm wird nicht ausgelöst                | Ein kritischer Zustand (z.B. zu hohe Temperatur) wird erkannt, aber der Nutzer wird nicht benachrichtigt. Der Schaden passiert. | 10 | Fehler im Alarmierungs-Code; externer E-Mail/Push-Dienst ist ausgefallen; falsche Konfiguration. | 2  | Unit-Tests für die Alarm-Logik.                                                                                                                    | 6  | 120 |
-
+| Unbefugter Zugriff auf API (Authentifizierungsfehler) | Ein anonymer Angreifer kann geschützte Daten auslesen oder schreibend verändern. Kompromittierung der Datensicherheit. | 9  | API-Endpunkt ist nicht geschützt; schwache Passwort-Richtlinien; kein Schutz vor Brute-Force-Angriffen. | 5  | Implementierung von OAuth2 mit JWT-Tokens für jeden geschützten Endpunkt; sicheres Passwort-Hashing (z\.B\. mit bcrypt); Account-Sperrung nach fehlgeschlagenen Login-Versuchen. | 3  | 135 |
+| Unberechtigter Zugriff auf Daten (Autorisierungsfehler) | Ein angemeldeter Nutzer greift auf Daten zu, für die er keine Berechtigung hat (z\.B\. Daten eines anderen Nutzers). | 8  | Fehlerhafte oder fehlende Prüfung der Benutzerrolle oder des Datenbesitzes innerhalb der API-Logik. | 4  | Implementierung einer rollenbasierten Zugriffskontrolle (RBAC); API-Logik prüft bei jeder Anfrage, ob der Nutzer die erforderliche Rolle (Admin, User) oder den Besitz der Ressource hat. | 4  | 128 |
 
 ## Hinweise
 
