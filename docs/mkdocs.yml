@@ -1,4 +1,4 @@
-site_name: Project
+site_name: STORASENSE
 site_url: https://github.com/STORASENSE/storasense-platform
 repo_url: https://github.com/STORASENSE/storasense-platform
 repo_name: "STORASENSE/storasense-platform"
@@ -15,10 +15,10 @@ theme:
     navigation.instant: true
     navigation.tracking: true
   logo:
-    icon: "folder_open"
+    icon: "docs/images/icon01_transparent.png"
   palette:
-    primary: "light blue"
-    accent: "light blue"
+    primary: " blue"
+    accent: " blue"
     font:
       text: Roboto
       code: Roboto Mono
@@ -61,4 +61,9 @@ plugins:
 
 nav:
   - Home: index.md
-  - About: intro_goals.md
+  - About:
+      - Vision: intro_goals.md
+      - MVP: mvp.md
+  - Technologies: techstack.md
+  - Architecture:
+      - Data Domain: data.md
