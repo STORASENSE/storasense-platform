@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - dev
-      - feature/add-docs
+      - feature/arc-general
 
 jobs:
   deploy:
