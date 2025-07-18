@@ -1,7 +1,7 @@
 site_name: Project
-site_url: https://github.com/INF2023AI-SE1-ARMP/Project
-repo_url: https://github.com/INF2023AI-SE1-ARMP/Project
-repo_name: "INF2023AI-SE1-ARMP/Project"
+site_url: https://github.com/STORASENSE/storasense-platform
+repo_url: https://github.com/STORASENSE/storasense-platform
+repo_name: "STORASENSE/storasense-platform"
 
 theme:
   name: "material"
