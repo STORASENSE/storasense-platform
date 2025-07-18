@@ -98,6 +98,7 @@ Die Schema der SQLite-Datenbank besteht aus drei Tabellen, die die Entitäten un
 
 **Tabelle: Storage**
 Definiert die physischen Lagerorte, die überwacht werden bnzw an denen die Sensoren platziert sind.
+
 | Field        | Data Type | Description                                 |
 |--------------|-----------|--------------------------------------|
 | storage_id  | String    | Primary key (PK)                     |
@@ -105,6 +106,7 @@ Definiert die physischen Lagerorte, die überwacht werden bnzw an denen die Sens
 
 **Tabelle: User**
 Enthält die Informationen zu den Nutzern der Plattform.
+
 | Field        | Data Type | Description                                                      |
 |--------------|-----------|-----------------------------------------------------------|
 | user_id      | String    | Primary key (PK)                                          |
@@ -114,8 +116,9 @@ Enthält die Informationen zu den Nutzern der Plattform.
 | description  | String    | Optional description of the user                          |
 | role         | Enum user_role: Admin, User     | Defines the permission level ("Admin", "User")       |
 
-**Tabelle:User_Storage_Access**
+**Tabelle: User_Storage_Access**
 Verknüpft die Benutzer mit den Lagerorten, auf die sie Zugriff haben.
+
 | Field        | Data Type | Description                                         |
 |--------------|-----------|----------------------------------------------|
 | storage_id   | String    | Primary key (PK)    |
