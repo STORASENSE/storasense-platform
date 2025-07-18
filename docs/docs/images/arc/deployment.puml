@@ -1,0 +1,68 @@
+@startuml
+' --- Styling ---
+!theme plain
+skinparam shadowing false
+skinparam actorStyle awesome
+skinparam rectangle {
+    borderRadius 5
+}
+skinparam database {
+    borderRadius 5
+}
+skinparam component {
+    borderRadius 5
+}
+skinparam node {
+    borderColor #666666
+}
+' Styling für das Netzwerk-Paket
+skinparam package {
+    borderColor #333333
+    borderStyle dashed
+}
+
+' --- Akteure ---
+actor "Client (Webbrowser)" as User
+node "IoT-Gerät\n(Arduino)" as Device
+
+' --- Deployment-Knoten ---
+node "Server-Infrastruktur (Docker Host)" as Server {
+    ' Dieses Paket repräsentiert die logische Grenze des Docker Compose Netzwerks
+    package "Docker Compose Network" as DockerNetwork {
+        node "Frontend-Container" as FrontendContainer {
+            component "Frontend\n(Next.js)" as Frontend
+        }
+        node "FastAPI-Container" as FastAPIContainer {
+            component "Backend\n(FastAPI exposes REST API)" as Backend
+        }
+        node "SQLite-Container" as SQLiteContainer {
+           database "SQLite\n(Verwaltung)" as SQLite
+        }
+        node "MongoDB-Container*" as MongoDBContainer {
+            database "MongoDB\n(Messwerte)" as MongoDB
+        }
+        node "MQTT-Broker-Container" as MqttBrokerContainer {
+            component "MQTT Broker" as MqttBroker
+        }
+    }
+}
+
+' --- Beziehungen und Datenflüsse ---
+' Externe Kommunikation zu den exponierten Ports der Container
+User -right-> Frontend : Nutzt das Dashboard (HTTPS)
+Device .up.> MqttBroker: Sendet Sensordaten (MQTT)
+
+' Interne Kommunikation innerhalb des Docker-Netzwerks
+Frontend .down.> Backend : API-Anfragen
+Backend .down.> MongoDB : Speichert/liest Messwerte
+Backend .right.> MqttBroker : Subscribed/Published
+
+' Spezielle Interaktion via Shared Volume, keine Netzwerkkommunikation
+Backend ..> SQLite : "Interagiert via\nShared Volume"
+
+' Hinweis für MongoDB
+note right of MongoDBContainer
+* ggf. als SaaS-Lösung (MongoDB Atlas)
+end note
+
+@enduml
