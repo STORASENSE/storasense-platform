@@ -35,6 +35,15 @@ Die folgenden Funktionen sind nicht Bestandteil des MVPs, können jedoch zu eine
 - **Ultraschallsensor zur Türüberwachung**, z. B. zur Anwesenheitserkennung oder Zutrittskontrolle
 - **Benachrichtigung per Push-Nachricht** bei Grenzwertüberschreitungen oder anderen definierten Ereignissen
 
+## Rahmenbedingungen
+### Technische
+- Hardware: Arduino-Mikrocontroller mit (voraussichtlich) vier angeschlossenen Sensoren, die folgende Daten liefern: Temperaturmesswert, Luftfeuchtigkeitsmesswert, Kohlenwasserstoffmesswert, Zustand der Tür (offen/geschlossen)
+- Gestellter MQTT-Broker nach Pub/Sub-Muster
+
+### Organisatorische
+- Entwicklungszeitraum: 2.5 Monate
+- Teamgröße: 4 Personen
+
 ## Software-FMEA Analyse
 Folgende SFMEA-Analyse dient der Identifizierung potenzieller Schwachstellen des Systems - insbesondere des oben beschriebenen MVPs:
 Dafür wird das Gesamtsystem STORASENSE in seine Teilsysteme gegliedert und analysiert:
