@@ -73,28 +73,43 @@ Die weiteren Entitäten haben eine deutlich geringere Anzahl an Instanzen:
 * Weiter sind 2 Rollen vorgesehen, die den Benutzern zugeordnet werden können.
 * Die letzten 500 Alarme eines Lagerorts werden ebenfalls gespeichert. So ergibt sich eine maximale Anzahl von maximal 25.000 Alarm-Einträgen (500 Alarme x 50 Lagerorte).
 
-Insgesamt sind die weiteren Entitäten also zu vernachlässigen, da sie nur eine geringe Anzahl an Instanzen haben.
+Insgesamt sind die weiteren Entitäten also zu vernachlässigen, da sie nur eine geringe Anzahl an Instanzen haben. <br>
+**Außerdem gilt es zu beachten, dass der Großteil der Daten der weiteren Entitäten sich in der Regel nicht ständig ändern, sondern einmal angelegt werden und ggf. selten aktualisiert werden.**
+
 
 ### Datengröße
 #### Measurement:
 Die Messwerte sind in der Regel numerisch (z.B. Temperatur, Luftfeuchtigkeit) und benötigen daher wenig Speicherplatz. <br>
 
 | Datenfeld     | Typ         | Größe (Bytes) | Beschreibung                        |
-|--------------|-------------|---------------|-------------------------------------|
-| timestamp           | Datetime     | 8             | Timestamp           |
-| value         | Float      | 4             | Numerisch                  |
-| unit  | String      | 2             |  Einheit als Kurzstring (z.B. "C")              |
-| sensor_type    | String    | 2-4           | Sensortyp als Kürzel           |
-| storage_id        | Integer       | 2             | Lagerortreferenz                   |
-| Gesamt         | -      | **~18 Byte**  | Durchschnittlich pro Messung               |
-
-*Anmerkung: Für den binären Türsensor kann das Datenfeld „value“ ein Boolean (1 Byte) sein, der Gesamtbedarf bleibt vergleichbar.*
+|--------------|-------------|----------|-------------------------------------|
+| timestamp           | Datetime     | 8        | Timestamp           |
+| value         | Float      | 4        | Numerisch                  |
+| unit  | String      | 2        |  Einheit als Kurzstring (z.B. "C")              |
+| sensor_type    | String    | 2-4      | Sensortyp            |
+| storage_id        | Integer       | 2        | Lagerortreferenz                   |
+| Gesamt         | -      | **~18**  | Durchschnittlich pro Messung               |
 
 **Gesamtvolumen:**
 864.000 Messungen × ~ 18 Byte = **~15,5 MB**
 
 #### Weitere Entitäten:
+Der Speicherbedarf der weiteren Entitäten ist ebenfalls gering, da sie nur wenige Attribute haben und in der Regel nicht sehr viele Instanzen existieren. <br>
 
+* Anschaulich lässt sich dies am Beispiel der User-Entität darstellen, die folgende Attribute hat:
+
+| Datenfeld    | Typ      | Größe (Bytes) |
+|--------------|----------|---------------|
+| id           | Integer  | 4             |
+| username     | String   | 20           |
+| password (hash)    | String   | 64            |
+| role_id      | Integer  | 2             |
+| description  | String   | 50          |
+| storage_id   | Integer[]  | 8           |
+| Gesamt       | -        | **~150**      |
+
+**Gesamtvolumen für 500 User:**
+500 User × ~ 150 Byte = **~75 KB**
 
 ## Kriterien für die Datenbankauswahl
 Die Auswahl der Datenbanktechnologie erfolgt anhand folgender Kriterien:
