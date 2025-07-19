@@ -50,12 +50,11 @@ Ein Alarm beinhaltet folgende Attribute:
   * **sensor_id**: Referenz auf den Sensor, der den Alarm ausgelöst hat
   * **storage_id**: Referenz auf den Lagerort, zu dem der Alarm gehört <br>
 
-### ER-Diagramm
-
-### Datenvolumen
+## Datenvolumen
 Das erwartete Datenvolumen ist moderat, da das System in erster Linie Echtzeitdaten von Sensoren erfasst und speichert.
 
-#### Datenmenge
+### Datenmenge
+#### Measurement:
 Wie eingangs im [Projektüberblick](mvp.md#funktionale-anforderungen) beschrieben, besteht die Sensorik des Systems aus vier Sensoren die täglich für 2.5 Monate alle 30 Sekunden Messwerte erfassen.
 Folgende Rechnung verdeutlicht die erwartete Datenmenge:
 * Anzahl der Sensoren: 4
@@ -66,9 +65,12 @@ Folgende Rechnung verdeutlicht die erwartete Datenmenge:
   * Messungen pro Tag gesamt (4 Sensoren): 2.880 x 4 = 11.520
   * Messungen für 2,5 Monate (ca. 75 Tage): 11.520 x 75 = **864.000 Messpunkte**
 
-Die Gesamtzahl der Lagerorte und Benutzer ist begrenzt, was die Datenbankgröße überschaubar hält.
+#### Weitre Entitäten:
+Die weiteren Entitäten (Storage, User, Role, Sensor, Alert) haben eine deutlich geringere Anzahl an Instanzen und sind daher zu vernachlässigen.
 
-#### Datengröße
+### Datengröße
+
+Die Messwerte sind in der Regel numerisch (z.B. Temperatur, Luftfeuchtigkeit) und benötigen daher wenig Speicherplatz. <br>
 
 
 ## Kriterien für die Datenbankauswahl

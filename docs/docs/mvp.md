@@ -1,4 +1,4 @@
-# STORASENSE - MVP / Projektüberblick
+# STORASENSE - Projektüberblick / MVP
 
 ## Ziel des MVP
 
@@ -18,6 +18,8 @@ Die empfangenen Messwerte werden in einer permanenten Datenbank gespeichert und 
 - Liegt die gemessene Temperatur **außerhalb des definierten Bereichs**, wird automatisch eine **Warnung** erzeugt.
 - Die Warnung wird über den **MQTT-Broker** veröffentlicht: Bei einer Grenzwertverletzung wird eine Nachricht auf ein dafür vorgesehenes **MQTT-Topic** geschickt, auf das andere Systeme oder Komponenten zugreifen können (z. B. zur Steuerung von Aktoren).
 - Die Benutzeroberfläche stellt ein **aktives Dashboard** dar, das die aktuellen Sensordaten in Echtzeit visualisiert.
+- Das System verwaltet Benutzer (bis zu ~500), die verschiedene Rollen haben können (z. B. Admin, User).
+- Weiter erlaubt das System die Verwaltung von Lagerorten (bis zu ~500), die jeweils mit den gegebenen Sensoren verbunden sein können.
 
 ## Nicht-funktionale Anforderungen
 
