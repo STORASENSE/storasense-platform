@@ -11,4 +11,9 @@ Das Modell basiert auf drei zentralen Entitäten:
 
 * Messwert: Repräsentiert eine einzelne, zu einem exakten Zeitpunkt erfasste Messung (z.B. Temperatur, Luftfeuchtigkeit). Jeder Messwert ist immer genau einem Lagerort zugeordnet.
 
-##
+## Kriterien für die Datenbankauswahl
+Die Auswahl der Datenbanktechnologie erfolgt anhand folgender Kriterien:
+
+* Unterstützung des Datenmodells: Die Datenbank muss in der Lage sein, die definierten Entitäten und deren Beziehungen ([vgl. Datenmodellierung](data_eva.md#datenmodellierung)) effizient abzubilden.
+* Entwicklungsaufwand / Komplexität: Die Implementierung des Datenmodells sollte sich insbesondere den fachlichen [Rahmenbedingungen](mvp.md#rahmenbedingungen) des Projekts anpassen. Aufgrund der Projektlaufzeit von 2.5 Monaten und der Teamgröße von 4 Personen gilt es somit unnötige Komplexität zu vermeiden.
+*

@@ -39,6 +39,7 @@ Die folgenden Funktionen sind nicht Bestandteil des MVPs, können jedoch zu eine
 ### Technische
 - Hardware: Arduino-Mikrocontroller mit (voraussichtlich) vier angeschlossenen Sensoren, die folgende Daten liefern: Temperaturmesswert, Luftfeuchtigkeitsmesswert, Kohlenwasserstoffmesswert, Zustand der Tür (offen/geschlossen)
 - Gestellter MQTT-Broker nach Pub/Sub-Muster
+- Python als Programmiersprache für die Backend-Entwicklung
 
 ### Organisatorische
 - Entwicklungszeitraum: 2.5 Monate
