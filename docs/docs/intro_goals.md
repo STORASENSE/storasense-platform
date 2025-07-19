@@ -14,7 +14,7 @@ Weiter erfolgt die Kontrolle des Lagerraums im Zuge der Überwachung des Zustand
 # Aufgabenstellung
 Es gilt ein System zu entwickeln, das sowohl aus Hardware- als auch aus Softwarekomponenten besteht, die ineinandergreifen.
 
-**Sensorik (Hardware)**: Ein Netzwerk von IoT erfasst die physikalischen Messgrößen.
+**Sensorik (Hardware)**: Ein Netzwerk von IoT erfasst die physikalischen Messgrößen alle 30 Sekunden.
 * Temperatursensor (2x)*: Messung der Raumtemperatur (Innen- und Außen- Raum) in Celsius.
 * Luftfeuchtigkeitssensor*: Erfassung der relativen Luftfeuchtigkeit (in %).
 * Luftqualitätssensor: Detektion von Verunreinigungen in der Luft.
@@ -23,9 +23,11 @@ Es gilt ein System zu entwickeln, das sowohl aus Hardware- als auch aus Software
 **Software-Plattform (Kernsystem)**: Eine zentrale Anwendung, die folgende Funktionalitäten bereitstellt:
 * Echtzeit-Dashboard: Grafische Visualisierung aller aktuellen (bspw. alle 30sec veröffentlichten) Sensorwerte.
 * Historische Datenanalyse: Speicherung und Darstellung von Messdaten über Zeit, um Trends und Muster zu erkennen.
-* Konfigurierbare Schwellenwerte: Ermöglicht dem Akteur (Lagerverantwortlicher), für jeden Sensor individuelle Min/Max-Grenzwerte zu definieren.
-* Automatisiertes Alarmsystem: Versendet bei Grenzwertverletzungen automatisch Benachrichtigungen innerhalb kürzester  Zeit (bspw. Innerhalb der nächsten 90sec) – beispielsweise via E-Mail oder Push-Benachrichtigung.
+* Konfigurierbare Schwellenwerte / Festlegen eines Toleranzbereichs: Ermöglicht dem Akteur (Lagerverantwortlicher), für jeden Sensor individuelle Min/Max-Grenzwerte zu definieren.
+* Automatisiertes Alarmsystem: Versendet bei Grenzwertverletzungen automatisch Benachrichtigungen innerhalb kürzester  Zeit (bspw. Innerhalb der nächsten 90sec) – beispielsweise via E-Mail oder Push-Benachrichtigung. Speichert eine Alarmhistorie der letzten 500 Alarme pro Lagerort.
 * Proaktive Gegensteuerung: Bei einem kritischen Ereignis (insbesondere Grenzwertverletzungen) sendet das System eine Nachricht an das zuvor richtige ermittelte Topic. Eine auf dieses Topic abonnierte Entität – ein Aktor wie ein intelligentes Kühlaggregat empfängt diese Nachricht und führt automatisiert eine Aktion aus.
+* Das System verwaltet Benutzer (bis zu ~500), die verschiedene Rollen haben können (z. B. Admin, User).
+* Weiter erlaubt das System die Verwaltung von Lagerorten (bis zu ~500), die jeweils mit den gegebenen Sensoren verbunden sein können.
 
 *Höchste Priorität
 
@@ -95,15 +97,15 @@ Die Benachrichtigung erfolgt dabei dual:
 * **Push-Benachrichtigung** an Endgeräte zur unmittelbaren menschlichen Wahrnehmung
 * **MQTT-Nachricht** an ein vordefiniertes Topic zur automatisierten Weiterverarbeitung durch angeschlossene Systeme
 
-| Attribut        | Beschreibung                                                                                                                                                                                                                      |
-|-----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Szenarioname    | Schnelles Alarmierungssystem                                                                                                                                                                                                      |
-| Quelle          | Sensorik / Arduino / Software-Plattform (z\.B\. App)                                                                                                                                                                             |
-| Stimulus        | Gemessene Temperatur unterschreitet den vereinbarten Grenzwert für länger als 30s\.                                                                                                        |
-| Artefakt        | Arduino mit Sensorik, die Software inklusive UI, Benachrichtigungssystem \(z\.B\. Email-Client\) und MQTT\-Publisher\.                                                                     |
-| Umgebung        | Das System befindet sich im produktiven Normalbetrieb\.                                                                                                                                    |
-| Reaktion        | Durch kontinuierliche Datenübertragung kann schnell ein abnormaler Zustand detektiert werden\. Daraufhin werden betreffende Entitäten alarmiert – Nutzer und ggf\. weitere Systeme\.        |
-| Reaktionsmaß    | Nach Detektion wird innerhalb von 90 Sekunden sowohl eine Push\-Benachrichtigung, als auch eine MQTT\-Nachricht versendet\.                                                                |
+| Attribut        | Beschreibung                                                                                                                                                                        |
+|-----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Szenarioname    | Schnelles Alarmierungssystem                                                                                                                                                        |
+| Quelle          | Sensorik / Arduino / Software-Plattform (z\.B\. App)                                                                                                                                |
+| Stimulus        | Gemessener Messwert verletzt den festgelegten Toleranzbereich für länger als 30s\.                                                                                                  |
+| Artefakt        | Arduino mit Sensorik, die Software inklusive UI, Benachrichtigungssystem \(z\.B\. Email-Client\) und MQTT\-Publisher\.                                                              |
+| Umgebung        | Das System befindet sich im produktiven Normalbetrieb\.                                                                                                                             |
+| Reaktion        | Durch kontinuierliche Datenübertragung kann schnell ein abnormaler Zustand detektiert werden\. Daraufhin werden betreffende Entitäten alarmiert – Nutzer und ggf\. weitere Systeme\. |
+| Reaktionsmaß    | Nach Detektion wird innerhalb von 90 Sekunden sowohl eine Push\-Benachrichtigung, als auch eine MQTT\-Nachricht versendet\.                                                         |
 
 ## Sicherheit:
 

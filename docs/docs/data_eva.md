@@ -121,3 +121,7 @@ Die Auswahl der Datenbanktechnologie erfolgt nun anhand folgender Kriterien:
 * Unterstützung des Datenmodells: Die Datenbank muss in der Lage sein, die definierten Entitäten und deren Beziehungen ([vgl. Datenmodellierung](data_eva.md#datenmodellierung)) effizient abzubilden.
 * Entwicklungsaufwand, Komplexität: Die Implementierung des Datenmodells sollte sich insbesondere den fachlichen [Rahmenbedingungen](mvp.md#rahmenbedingungen) des Projekts anpassen. <br> Aufgrund der Projektlaufzeit von 2.5 Monaten und der Teamgröße von 4 Personen gilt es somit unnötige Komplexität zu vermeiden.
 * Performance:
+
+## SQL vs NoSQL
+
+## SQL: Datenbanken
