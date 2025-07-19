@@ -50,7 +50,7 @@ Ein Alarm beinhaltet folgende Attribute:
   * **sensor_id**: Referenz auf den Sensor, der den Alarm ausgelöst hat
   * **storage_id**: Referenz auf den Lagerort, zu dem der Alarm gehört <br>
 
-## ER-Diagramm
+### ER-Diagramm
 
 ## Datenvolumen
 Das erwartete Datenvolumen ist moderat, da das System in erster Linie Echtzeitdaten von Sensoren erfasst und speichert.
