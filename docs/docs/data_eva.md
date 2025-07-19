@@ -50,6 +50,8 @@ Ein Alarm beinhaltet folgende Attribute:
   * **sensor_id**: Referenz auf den Sensor, der den Alarm ausgelöst hat
   * **storage_id**: Referenz auf den Lagerort, zu dem der Alarm gehört <br>
 
+## ER-Diagramm
+
 ## Datenvolumen
 Das erwartete Datenvolumen ist moderat, da das System in erster Linie Echtzeitdaten von Sensoren erfasst und speichert.
 
@@ -69,7 +71,7 @@ Insgesamt werden also ca. **864.000 Messpunkte** erwartet, die in der Datenbank 
 
 #### Weitere Entitäten:
 Die weiteren Entitäten haben eine deutlich geringere Anzahl an Instanzen:
-* Wie bereits in der [Projektübersicht](mvp.md#funktionale-anforderungen) beschrieben unterstützt das System bis zu 500 Benutzer und 50 Lagerorte.
+* Wie bereits im [Projektüberblick](mvp.md#funktionale-anforderungen) beschrieben unterstützt das System bis zu 500 Benutzer und 50 Lagerorte.
 * Weiter sind 2 Rollen vorgesehen, die den Benutzern zugeordnet werden können.
 * Die letzten 500 Alarme eines Lagerorts werden ebenfalls gespeichert. So ergibt sich eine maximale Anzahl von maximal 25.000 Alarm-Einträgen (500 Alarme x 50 Lagerorte).
 
@@ -112,7 +114,7 @@ Der Speicherbedarf der weiteren Entitäten ist ebenfalls gering, da sie nur weni
 500 User × ~ 150 Byte = **~75 KB**
 
 ## Kriterien für die Datenbankauswahl
-Die Auswahl der Datenbanktechnologie erfolgt anhand folgender Kriterien:
+Die Auswahl der Datenbanktechnologie erfolgt nun anhand folgender Kriterien:
 
 * Unterstützung des Datenmodells: Die Datenbank muss in der Lage sein, die definierten Entitäten und deren Beziehungen ([vgl. Datenmodellierung](data_eva.md#datenmodellierung)) effizient abzubilden.
 * Entwicklungsaufwand / Komplexität: Die Implementierung des Datenmodells sollte sich insbesondere den fachlichen [Rahmenbedingungen](mvp.md#rahmenbedingungen) des Projekts anpassen. <br> Aufgrund der Projektlaufzeit von 2.5 Monaten und der Teamgröße von 4 Personen gilt es somit unnötige Komplexität zu vermeiden.
