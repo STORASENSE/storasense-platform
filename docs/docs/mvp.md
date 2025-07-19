@@ -1,4 +1,4 @@
-# MVP – STORASENSE
+# STORASENSE - MVP / Projektüberblick
 
 ## Ziel des MVP
 
@@ -12,7 +12,7 @@ Die empfangenen Messwerte werden in einer permanenten Datenbank gespeichert und 
 
 ## Funktionale Anforderungen
 
-- Das System misst regelmäßig die **Temperatur** und **Luftfeuchtigkeit** über angeschlossene Sensoren.
+- Das System misst alle 30 Sekunden verschiedene Sensorwerte - anfangs insbesondere die **Temperatur** und **Luftfeuchtigkeit** über angeschlossene Sensoren.
 - Die Messergebnisse werden in einer **permanenten Datenbank** gespeichert.
 - Der Benutzer kann über eine **grafische Benutzeroberfläche** einen **Temperatur-Mindestwert** und einen **Temperatur-Höchstwert** definieren.
 - Liegt die gemessene Temperatur **außerhalb des definierten Bereichs**, wird automatisch eine **Warnung** erzeugt.
