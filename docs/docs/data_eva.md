@@ -2,39 +2,53 @@
 
 ## Datenmodellierung (Konzeptuell)
 Vor der Auswahl einer spezifischen Datenbanktechnologie wird das fachliche Datenmodell definiert, das alle für das Überwachungssystem relevanten Informationen und deren Beziehungen
-zueinander abbildet.
-Das Modell basiert auf vier zentralen Entitäten:
+zueinander abbildet. <br> Das Modell basiert auf **fünf Entitäten**:
 
-* Lagerort: Repräsentiert einen physischen Ort (z.B. "Weinkeller A", "Lagerhalle B"), der überwacht wird. Jeder Lagerort besitzt eindeutige Attribute wie eine ID und einen Namen.
+* **Storage**: Repräsentiert einen physischen Ort (z.B. "Weinkeller A", "Lagerhalle B"), der überwacht wird. Jeder Lagerort besitzt eindeutige Attribute wie eine ID und einen Namen.
 Ein Lagerort beinhaltet folgende Attribute:
   * **id**: Eindeutige ID des Lagerorts
   * **name**: Name des Lagerorts (z.B. "Weinkeller A")
   * **description**: Optionale Beschreibung des Lagerorts
   * **sensors**: Sensor-IDs, die diesem Lagerort zugeordnet sind <br>
 <br>
-* Benutzer: Stellt eine Person dar, die mit dem System interagiert.
+* **User**: Stellt eine Person dar, die mit dem System interagiert.
 Ein Benutzer beinhaltet folgende Attribute:
   * **id**: Eindeutige ID des Benutzers
   * **username**: Eindeutiger Benutzername
-  * **password**: Passwort - gehasht gespeichert
-  * **role**: Rolle des Benutzers (z.B. "Admin", "User")
-  * **description**: Optionale Besdhreibung des Benutzers                          |
+  * **password**: Gehasht gespeichertes Passwort
+  * **role_id**: Refrenz auf die Rolle des Benutzers
+  * **description**: Optionale Besdhreibung des Benutzers
   * **storage_id**: Lagerort-IDs, auf die der Benutzer Zugriff hat <br>
 <br>
-* Messwert: Repräsentiert eine einzelne, zu einem exakten Zeitpunkt erfasste Messung (z.B. Temperatur, Luftfeuchtigkeit).
+* **Role**: Definiert die Rolle eines Benutzers im System, um Zugriffsrechte zu steuern.
+Eine Rolle beinhaltet folgende Attribute:
+  * **id**: Eindeutige ID der Rolle
+  * **name**: Name der Rolle (z.B. "Admin", "User")
+  * **description**: Optionale Beschreibung der Rolle <br>
+<br>
+* **Measurement**: Repräsentiert eine einzelne, zu einem exakten Zeitpunkt erfasste Messung (z.B. Temperatur, Luftfeuchtigkeit).
 Ein Messwert beinhaltet folgende Attribute:
   * **timestamp**: Zeitpunkt der Messung
   * **value**: Der gemessene Wert
   * **unit**: Einheit des Messwertes (z.B. Temperatur in °C, Luftfeuchtigkeit in %)
   * **sensor_type**: Referenz auf den Sensor, der die Messung durchgeführt hat (z.B. "temperatur_sensor", "humidity_sensor")
-  * **storage_id**: Referenz auf den Lagerort, zu dem der Messwert gehört
-
-* Sensor: Stellt einen physischen Sensor dar, der Messwerte erfasst.
+  * **storage_id**: Referenz auf den Lagerort, zu dem der Messwert gehört <br>
+<br>
+* **Sensor**: Stellt einen physischen Sensor dar, der Messwerte erfasst.
 Ein Sensor beinhaltet folgende Attribute:
   * **id**: Eindeutige ID des Sensors
   * **type**: Typ des Sensors (z.B. "temperatur_sensor", "humidity_sensor")
   * **location_id**: Referenz auf den Lagerort, an dem der Sensor installiert ist
-  * **description**: Optionale Beschreibung des Sensors
+  * **description**: Optionale Beschreibung des Sensors <br>
+<br>
+* **Alert**: Repräsentiert eine Benachrichtigung, die ausgelöst wird, wenn ein Messwert außerhalb eines definierten Schwellenwerts liegt.
+Ein Alarm beinhaltet folgende Attribute:
+  * **id**: Eindeutige ID des Alarms
+  * **timestamp**: Zeitpunkt, zu dem der Alarm ausgelöst wurde
+  * **message**: Beschreibung des Alarms (z.B. "Temperatur zu hoch")
+  * **severity**: Schweregrad des Alarms (z.B. "hoch", "mittel", "niedrig")
+  * **sensor_id**: Referenz auf den Sensor, der den Alarm ausgelöst hat
+  * **storage_id**: Referenz auf den Lagerort, zu dem der Alarm gehört <br>
 
 ### ER-Diagramm
 
