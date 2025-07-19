@@ -27,7 +27,7 @@ Die empfangenen Messwerte werden in einer permanenten Datenbank gespeichert und 
     - Das System soll eine **Verfügbarkeit von 99% innerhlab eines Zeitraums von drei Tagen** aufweisen.
     - Falls das System abstürzt, wird es versuchen, sich **automatisch bis zu drei Mal in kurzen Abständen neu zu starten**.
 - **Sicherheit des Systems**: Authentifizierung und Autorisierung
-- **Performance des Systems**: Schnelles Alamierungssystem - Push-Benachrichtigung und MQTT-Benachrichtigung innerhalb von 90 Sekunden nachdem der festgelegte Toleranzbereich für länger als 30s verletzt wird.
+- **Performance des Systems**: Schnelles Alamierungssystem - Push-Benachrichtigung und MQTT-Benachrichtigung innerhalb von 90 Sekunden nachdem der festgelegte Toleranzbereich des Sensors für länger als 30s verletzt wird.
 
 ## Optionale Erweiterungen
 

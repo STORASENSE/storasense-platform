@@ -6,49 +6,49 @@ zueinander abbildet. Dieser ergeben sich aus den festgelegten [Anforderungen](mv
 
 * **Storage**: Repräsentiert einen physischen Ort (z.B. "Weinkeller A", "Lagerhalle B"), der überwacht wird. Jeder Lagerort besitzt eindeutige Attribute wie eine ID und einen Namen.
 Ein Lagerort beinhaltet folgende Attribute:
-  * **id**: Eindeutige ID des Lagerorts
-  * **name**: Name des Lagerorts (z.B. "Weinkeller A")
-  * **description**: Optionale Beschreibung des Lagerorts
-  * **sensor**: Sensor-IDs, die diesem Lagerort zugeordnet sind <br>
-<br>
+  * `id`: Eindeutige ID des Lagerorts
+  * `name`: Name des Lagerorts (z\.B\. "Weinkeller A")
+  * `description`: Optionale Beschreibung des Lagerorts
+  * `sensor`: Sensor\-IDs, die diesem Lagerort zugeordnet sind <br>
+  <br>
 * **User**: Stellt eine Person dar, die mit dem System interagiert.
 Ein Benutzer beinhaltet folgende Attribute:
-  * **id**: Eindeutige ID des Benutzers
-  * **username**: Eindeutiger Benutzername
-  * **password**: Gehasht gespeichertes Passwort
-  * **role_id**: Refrenz auf die Rolle des Benutzers
-  * **description**: Optionale Besdhreibung des Benutzers
-  * **storage_id**: Lagerort-IDs, auf die der Benutzer Zugriff hat <br>
-<br>
+  * `id`: Eindeutige ID des Benutzers
+  * `username`: Eindeutiger Benutzername
+  * `password`: Gehasht gespeichertes Passwort
+  * `role_id`: Referenz auf die Rolle des Benutzers
+  * `description`: Optionale Beschreibung des Benutzers
+  * `storage_id`: Lagerort-IDs, auf die der Benutzer Zugriff hat <br>
+  <br>
 * **Role**: Definiert die Rolle eines Benutzers im System, um Zugriffsrechte zu steuern.
 Eine Rolle beinhaltet folgende Attribute:
-  * **id**: Eindeutige ID der Rolle
-  * **name**: Name der Rolle (z.B. "Admin", "User")
-  * **description**: Optionale Beschreibung der Rolle <br>
-<br>
+  * `id`: Eindeutige ID der Rolle
+  * `name`: Name der Rolle (z\.B\. "Admin", "User")
+  * `description`: Optionale Beschreibung der Rolle <br>
+  <br>
 * **Measurement**: Repräsentiert eine einzelne, zu einem exakten Zeitpunkt erfasste Messung (z.B. Temperatur, Luftfeuchtigkeit).
 Ein Messwert beinhaltet folgende Attribute:
-  * **timestamp**: Zeitpunkt der Messung
-  * **value**: Der gemessene Wert
-  * **unit**: Einheit des Messwertes (z.B. Temperatur in °C, Luftfeuchtigkeit in %)
-  * **sensor_type**: Referenz auf den Sensor, der die Messung durchgeführt hat (z.B. "temperatur_sensor", "humidity_sensor")
-  * **storage_id**: Referenz auf den Lagerort, zu dem der Messwert gehört <br>
-<br>
+  * `timestamp`: Zeitpunkt der Messung
+  * `value`: Der gemessene Wert
+  * `unit`: Einheit des Messwertes (z\.B\. Temperatur in °C, Luftfeuchtigkeit in %)
+  * `sensor_type`: Referenz auf den Sensor, der die Messung durchgeführt hat
+  * `storage_id`: Referenz auf den Lagerort, zu dem der Messwert gehört <br>
+  <br>
 * **Sensor**: Stellt einen physischen Sensor dar, der Messwerte erfasst.
 Ein Sensor beinhaltet folgende Attribute:
-  * **id**: Eindeutige ID des Sensors
-  * **type**: Typ des Sensors (z.B. "temperatur_sensor", "humidity_sensor")
-  * **location_id**: Referenz auf den Lagerort, an dem der Sensor installiert ist
-  * **description**: Optionale Beschreibung des Sensors <br>
-<br>
+  * `id`: Eindeutige ID des Sensors
+  * `type`: Typ des Sensors (z\.B\. "temperatur_sensor", "humidity_sensor")
+  * `location_id`: Referenz auf den Lagerort, an dem der Sensor installiert ist
+  * `description`: Optionale Beschreibung des Sensors <br>
+  <br>
 * **Alert**: Repräsentiert einen Alarm, der ausgelöst wird, wenn ein Messwert außerhalb eines definierten Schwellenwerts liegt.
 Ein Alarm beinhaltet folgende Attribute:
-  * **id**: Eindeutige ID des Alarms
-  * **timestamp**: Zeitpunkt, zu dem der Alarm ausgelöst wurde
-  * **message**: Beschreibung des Alarms (z.B. "Temperatur zu hoch")
-  * **severity**: Schweregrad des Alarms (z.B. "hoch", "mittel", "niedrig")
-  * **sensor_id**: Referenz auf den Sensor, der den Alarm ausgelöst hat
-  * **storage_id**: Referenz auf den Lagerort, zu dem der Alarm gehört <br>
+  * `id`: Eindeutige ID des Alarms
+  * `timestamp`: Zeitpunkt, zu dem der Alarm ausgelöst wurde
+  * `message`: Beschreibung des Alarms (z\.B\. "Temperatur zu hoch")
+  * `severity`: Schweregrad des Alarms (z\.B\. "hoch", "mittel", "niedrig")
+  * `sensor_id`: Referenz auf den Sensor, der den Alarm ausgelöst hat
+  * `storage_id`: Referenz auf den Lagerort, zu dem der Alarm gehört <br>
 
 ### ER-Diagramm
 
@@ -113,14 +113,36 @@ Der Speicherbedarf der weiteren Entitäten ist ebenfalls gering, da sie nur weni
 **Gesamtvolumen für 500 User:**
 500 User × ~ 150 Byte = **~75 KB**
 
-## Nicht funktionale Anforderungen <=> Datendomaine
+## Nichtfunktionale Anforderungen <=> Datendomäne
+
+### **Einfluss der nicht-funktionalen Anforderungen auf die Datendomäne**
+
+Die definierten nicht-funktionalen Anforderungen übersetzen die allgemeinen Systemziele in konkrete Erwartungen an die Datenspeicherung und -verarbeitung. Somit sind sind ein entscheidender Faktor für die Auswahl der richtigen Datenbanktechnologie.
+
+#### **Performance und schnelle Alarmierung**
+
+Die Anforderung, einen Alarm innerhalb von 90 Sekunden auszulösen, *nachdem* ein Grenzwert für über 30 Sekunden verletzt wurde, stellt eine hohe Anforderung an die Datenbank-Performance. Dies erfordert mehr als nur eine schnelle Einzelabfrage. Die Datenbank muss folgende Operationen sehr effizient unterstützen:
+1.  **Schnelles Schreiben (Ingestion):** Jeder neue `Measurement`-Datensatz muss mit minimaler Latenz gespeichert werden, damit die Alarmierungskette sofort starten kann.
+2.  **Effiziente Zeitfenster-Abfragen:** Um eine 30-sekündige Grenzwertverletzung zu erkennen, muss das System eine Abfrage wie "Gib mir alle Messwerte von `sensor_x` der letzten 30-40 Sekunden" sehr schnell ausführen können. Dies verlangt Indexierungsfähigkeiten, insbesondere auf den Feldern `timestamp` und `sensor_id`.
+
+#### **Hohe Verfügbarkeit und Ausfallsicherheit**
+
+Die geforderte Verfügbarkeit von 99% über einen Zeitraum von drei Tagen erlaubt eine maximale Ausfallzeit von ca. 43 Minuten.
+*   **Stabilität und Datenpersistenz:** Die Datenbank muss ein robuster, stabiler Dienst sein, der Daten zuverlässig auf die Festplatte schreibt. Reine In-Memory-Lösungen sind damit ausgeschlossen, da bei einem Neustart keine Daten verloren gehen dürfen.
+*   **Unterstützung für Resilienz:** Die Anforderung des automatischen Neustarts wird von der Infrastruktur (Docker Compose) umgesetzt. Die Datenbank muss diesen Prozess jedoch unterstützen, d.h. nach einem unerwarteten Herunterfahren schnell und konsistent wieder hochfahren.
+
+#### **Sicherheit (Authentifizierung & Autorisierung)**
+
+Diese Anforderung betrifft primär die Anwendungslogik, aber die Datenbank muss die sichere Implementierung unterstützen:
+*   **Sichere Datenspeicherung:** Die Datenbank muss sensible Daten wie gehashte Passwörter in der `User`-Entität sicher speichern.
+*   **Unterstützung relationaler Integrität:** Um die Autorisierung (wer darf auf welchen `Storage` zugreifen?) sicherzustellen, muss die Datenbank die Beziehungen zwischen `User`, `Role` und `Storage` zuverlässig abbilden können. Ein System, das diese Beziehungen durch **Constraints** und **Fremdschlüssel** auf Datenbankebene garantiert, ist hier also wichtig, da es das Risiko von Fehlern in der Anwendungslogik reduziert.
 
 ## Kriterien für die Datenbankauswahl
 Die Auswahl der Datenbanktechnologie erfolgt nun anhand folgender Kriterien:
 
-* Unterstützung des Datenmodells: Die Datenbank muss in der Lage sein, die definierten Entitäten und deren Beziehungen ([vgl. Datenmodellierung](data_eva.md#datenmodellierung)) effizient abzubilden.
-* Entwicklungsaufwand, Komplexität: Die Implementierung des Datenmodells sollte sich insbesondere den fachlichen [Rahmenbedingungen](mvp.md#rahmenbedingungen) des Projekts anpassen. <br> Aufgrund der Projektlaufzeit von 2.5 Monaten und der Teamgröße von 4 Personen gilt es somit unnötige Komplexität zu vermeiden.
-* Performance:
+* **Unterstützung des Datenmodells**: Die Datenbank muss in der Lage sein, die definierten Entitäten und deren Beziehungen ([vgl. Datenmodellierung](data_eva.md#datenmodellierung)) effizient abzubilden.
+* **Komplexität**: Die Implementierung des Datenmodells sollte sich insbesondere den fachlichen [Rahmenbedingungen](mvp.md#rahmenbedingungen) des Projekts anpassen. <br> Aufgrund der Projektlaufzeit von 2.5 Monaten und der Teamgröße von 4 Personen gilt es somit unnötige Komplexität zu vermeiden.
+* **Performance**: Die Leistungsfähigkeit der Datenbank ist entscheidend für die Realisierung des schnellen Alarmsystems (vgl. [Nichtfunktionale Anforderungen <=> Datendomäne](data_eva.md#nicht-funktionale-anforderungen--datendomäne)).
 
 ## SQL vs NoSQL
 
