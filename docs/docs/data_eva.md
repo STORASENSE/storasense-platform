@@ -2,14 +2,14 @@
 
 ## Datenmodellierung (Konzeptuell)
 Vor der Auswahl einer spezifischen Datenbanktechnologie wird das fachliche Datenmodell definiert, das alle für das Überwachungssystem relevanten Informationen und deren Beziehungen
-zueinander abbildet. <br> Das Modell basiert auf **fünf Entitäten**:
+zueinander abbildet. <br> Das Modell basiert auf **sechs Entitäten**:
 
 * **Storage**: Repräsentiert einen physischen Ort (z.B. "Weinkeller A", "Lagerhalle B"), der überwacht wird. Jeder Lagerort besitzt eindeutige Attribute wie eine ID und einen Namen.
 Ein Lagerort beinhaltet folgende Attribute:
   * **id**: Eindeutige ID des Lagerorts
   * **name**: Name des Lagerorts (z.B. "Weinkeller A")
   * **description**: Optionale Beschreibung des Lagerorts
-  * **sensors**: Sensor-IDs, die diesem Lagerort zugeordnet sind <br>
+  * **sensor**: Sensor-IDs, die diesem Lagerort zugeordnet sind <br>
 <br>
 * **User**: Stellt eine Person dar, die mit dem System interagiert.
 Ein Benutzer beinhaltet folgende Attribute:
@@ -68,7 +68,7 @@ Folgende Rechnung verdeutlicht die erwartete Datenmenge:
 
 Die Gesamtzahl der Lagerorte und Benutzer ist begrenzt, was die Datenbankgröße überschaubar hält.
 
-#### Datenstruktur
+#### Datengröße
 
 
 ## Kriterien für die Datenbankauswahl
