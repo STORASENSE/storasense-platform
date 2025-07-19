@@ -1,8 +1,8 @@
 # Datendomäne
 
 ## Datenmodellierung (Konzeptuell)
-Vor der Auswahl einer spezifischen Datenbanktechnologie wird das fachliche Datenmodell definiert, das alle für das Überwachungssystem relevanten Informationen und deren Beziehungen
-zueinander abbildet. <br> Das Modell basiert auf **sechs Entitäten**:
+Vor der Auswahl einer spezifischen Datenbanktechnologie wird das fachliche Datenmodell definiert, das alle für das System STORASENSE relevanten Informationen und deren Beziehungen
+zueinander abbildet. Dieser ergeben sich aus den festgelegten [Anforderungen](mvp.md). <br> Insgesamt basiert das Modell auf **sechs Entitäten**:
 
 * **Storage**: Repräsentiert einen physischen Ort (z.B. "Weinkeller A", "Lagerhalle B"), der überwacht wird. Jeder Lagerort besitzt eindeutige Attribute wie eine ID und einen Namen.
 Ein Lagerort beinhaltet folgende Attribute:
@@ -41,7 +41,7 @@ Ein Sensor beinhaltet folgende Attribute:
   * **location_id**: Referenz auf den Lagerort, an dem der Sensor installiert ist
   * **description**: Optionale Beschreibung des Sensors <br>
 <br>
-* **Alert**: Repräsentiert eine Benachrichtigung, die ausgelöst wird, wenn ein Messwert außerhalb eines definierten Schwellenwerts liegt.
+* **Alert**: Repräsentiert einen Alarm, der ausgelöst wird, wenn ein Messwert außerhalb eines definierten Schwellenwerts liegt.
 Ein Alarm beinhaltet folgende Attribute:
   * **id**: Eindeutige ID des Alarms
   * **timestamp**: Zeitpunkt, zu dem der Alarm ausgelöst wurde
@@ -65,12 +65,35 @@ Folgende Rechnung verdeutlicht die erwartete Datenmenge:
   * Messungen pro Tag gesamt (4 Sensoren): 2.880 x 4 = 11.520
   * Messungen für 2,5 Monate (ca. 75 Tage): 11.520 x 75 = **864.000 Messpunkte**
 
-#### Weitre Entitäten:
-Die weiteren Entitäten (Storage, User, Role, Sensor, Alert) haben eine deutlich geringere Anzahl an Instanzen und sind daher zu vernachlässigen.
+Insgesamt werden also ca. **864.000 Messpunkte** erwartet, die in der Datenbank gespeichert werden müssen.
+
+#### Weitere Entitäten:
+Die weiteren Entitäten haben eine deutlich geringere Anzahl an Instanzen:
+* Wie bereits in der [Projektübersicht](mvp.md#funktionale-anforderungen) beschrieben unterstützt das System bis zu 500 Benutzer und 50 Lagerorte.
+* Weiter sind 2 Rollen vorgesehen, die den Benutzern zugeordnet werden können.
+* Die letzten 500 Alarme eines Lagerorts werden ebenfalls gespeichert. So ergibt sich eine maximale Anzahl von maximal 25.000 Alarm-Einträgen (500 Alarme x 50 Lagerorte).
+
+Insgesamt sind die weiteren Entitäten also zu vernachlässigen, da sie nur eine geringe Anzahl an Instanzen haben.
 
 ### Datengröße
-
+#### Measurement:
 Die Messwerte sind in der Regel numerisch (z.B. Temperatur, Luftfeuchtigkeit) und benötigen daher wenig Speicherplatz. <br>
+
+| Datenfeld     | Typ         | Größe (Bytes) | Beschreibung                        |
+|--------------|-------------|---------------|-------------------------------------|
+| timestamp           | Datetime     | 8             | Timestamp           |
+| value         | Float      | 4             | Numerisch                  |
+| unit  | String      | 2             |  Einheit als Kurzstring (z.B. "C")              |
+| sensor_type    | String    | 2-4           | Sensortyp als Kürzel           |
+| storage_id        | Integer       | 2             | Lagerortreferenz                   |
+| Gesamt         | -      | **~18 Byte**  | Durchschnittlich pro Messung               |
+
+*Anmerkung: Für den binären Türsensor kann das Datenfeld „value“ ein Boolean (1 Byte) sein, der Gesamtbedarf bleibt vergleichbar.*
+
+**Gesamtvolumen:**
+864.000 Messungen × ~ 18 Byte = **~15,5 MB**
+
+#### Weitere Entitäten:
 
 
 ## Kriterien für die Datenbankauswahl
