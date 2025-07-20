@@ -184,7 +184,12 @@ Für das Projekt bietet diese Kombination folgende Vorteile, die direkt auf die 
 * Optimale Performance für die Alarmierung: Die zentrale Anforderung des schnellen Alarmsystems wird durch TimescaleDB ideal unterstützt. Die Measurement-Tabelle wird als sogenannte Hypertable konfiguriert. Dadurch werden die Messdaten im Hintergrund automatisch nach Zeit partitioniert, was Abfragen auf kurzen Zeitfenstern ("alle Werte der letzten 30 Sekunden") extrem performant macht.
 * Hohe Datenintegrität bei geringer Komplexität: Während TimescaleDB die Zeitreihendaten optimiert, kümmert sich der PostgreSQL-Kern um die relationalen Daten. Die Beziehungen zwischen User, Role und Storage werden durch Foreign Keys und ACID-Transaktionen auf Datenbankebene abgesichert. Dies ermöglicht die Datenkonsistenz, reduziert den Entwicklungsaufwand im Backend und vermeidet Komplexität.
 * Python-Entwickler-Unterstützung: PostgreSQL ist im Python-Ökosystem integriert und wird von Bibliotheken wie SQLAlchemy optimal unterstützt. Die Verwendung von standardisiertem SQL erleichtert zudem die Anbindung von Visualisierungs-Tools und die Formulierung komplexer Abfragen für das Analyse-Dashboard.
-* Betriebsstabilität: Obwohl das aktuelle Datenvolumen gering ist, ist das System von Anfang an für ein potenzielles Wachstum der Sensordaten ausgelegt. Die bewiesene Betriebsstabilität von PostgreSQL gewährleistet zudem die geforderte hohe Verfügbarkeit in einer Docker-Umgebung.
+* Betriebsstabilität: Obwohl das aktuelle Datenvolumen gering ist, ist das System von Anfang an für ein potenzielles Wachstum der Sensordaten ausgelegt. Die Betriebsstabilität von PostgreSQL ermöglicht zudem die geforderte hohe Verfügbarkeit in einer Docker-Umgebung.
+* Open-Source: PostgreSQL ist eine weit verbreitete Open-Source-Datenbank mit einer großen Community. Langfristige Unterstützung, regelmäßige Updates und eine Vielzahl von Ressourcen und Features für Entwickler werden so kostenlos ermöglicht.
 
 Quellen:
 * [1](https://www.tigerdata.com/blog/postgresql-timescaledb-1000x-faster-queries-90-data-compression-and-much-more)
+* https://www.tigerdata.com/blog/storing-iot-data-why-you-should-use-postgresql
+* https://www.prisma.io/dataguide/postgresql/benefits-of-postgresql#robust-feature-set
+* https://www.ionos.com/digitalguide/server/know-how/postgresql/
+*
