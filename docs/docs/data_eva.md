@@ -180,7 +180,11 @@ Auch die Abfragemöglichkeiten im Zuge der Visualisierung mittels eines Dashboar
 Um einerseits die einfachen, zeitabhängigen Messreihen effizient verwalten zu können und andererseits die "relationalen Metadaten" (User, Role, Storage) mit ihren Beziehungen abzubilden, wird die **PostgreSQL**-Datenbank ausgewählt. <br>
 Diese hat sich als eine der leistungsfähigsten Open-Source-Datenbanken etabliert und bietet neben dem klassichen relationalen Ansatz auch Unterstützung für zeitbasierte Daten durch die Erweiterung **TimescaleDB**. <br>
 TimescaleDB ist eine Erweiterung für PostgreSQL, die speziell für die Speicherung und Abfrage von Zeitreihendaten entwickelt wurde. Sie bietet Funktionen wie automatische Partitionierung (Chunking) und Indizierung, die die Performance bei zeitbasierten Abfragen erheblich verbessern [1]. <br>
-
+Für das Projekt STORASENSE bietet diese Kombination folgende Vorteile, die direkt auf die zuvor definierten Auswahlkriterien abzielen:
+* Optimale Performance für die Alarmierung: Die zentrale Anforderung des schnellen Alarmsystems wird durch TimescaleDB ideal unterstützt. Die Measurement-Tabelle wird als sogenannte Hypertable konfiguriert. Dadurch werden die Messdaten im Hintergrund automatisch nach Zeit partitioniert, was Abfragen auf kurzen Zeitfenstern ("alle Werte der letzten 30 Sekunden") extrem performant macht.
+* Hohe Datenintegrität bei geringer Komplexität: Während TimescaleDB die Zeitreihendaten optimiert, kümmert sich der PostgreSQL-Kern um die relationalen Daten. Die Beziehungen zwischen User, Role und Storage werden durch Foreign Keys und ACID-Transaktionen auf Datenbankebene abgesichert. Dies garantiert die Datenkonsistenz, reduziert den Entwicklungsaufwand im Backend erheblich und vermeidet Komplexität.
+* Python-Entwickler-Unterstützung: PostgreSQL ist im Python-Ökosystem fest verankert und wird von führenden Bibliotheken wie SQLAlchemy optimal unterstützt. Die Verwendung von standardisiertem SQL erleichtert zudem die Anbindung von Visualisierungs-Tools und die Formulierung komplexer Abfragen für das Analyse-Dashboard.
+* Betriebsstabilität: Obwohl das aktuelle Datenvolumen gering ist, ist das System von Anfang an für ein potenzielles Wachstum der Sensordaten ausgelegt. Die bewiesene Betriebsstabilität von PostgreSQL gewährleistet zudem die geforderte hohe Verfügbarkeit in einer Docker-Umgebung.
 
 
 Quellen:
