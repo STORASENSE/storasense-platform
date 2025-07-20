@@ -2,7 +2,7 @@
 
 ## Datenmodellierung (Konzeptuell)
 Vor der Auswahl einer spezifischen Datenbanktechnologie wird das fachliche Datenmodell definiert, das alle für das System STORASENSE relevanten Informationen und deren Beziehungen
-zueinander abbildet. Dieser ergeben sich aus den festgelegten [Anforderungen](mvp.md). <br> Insgesamt basiert das Modell auf **sechs Entitäten**:
+zueinander abbildet. Diese ergeben sich aus den definierten [Anforderungen](mvp.md). <br> Insgesamt basiert das Modell auf **sechs Entitäten**:
 
 * **Storage**: Repräsentiert einen physischen Ort (z.B. "Weinkeller A", "Lagerhalle B"), der überwacht wird. Jeder Lagerort besitzt eindeutige Attribute wie eine ID und einen Namen.
 Ein Lagerort beinhaltet folgende Attribute:
@@ -140,10 +140,13 @@ Diese Anforderung betrifft primär die Anwendungslogik, aber die Datenbank muss 
 ## Kriterien für die Datenbankauswahl
 Die Auswahl der Datenbanktechnologie erfolgt nun anhand folgender Kriterien:
 
-* **Unterstützung des Datenmodells**: Die Datenbank muss in der Lage sein, die definierten Entitäten und deren Beziehungen ([vgl. Datenmodellierung](data_eva.md#datenmodellierung)) effizient abzubilden.
-* **Komplexität**: Die Implementierung des Datenmodells sollte sich insbesondere den fachlichen [Rahmenbedingungen](mvp.md#rahmenbedingungen) des Projekts anpassen. <br> Aufgrund der Projektlaufzeit von 2.5 Monaten und der Teamgröße von 4 Personen gilt es somit unnötige Komplexität zu vermeiden.
-* **Performance**: Die Leistungsfähigkeit der Datenbank ist entscheidend für die Realisierung des schnellen Alarmsystems (vgl. [Nichtfunktionale Anforderungen <=> Datendomäne](data_eva.md#nicht-funktionale-anforderungen--datendomäne)).
-
+* **Unterstützung des Datenmodells**: Die Datenbank muss in der Lage sein, die definierten Entitäten und deren Beziehungen ([vgl. Datenmodellierung](data_eva.md#datenmodellierung)) effizient abzubilden. Beispielsweise gilt es die Grundlage für die Sicherheit des Systems zu schaffen (vgl. [Nichtfunktionale Anforderungen <=> Datendomäne](data_eva.md#nicht-funktionale-anforderungen--datendomäne)). <br>
+<br>
+* **Komplexität**: Die Implementierung des Datenmodells sollte sich insbesondere den fachlichen [Rahmenbedingungen](mvp.md#rahmenbedingungen) des Projekts anpassen. <br> Aufgrund der Projektlaufzeit von 2.5 Monaten und der Teamgröße von 4 Personen gilt es somit unnötige Komplexität zu vermeiden. <br>
+<br>
+* **Performance**: Die Leistungsfähigkeit der Datenbank ist entscheidend für die Realisierung des schnellen Alarmsystems (vgl. [Nichtfunktionale Anforderungen <=> Datendomäne](data_eva.md#nicht-funktionale-anforderungen--datendomäne)). Hierbei gilt es insbesondere die Messdaten, die den Großteil des [Datenvolumens](data_eva.md#datenvolumen) ausmachen, effizient zu verwalten. <br>
+<br>
+* **Datenvolumen**: Das berechnete [Datenvolumen](data_eva.md#datenvolumen) ist mit unter 1 MB pro Woche sehr gering. Daher sind Skalierungsmechanismen (wie z.B. horizontales Sharding) für dieses Projekt nicht relevant. Das Kriterium bewertet stattdessen, wie gut die Datenbanktechnologie mit diesem spezifischen, moderaten Datenvolumen umgeht, ohne unnötigen administrativen oder ressourcentechnischen Overhead zu erzeugen. <br>
 ## SQL vs NoSQL
 
 ## SQL: Datenbanken
