@@ -176,7 +176,7 @@ Performance und Betriebsstabilität sind in beiden Fällen hoch, aber der SQL-An
 Weiter lässt sich die Performance, insbesondere hinsichtlich der Measurement-Daten, in der SQL-Datenbank durch Indizes auf beispielsweise den Zeitstempel manuell beziehungsweise durch Nutzung einer spezialisierten SQL-Datenbank (Timeseries) verbessern. <br>
 Auch die Abfragemöglichkeiten im Zuge der Visualisierung mittels eines Dashboards sind im SQL-Ansatz gegeben, da SQL eine standardisierte und mächtige Abfragesprache bietet, die komplexe Aggregationen und Verknüpfungen unterstützt. <br>
 
-## Datenbanktechnologie - PostgreSQL
+## Datenbanktechnologie - PostgreSQl mit TimescaleDB
 Um einerseits die einfachen, zeitabhängigen Messreihen effizient verwalten zu können und andererseits die "relationalen Metadaten" (User, Role, Storage) mit ihren Beziehungen abzubilden, wird die **PostgreSQL**-Datenbank ausgewählt. <br>
 Diese hat sich als eine der leistungsfähigsten Open-Source-Datenbanken etabliert und bietet neben dem klassichen relationalen Ansatz auch Unterstützung für zeitbasierte Daten durch die Erweiterung **TimescaleDB**. <br>
 TimescaleDB ist eine Erweiterung für PostgreSQL, die speziell für die Speicherung und Abfrage von Zeitreihendaten entwickelt wurde. Sie bietet Funktionen wie automatische Partitionierung (Chunking) und Indizierung, die die Performance bei zeitbasierten Abfragen erheblich verbessern [1]. <br>
