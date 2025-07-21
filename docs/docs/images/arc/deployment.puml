@@ -24,9 +24,7 @@ skinparam package {
 ' --- Akteure ---
 actor "Client (Webbrowser)" as User
 node "IoT-Gerät\n(Arduino)" as Device
-node "MQTT-Broker-Container" as MqttBrokerContainer {
-component "MQTT Broker" as MqttBroker
-}
+
 
 ' --- Deployment-Knoten ---
 node "Server-Infrastruktur (Docker Host)" as Server {
@@ -42,6 +40,10 @@ node "Server-Infrastruktur (Docker Host)" as Server {
            database "PostgreSQl \n mit TimescaleDB" as Postgres
         }
 
+    }
+
+    node "MQTT-Broker-Container" as MqttBrokerContainer {
+        component "MQTT Broker" as MqttBroker
     }
 }
 
