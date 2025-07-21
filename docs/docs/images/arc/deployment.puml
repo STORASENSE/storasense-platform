@@ -24,6 +24,9 @@ skinparam package {
 ' --- Akteure ---
 actor "Client (Webbrowser)" as User
 node "IoT-Gerät\n(Arduino)" as Device
+node "MQTT-Broker-Container" as MqttBrokerContainer {
+component "MQTT Broker" as MqttBroker
+}
 
 ' --- Deployment-Knoten ---
 node "Server-Infrastruktur (Docker Host)" as Server {
@@ -33,17 +36,12 @@ node "Server-Infrastruktur (Docker Host)" as Server {
             component "Frontend\n(Next.js)" as Frontend
         }
         node "FastAPI-Container" as FastAPIContainer {
-            component "Backend\n(FastAPI exposes REST API)" as Backend
+            component "Backend\n(FastAPI exposed\nREST API)" as Backend
         }
-        node "SQLite-Container" as SQLiteContainer {
-           database "SQLite\n(Verwaltung)" as SQLite
+        node "PostgreSQl-Container" as PostgresContainer {
+           database "PostgreSQl \n mit TimescaleDB" as Postgres
         }
-        node "MongoDB-Container*" as MongoDBContainer {
-            database "MongoDB\n(Messwerte)" as MongoDB
-        }
-        node "MQTT-Broker-Container" as MqttBrokerContainer {
-            component "MQTT Broker" as MqttBroker
-        }
+
     }
 }
 
@@ -53,16 +51,10 @@ User -right-> Frontend : Nutzt das Dashboard (HTTPS)
 Device .up.> MqttBroker: Sendet Sensordaten (MQTT)
 
 ' Interne Kommunikation innerhalb des Docker-Netzwerks
-Frontend .down.> Backend : API-Anfragen
-Backend .down.> MongoDB : Speichert/liest Messwerte
+Frontend .down.> Backend : API-Anfragen (HTTPS)
 Backend .right.> MqttBroker : Subscribed/Published
 
 ' Spezielle Interaktion via Shared Volume, keine Netzwerkkommunikation
-Backend ..> SQLite : "Interagiert via\nShared Volume"
-
-' Hinweis für MongoDB
-note right of MongoDBContainer
-* ggf. als SaaS-Lösung (MongoDB Atlas)
-end note
+Backend ..> Postgres : "Interagiert via\nShared Volume"
 
 @enduml
