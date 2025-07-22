@@ -1,7 +1,8 @@
 # "Modular Monolith" Backend Architecture
 ## Grundsätzlich (Kriterien)
 
-### Modularisierung
+### Modularisierung (Separation of Concerns)
+* Backend-System wird in sich geschlossene Bausteine zerlegt, die jeweils eine bestimmte Funktionalität bereitstellen (Serparation of Concerns)
 * Module sollten in sich geschlossene, in sich konsistente Einheiten sein - die leicht entfernbar oder austauschbar sind ("plug and play")
 
 ### Lose Kopplung
