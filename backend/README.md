@@ -17,13 +17,14 @@
 
 ## Pattern / Techniken
 
-### Relevante Prinzipien:
-#### SOLID
-* Open-Closed Principle (OCP)
-* Dependency Inversion Principle (DIP): durchgängig einhalten, zwischen MODULES und zwischen MODULES-SHARED_STUFF
-  * ggf. mit Dependency Injection realisiert (Depdency Injector verwaltet die Instanz der abstrakten Klassen)
+### Principles:
+#### SOLID: Open-Closed Principle (OCP)
+#### SOLID: Dependency Inversion Principle (DIP)
+* durchgängig einhalten, zwischen MODULES und zwischen MODULES-SHARED_STUFF
+* ggf. mit Dependency Injection realisiert (Depdency Injector verwaltet die Instanz der abstrakten Klassen)
 
-### Pattern:
-#### Hexagonal Pattern / Ports, Adapter
+### Pattern (Principles, Kriterien umsetzen): Hexagonal Pattern (Ports, Adapter)
 * Module sollten nur über Adapter auf Shared Stuff zugreifen
 * Module sollten nur über Adapter auf andere Module zugreifen
+
+* https://blog.artisivf.com/2024/08/29/how-to-build-a-modular-monolith-with-hexagonal-architecture/
