@@ -38,7 +38,7 @@ Ein Messwert beinhaltet folgende Attribute:
 Ein Sensor beinhaltet folgende Attribute:
   * `id`: Eindeutige ID des Sensors
   * `type`: Typ des Sensors (z\.B\. "temperatur_sensor", "humidity_sensor")
-  * `location_id`: Referenz auf den Lagerort, an dem der Sensor installiert ist
+  * `storage_id`: Referenz auf den Lagerort, an dem der Sensor installiert ist
   * `description`: Optionale Beschreibung des Sensors <br>
   <br>
 * **Alert**: Repräsentiert einen Alarm, der ausgelöst wird, wenn ein Messwert außerhalb eines definierten Schwellenwerts liegt.
@@ -184,12 +184,34 @@ Für das Projekt bietet diese Kombination folgende Vorteile, die direkt auf die 
 * Optimale Performance für die Alarmierung: Die zentrale Anforderung des schnellen Alarmsystems wird durch TimescaleDB ideal unterstützt. Die Measurement-Tabelle wird als sogenannte Hypertable konfiguriert. Dadurch werden die Messdaten im Hintergrund automatisch nach Zeit partitioniert, was Abfragen auf kurzen Zeitfenstern ("alle Werte der letzten 30 Sekunden") extrem performant macht.
 * Hohe Datenintegrität bei geringer Komplexität: Während TimescaleDB die Zeitreihendaten optimiert, kümmert sich der PostgreSQL-Kern um die relationalen Daten. Die Beziehungen zwischen User, Role und Storage werden durch Foreign Keys und ACID-Transaktionen auf Datenbankebene abgesichert. Dies ermöglicht die Datenkonsistenz, reduziert den Entwicklungsaufwand im Backend und vermeidet Komplexität.
 * Python-Entwickler-Unterstützung: PostgreSQL ist im Python-Ökosystem integriert und wird von Bibliotheken wie SQLAlchemy optimal unterstützt. Die Verwendung von standardisiertem SQL erleichtert zudem die Anbindung von Visualisierungs-Tools und die Formulierung komplexer Abfragen für das Analyse-Dashboard.
-* Betriebsstabilität: Obwohl das aktuelle Datenvolumen gering ist, ist das System von Anfang an für ein potenzielles Wachstum der Sensordaten ausgelegt. Die Betriebsstabilität von PostgreSQL ermöglicht zudem die geforderte hohe Verfügbarkeit in einer Docker-Umgebung.
+* Betriebsstabilität: Obwohl das aktuelle Datenvolumen gering ist, ist das System von Anfang an für ein potenzielles Wachstum der Sensordaten ausgelegt. Die Betriebsstabilität von PostgreSQL ermöglicht zudem die geforderte hohe Verfügbarkeit in einer Docker-Umgebung [2].
 * Open-Source: PostgreSQL ist eine weit verbreitete Open-Source-Datenbank mit einer großen Community. Langfristige Unterstützung, regelmäßige Updates und eine Vielzahl von Ressourcen und Features für Entwickler werden so kostenlos ermöglicht.
 
+### TimescaleDB unter der Haube [1]
+Die TimescaleDB-Erweiterung steigert die Effizienz bei der Verarbeitung von zeitabhängigen Messreihen in PostgreSQL durch einen optimierten Mechanismus: Die automatische Partitionierung von Daten in sogenannte **Hypertables**.
+
+*Grundsätzlich gilt: Je länger die Laufzeit des Systems, desto mehr Messwerte werden erfasst und desto mehr lassen sich die Vorteile von TimescaleDB erkennen.*
+#### 1. Hypertables, Chunks:
+   * Anstatt alle Messwerte in einer einzigen, riesigen Tabelle zu speichern, wandelt TimescaleDB die Tabelle in eine sogenannte Hypertable um.
+   Diese Hypertable ist eine virtuelle Abstraktion, die im Hintergrund aus vielen kleineren, physischen Tabellen (= **Chunks**) besteht.
+   * **Automatische Partitionierung**: TimescaleDB teilt die Daten automatisch nach einem Zeitintervall in diese Chunks auf.
+   Beispielweise kann festlegt werden, dass für jede Woche ein neuer Chunk erstellt wird.
+   Alle Messwerte, die in dieser Woche anfallen, werden ausschließlich in diesen einen Chunk geschrieben.
+
+#### 2. (Mögliche) Effizienzgewinne:
+   * **Schnellere Abfragen (Query Performance)**: Wenn man eine Abfrage startet, die auf einen kurzen Zeitraum begrenzt ist (z.B. "Gib mir alle Temperaturwerte der letzten Minute"), muss PostgreSQL nicht die gesamte Tabelle durchsuchen.
+Stattdessen identifiziert TimescaleDB sofort, welcher Chunk (oder welche wenigen Chunks) die Daten für diesen Zeitraum enthält, und scannt nur diese sehr kleinen Tabellen.
+   * **Schnelleres Schreiben (Ingest Performance)**:
+   Neue Messwerte werden immer nur in den neuesten Chunk geschrieben. Da dieser Chunk relativ klein ist und oft vollständig im Arbeitsspeicher gehalten wird, bleibt der Schreibvorgang konstant schnell, selbst wenn das Gesamtvolumen der historischen Daten auf ssehr viele Einträge (z.B. Millionen) anwächst.
+   Ohne TimescaleDB würden die Indizes einer einzigen großen Tabelle mit der Zeit fragmentieren und Schreibvorgänge verlangsamen.
+   * **Datenverwaltngung**:
+     * **Löschen**: Das Löschen alter Daten (z.B. "alle Messwerte älter als ein Jahr") wird effizienter, da durch die Chunks ganze Tabellen auf einmal mit (DROP TABLE) entfernt werden können, anstatt Zeile für Zeile zu löschen.
+     * **Komprimierung - Speicherbedarf**: TimescaleDB bietet auch eine eingebaute Komprimierung für ältere Chunks, die den Speicherbedarf weiter reduziert.
+     * **Komprimierung - Abfragegeschwindigkeit**: TimescaleDB kann auf die Daten im komprimierten Zustand wie in einem spaltenorientierten Format zugreifen. Anstatt eine ganze Zeile mit allen Datenfeldern (timestamp, value, unit etc.) lesen zu müssen (wie es bei klassicher seitenweiser Speicherung der Fall ist), kann die Datenbank gezielt nur die Spalten abrufen, die für die Abfrage benötigt werden – zum Beispiel nur den value.
+
 Quellen:
-* [1](https://www.tigerdata.com/blog/postgresql-timescaledb-1000x-faster-queries-90-data-compression-and-much-more)
+* [1] https://www.tigerdata.com/blog/postgresql-timescaledb-1000x-faster-queries-90-data-compression-and-much-more
+* [2] https://docs.tigerdata.com/self-hosted/latest/install/installation-docker/
 * https://www.tigerdata.com/blog/storing-iot-data-why-you-should-use-postgresql
 * https://www.prisma.io/dataguide/postgresql/benefits-of-postgresql#robust-feature-set
 * https://www.ionos.com/digitalguide/server/know-how/postgresql/
-*
