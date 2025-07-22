@@ -1,6 +1,7 @@
-# Modular Monolith Architecture
+# "Modular Monolith" Backend Architecture
 ## Grundsätzlich (Kriterien)
 ### Modularisierung
+* Module sollten in sich geschlossene, in sich konsistente Einheiten sein - die leicht entfernbar oder austauschbar sind ("plug and play")
 ### Lose Kopplung
 * Module sollten möglichst unabhängig voneinander sein
 ### Geheimnisprinzip, Abstraktion
