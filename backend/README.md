@@ -23,7 +23,7 @@
   * ggf. mit Dependency Injection realisiert (Depdency Injector verwaltet die Instanz der abstrakten Klassen)
 
 ### Pattern:
-#### Adapter Pattern
+#### Hexagonal Pattern / Ports, Adapter
 * Module sollten nur über Adapter auf Shared Stuff zugreifen
 * Shared Stuff sollte nur über Adapter auf Module zugreifen
 * Module sollten nur über Adapter auf andere Module zugreifen
