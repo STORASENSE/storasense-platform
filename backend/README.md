@@ -28,3 +28,4 @@
 * Module sollten nur über Adapter auf andere Module zugreifen
 
 * https://blog.artisivf.com/2024/08/29/how-to-build-a-modular-monolith-with-hexagonal-architecture/
+* https://python.plainenglish.io/mastering-hexagonal-architecture-with-fastapi-build-a-clean-and-scalable-todo-app-b265f5197be2
