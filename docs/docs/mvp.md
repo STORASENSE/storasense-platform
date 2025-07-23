@@ -1,4 +1,4 @@
-# MVP – STORASENSE
+# STORASENSE - Projektüberblick / MVP
 
 ## Ziel des MVP
 
@@ -12,12 +12,14 @@ Die empfangenen Messwerte werden in einer permanenten Datenbank gespeichert und 
 
 ## Funktionale Anforderungen
 
-- Das System misst regelmäßig die **Temperatur** und **Luftfeuchtigkeit** über angeschlossene Sensoren.
+- Das System misst alle 30 Sekunden verschiedene Sensorwerte - anfangs insbesondere die **Temperatur** und **Luftfeuchtigkeit** über angeschlossene Sensoren.
 - Die Messergebnisse werden in einer **permanenten Datenbank** gespeichert.
 - Der Benutzer kann über eine **grafische Benutzeroberfläche** einen **Temperatur-Mindestwert** und einen **Temperatur-Höchstwert** definieren.
 - Liegt die gemessene Temperatur **außerhalb des definierten Bereichs**, wird automatisch eine **Warnung** erzeugt.
-- Die Warnung wird über den **MQTT-Broker** veröffentlicht: Bei einer Grenzwertverletzung wird eine Nachricht auf ein dafür vorgesehenes **MQTT-Topic** geschickt, auf das andere Systeme oder Komponenten zugreifen können (z. B. zur Steuerung von Aktoren).
+- Die Warnung wird über den **MQTT-Broker** veröffentlicht: Bei einer Grenzwertverletzung wird eine Nachricht auf ein dafür vorgesehenes **MQTT-Topic** geschickt, auf das andere Systeme oder Komponenten zugreifen können (z. B. zur Steuerung von Aktoren). In der Plattformoberfläche wird die Warnung innerhalb einer Alarmhistorie eines Lagerraums (stellt die letzten 500 Alarme des Lagerraums dar) ebenfalls angezeigt.
 - Die Benutzeroberfläche stellt ein **aktives Dashboard** dar, das die aktuellen Sensordaten in Echtzeit visualisiert.
+- Das System verwaltet Benutzer (bis zu ~500), die verschiedene Rollen haben können (z. B. Admin, User).
+- Weiter erlaubt das System die Verwaltung von Lagerorten (bis zu ~500), die jeweils mit den gegebenen Sensoren verbunden sein können.
 
 ## Nicht-funktionale Anforderungen
 
@@ -25,7 +27,7 @@ Die empfangenen Messwerte werden in einer permanenten Datenbank gespeichert und 
     - Das System soll eine **Verfügbarkeit von 99% innerhlab eines Zeitraums von drei Tagen** aufweisen.
     - Falls das System abstürzt, wird es versuchen, sich **automatisch bis zu drei Mal in kurzen Abständen neu zu starten**.
 - **Sicherheit des Systems**: Authentifizierung und Autorisierung
-- **Performance des Systems**: Schnelles Alamierungssystem - Push-Benachrichtigung und MQTT-Benachrichtigung innerhalb von 90 Sekunden.
+- **Performance des Systems**: Schnelles Alamierungssystem - Push-Benachrichtigung und MQTT-Benachrichtigung innerhalb von 90 Sekunden nachdem der festgelegte Toleranzbereich des Sensors für länger als 30s verletzt wird.
 
 ## Optionale Erweiterungen
 
@@ -34,6 +36,16 @@ Die folgenden Funktionen sind nicht Bestandteil des MVPs, können jedoch zu eine
 - **Sensor zur Erkennung von Kohlenwasserstoffen** zur Überwachung der Luftqualität
 - **Ultraschallsensor zur Türüberwachung**, z. B. zur Anwesenheitserkennung oder Zutrittskontrolle
 - **Benachrichtigung per Push-Nachricht** bei Grenzwertüberschreitungen oder anderen definierten Ereignissen
+
+## Rahmenbedingungen
+### Technische
+- Hardware: Arduino-Mikrocontroller mit (voraussichtlich) vier angeschlossenen Sensoren, die folgende Daten liefern: Temperaturmesswert, Luftfeuchtigkeitsmesswert, Kohlenwasserstoffmesswert, Zustand der Tür (offen/geschlossen)
+- Gestellter MQTT-Broker nach Pub/Sub-Muster
+- Python als Programmiersprache für die Backend-Entwicklung
+
+### Organisatorische
+- Entwicklungszeitraum: 2.5 Monate
+- Teamgröße: 4 Personen
 
 ## Software-FMEA Analyse
 Folgende SFMEA-Analyse dient der Identifizierung potenzieller Schwachstellen des Systems - insbesondere des oben beschriebenen MVPs:

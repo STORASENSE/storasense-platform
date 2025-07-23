@@ -66,4 +66,4 @@ nav:
       - MVP: mvp.md
   - Technologies: techstack.md
   - Architecture:
-      - Data Domain: data.md
+      - Data Domain: old_data.md
