@@ -43,11 +43,39 @@ Die klaren Grenzen zwischen den Diensten erleichtern zudem die Wartung und ggf e
 ## Allgemeiner Ablauf
 Folgendes Diagramm zeigt den grundsätzlichen funktionalen Ablauf des Systems:
 
-<img src="images/arc/ablauf01.png" alt="ER-Diagram" width="900"/>
+<img src="images/arc/ablauf01.png" alt="ER-Diagram" width="1200"/>
 
-Ein weitere Qualitätseigenschaft, die sich durch die Architektur lösen lässt ist die [Performance-Qualitätseigenschaft](mvp.md#nicht-funktionale-anforderungen) hinsichtlich Erkennung und Alarmierung bei kritischen Sensorwerten.
-Sobald ein neuer Messwert vom MQTT-Client an das Backend übermittelt wird, wird dieser unmittelbar und ohne Verzögerung an den zuständigen Alarm-Service zur Überprüfung weitergeleitet. Die Prüfung auf Grenzwertverletzungen erfolgt somit, bevor der Datensatz in die Datenbank geschrieben wird.
+Ein weitere Anforderung, die durch die Architektur gefördert wird ist die [Performance-Qualitätseigenschaft](mvp.md#nicht-funktionale-anforderungen) hinsichtlich Erkennung und Alarmierung bei kritischen Sensorwerten.
+<br> Sobald ein neuer Messwert vom MQTT-Client an das Backend übermittelt wird, wird dieser unmittelbar und ohne Verzögerung an den zuständigen Alarm-Service zur Überprüfung weitergeleitet. Die Prüfung auf Grenzwertverletzungen erfolgt somit, bevor der Datensatz in die Datenbank geschrieben wird.
 <br> Durch diese bewusste Reihenfolge wird die Latenz der Alarmierung von der Latenz des Datenbank-Schreibvorgangs entkoppelt. Das System muss nicht auf die Bestätigung der Persistenz warten, um einen möglichen kritischen Zustand zu erkennen und darauf zu reagieren.
+
+## Bausteinsicht: FastAPI-Backend [WIP!!]
+
+### Grundsätzlich (Kriterien)
+
+#### Modularisierung (Separation of Concerns)
+* Backend-System wird in sich geschlossene Bausteine zerlegt, die jeweils eine bestimmte Funktionalität bereitstellen (Serparation of Concerns)
+* Module sollten in sich geschlossene, in sich konsistente Einheiten sein - die leicht entfernbar oder austauschbar sind ("plug and play")
+
+#### Lose Kopplung
+* Module sollten möglichst unabhängig voneinander sein
+
+#### Geheimnisprinzip, Abstraktion
+* Module sollten möglichst wenig Wissen über andere Module haben
+* Module sollten nur **über klar definierte Schnittstellen bzw Abstraktionen miteinander kommunizieren**
+
+#### Hohe Konsistenz der Module => Konzeptuelle Integrität
+* Module sollten ähnliche Strukturen und Konventionen verwenden (ähnliche Problem ähnlich lösen)
+
+### Pattern / Techniken
+
+#### Principles:
+##### SOLID: Open-Closed Principle (OCP)
+##### SOLID: Dependency Inversion Principle (DIP)
+* durchgängig einhalten, zwischen MODULES und zwischen MODULES-SHARED_STUFF
+* ggf. mit Dependency Injection realisiert (Depdency Injector verwaltet die Instanz der abstrakten Klassen)
+
+
 
 Quellen:
 * [1] Starke, G. (2024). Effektive Softwarearchitektur: Ein praktischer Leitfaden. Hanser Verlag. 48ff
