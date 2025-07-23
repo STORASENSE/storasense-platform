@@ -1,5 +1,9 @@
 # Architektur
 
+## Frontend to Backend Kommunikation
+
+
+
 ## Übersicht (Deployment)
 <img src="images/arc/arc_overview.png" alt="ER-Diagram" width="700"/>
 
