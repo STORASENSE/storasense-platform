@@ -137,7 +137,7 @@ Diese Anforderung betrifft primär die Anwendungslogik, aber die Datenbank muss 
 *   **Sichere Datenspeicherung:** Die Datenbank muss sensible Daten wie gehashte Passwörter in der `User`-Entität sicher speichern.
 *   **Unterstützung relationaler Integrität:** Um die Autorisierung (wer darf auf welchen `Storage` zugreifen?) sicherzustellen, muss die Datenbank die Beziehungen zwischen `User`, `Role` und `Storage` zuverlässig abbilden können. Ein System, das diese Beziehungen durch **Constraints** und **Fremdschlüssel** auf Datenbankebene garantiert, ist hier also wichtig, da es das Risiko von Fehlern in der Anwendungslogik reduziert.
 
-## Kriterien für die Datenbankauswahl
+## Datenbankauswahl - Kriterien
 Die Auswahl der Datenbanktechnologie erfolgt nun anhand folgender Kriterien:
 
 * **Unterstützung des Datenmodells**: Die Datenbank muss in der Lage sein, die definierten Entitäten und deren Beziehungen ([vgl. Datenmodellierung](data_eva.md#datenmodellierung)) effizient abzubilden. Beispielsweise gilt es die Grundlage für die Sicherheit des Systems zu schaffen (vgl. [Nichtfunktionale Anforderungen <=> Datendomäne](data_eva.md#nicht-funktionale-anforderungen--datendomäne)). <br>
@@ -204,7 +204,7 @@ Stattdessen identifiziert TimescaleDB sofort, welcher Chunk (oder welche wenigen
    * **Schnelleres Schreiben (Ingest Performance)**:
    Neue Messwerte werden immer nur in den neuesten Chunk geschrieben. Da dieser Chunk relativ klein ist und oft vollständig im Arbeitsspeicher gehalten wird, bleibt der Schreibvorgang konstant schnell, selbst wenn das Gesamtvolumen der historischen Daten auf ssehr viele Einträge (z.B. Millionen) anwächst.
    Ohne TimescaleDB würden die Indizes einer einzigen großen Tabelle mit der Zeit fragmentieren und Schreibvorgänge verlangsamen.
-   * **Datenverwaltngung**:
+   * **Datenverwaltung**:
      * **Löschen**: Das Löschen alter Daten (z.B. "alle Messwerte älter als ein Jahr") wird effizienter, da durch die Chunks ganze Tabellen auf einmal mit (DROP TABLE) entfernt werden können, anstatt Zeile für Zeile zu löschen.
      * **Komprimierung - Speicherbedarf**: TimescaleDB bietet auch eine eingebaute Komprimierung für ältere Chunks, die den Speicherbedarf weiter reduziert.
      * **Komprimierung - Abfragegeschwindigkeit**: TimescaleDB kann auf die Daten im komprimierten Zustand wie in einem spaltenorientierten Format zugreifen. Anstatt eine ganze Zeile mit allen Datenfeldern (timestamp, value, unit etc.) lesen zu müssen (wie es bei klassicher seitenweiser Speicherung der Fall ist), kann die Datenbank gezielt nur die Spalten abrufen, die für die Abfrage benötigt werden – zum Beispiel nur den value.
