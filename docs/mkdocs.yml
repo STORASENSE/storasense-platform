@@ -15,7 +15,7 @@ theme:
     navigation.tabs: true
     navigation.instant: true
     navigation.tracking: true
-  logo: "docs/images/icon01_transparent.png"
+  logo: "images/icon01_transparent.png"
   palette:
     primary: " blue"
     accent: " blue"
