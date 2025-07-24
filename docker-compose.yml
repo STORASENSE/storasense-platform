@@ -6,11 +6,6 @@ services:
     ports:
       - "8000:8000"
       - "5555:5555"
-    environment:
-      - ENVIRONMENT=${ENVIRONMENT}
-      - BACKEND_CORS_ORIGINS=${BACKEND_CORS_ORIGINS}
-      - HOST=${HOST}
-      - PORT=${PORT}
     volumes:
       - .:/app
     networks:
