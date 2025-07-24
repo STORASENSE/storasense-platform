@@ -1,1 +1,1 @@
-# Pydantic-based models
+# SQLAlchemy models
