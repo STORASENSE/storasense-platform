@@ -15,22 +15,23 @@ theme:
     navigation.tabs: true
     navigation.instant: true
     navigation.tracking: true
-  logo: "images/icon01_transparent.png"
+  logo: "images/icon01.png"
   palette:
-    primary: " blue"
-    accent: " blue"
+    primary: "black"
+    accent: "blue"
     font:
       text: Roboto
       code: Roboto Mono
+  favicon: "images/icon01.png"
 
 markdown_extensions:
     - admonition
-    - codehilite
     - footnotes
     - md_in_html
     - meta
     - toc:
         permalink: true
+        toc_depth: 2
     - pymdownx.caret
     - pymdownx.details
     - pymdownx.arithmatex:
@@ -65,6 +66,10 @@ nav:
       - Vision: intro_goals.md
       - MVP: mvp.md
   - Technologies: techstack.md
+  - Technologies: techstack.md
   - Architecture:
       - Architecture Overview: arc.md
       - Data Domain: data_eva.md
+
+extra_css:
+  - styles/extra.css
