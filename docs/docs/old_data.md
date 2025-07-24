@@ -29,7 +29,7 @@ Diese alle relevanten Informationen enthaltene Dokumente zeigen hier mehrere Vor
 
 ### MongoDB als ausgewählter Datenspeicher
 
-<img src="images/data/mongodb_overview_2.drawio.png" alt="MongoDB-Datenmodell" width="500"/>
+<img src="../images/data/mongodb_overview_2.drawio.png" alt="MongoDB-Datenmodell" width="500"/>
 
 Die Wahl fiel auf MongoDB als dokumentenbasierte NoSQL-Datenbank, da sie folgende Vorteile bietet [3]:
 * **Popularität**: MongoDB ist eine der am weitesten verbreiteten NoSQL-Datenbanken und hat eine große Community sowie umfangreiche Dokumentation. Für jede (praktische) Programmiersprache gibt es unterstützende Treiber - für Python beispielsweise den offiziellen Treiber **pymongo** [4].
@@ -39,7 +39,7 @@ Die Wahl fiel auf MongoDB als dokumentenbasierte NoSQL-Datenbank, da sie folgend
 
 ### Datenmodell
 
-<img src="images/data/mongodb_overview.png" alt="MongoDB-Datenmodell" width="500"/>
+<img src="../images/data/mongodb_overview.png" alt="MongoDB-Datenmodell" width="500"/>
 
 Die Sensordaten werden in einer **timeseries collection** gespeichert, die speziell für Zeitreihendaten optimiert ist [7].
 Hierbei handelt es sich um eine Sammlung von Dokumenten, die jeweils einen einzelnen Messwert eines Sensors repräsentieren.
@@ -92,7 +92,7 @@ Als relationale Datenbank wird SQLite gewählt, da sie folgende Vorteile bietet 
 
 ### Datenmodell
 
-<img src="images/data/sql_er_diagram.png" alt="ER-Diagram" width="700"/>
+<img src="../images/data/sql_er_diagram.png" alt="ER-Diagram" width="700"/>
 
 Die Schema der SQLite-Datenbank besteht aus drei Tabellen, die die Entitäten und ihre Beziehungen abbilden:
 

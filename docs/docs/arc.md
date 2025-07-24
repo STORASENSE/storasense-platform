@@ -1,7 +1,7 @@
 # Architektur
 
 ## Übersicht (Deployment)
-<img src="images/arc/arc_overview.png" alt="ER-Diagram" width="700"/>
+<img src="../images/arc/arc_overview.png" alt="ER-Diagram" width="700"/>
 
 | Komponente                   | Technologie                                      | Aufgabe & Verantwortung                                                                                                                                                                                                           | Kommuniziert mit                                 |
 |------------------------------|--------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------|
@@ -43,7 +43,7 @@ Die klaren Grenzen zwischen den Diensten erleichtern zudem die Wartung und ggf e
 ## Allgemeiner Ablauf
 Folgendes Diagramm zeigt den grundsätzlichen funktionalen Ablauf des Systems:
 
-<img src="images/arc/ablauf01.png" alt="ER-Diagram" width="1200"/>
+<img src="../images/arc/ablauf01.png" alt="ER-Diagram" width="1200"/>
 
 Ein weitere Anforderung, die durch die Architektur gefördert wird ist die [Performance-Qualitätseigenschaft](mvp.md#nicht-funktionale-anforderungen) hinsichtlich Erkennung und Alarmierung bei kritischen Sensorwerten.
 <br> Sobald ein neuer Messwert vom MQTT-Client an das Backend übermittelt wird, wird dieser unmittelbar und ohne Verzögerung an den zuständigen Alarm-Service zur Überprüfung weitergeleitet. Die Prüfung auf Grenzwertverletzungen erfolgt somit, bevor der Datensatz in die Datenbank geschrieben wird.
