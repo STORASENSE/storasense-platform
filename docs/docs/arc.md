@@ -46,8 +46,8 @@ Folgendes Diagramm zeigt den grundsätzlichen funktionalen Ablauf des Systems:
 <img src="images/arc/ablauf01.png" alt="ER-Diagram" width="1200"/>
 
 Ein weitere Anforderung, die durch die Architektur gefördert wird ist die [Performance-Qualitätseigenschaft](mvp.md#nicht-funktionale-anforderungen) hinsichtlich Erkennung und Alarmierung bei kritischen Sensorwerten.
-<br> Sobald ein neuer Messwert vom MQTT-Client an das Backend übermittelt wird, wird dieser unmittelbar und ohne Verzögerung an den zuständigen Alarm-Service zur Überprüfung weitergeleitet. Die Prüfung auf Grenzwertverletzungen erfolgt somit, bevor der Datensatz in die Datenbank geschrieben wird.
-<br> Durch diese bewusste Reihenfolge wird die Latenz der Alarmierung von der Latenz des Datenbank-Schreibvorgangs entkoppelt. Das System muss nicht auf die Bestätigung der Persistenz warten, um einen möglichen kritischen Zustand zu erkennen und darauf zu reagieren.
+<br> Sobald ein neuer Messwert vom MQTT-Client an das Backend übermittelt wird, wird dieser unmittelbar und ohne Verzögerung an den zuständigen Alarm-Service zur Überprüfung weitergeleitet. Die Prüfung auf Grenzwertverletzungen erfolgt somit, auch wenn die Daten noch nicht in der Datenbank gespeichert sind (das persistente Speichern erfolgt parallel).
+<br> Durch diese bewusste Priorisierung wird die Latenz der Alarmierung von der Latenz des Datenbank-Schreibvorgangs entkoppelt. Das System muss nicht auf die Bestätigung der Persistenz warten, um einen möglichen kritischen Zustand zu erkennen und darauf zu reagieren.
 
 ## Bausteinsicht: FastAPI-Backend [WIP!!]
 
