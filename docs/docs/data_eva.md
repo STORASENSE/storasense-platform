@@ -208,10 +208,10 @@ Stattdessen identifiziert TimescaleDB sofort, welcher Chunk (oder welche wenigen
      * **Löschen**: Das Löschen alter Daten (z.B. "alle Messwerte älter als ein Jahr") wird effizienter, da durch die Chunks ganze Tabellen auf einmal mit (DROP TABLE) entfernt werden können, anstatt Zeile für Zeile zu löschen.
      * **Komprimierung - Speicherbedarf**: TimescaleDB bietet auch eine eingebaute Komprimierung für ältere Chunks, die den Speicherbedarf weiter reduziert.
      * **Komprimierung - Abfragegeschwindigkeit**: TimescaleDB kann auf die Daten im komprimierten Zustand wie in einem spaltenorientierten Format zugreifen. Anstatt eine ganze Zeile mit allen Datenfeldern (timestamp, value, unit etc.) lesen zu müssen (wie es bei klassicher seitenweiser Speicherung der Fall ist), kann die Datenbank gezielt nur die Spalten abrufen, die für die Abfrage benötigt werden – zum Beispiel nur den value.
-
-Quellen:
-* [1] https://www.tigerdata.com/blog/postgresql-timescaledb-1000x-faster-queries-90-data-compression-and-much-more
-* [2] https://docs.tigerdata.com/self-hosted/latest/install/installation-docker/
-* https://www.tigerdata.com/blog/storing-iot-data-why-you-should-use-postgresql
-* https://www.prisma.io/dataguide/postgresql/benefits-of-postgresql#robust-feature-set
-* https://www.ionos.com/digitalguide/server/know-how/postgresql/
+---
+Quellen: <br>
+[1] https://www.tigerdata.com/blog/postgresql-timescaledb-1000x-faster-queries-90-data-compression-and-much-more <br>
+[2] https://docs.tigerdata.com/self-hosted/latest/install/installation-docker/ <br>
+https://www.tigerdata.com/blog/storing-iot-data-why-you-should-use-postgresql <br>
+https://www.prisma.io/dataguide/postgresql/benefits-of-postgresql#robust-feature-set <br>
+https://www.ionos.com/digitalguide/server/know-how/postgresql/ <br>

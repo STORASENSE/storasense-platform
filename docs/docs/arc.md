@@ -1,7 +1,7 @@
 # Architektur
 
 ## Übersicht (Deployment)
-<img src="images/arc/arc_overview.png" alt="ER-Diagram" width="700"/>
+![architecture-overview](images/arc/arc_overview.png)
 
 | Komponente                   | Technologie                                      | Aufgabe & Verantwortung                                                                                                                                                                                                           | Kommuniziert mit                                 |
 |------------------------------|--------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------|
@@ -41,9 +41,9 @@ Die klaren Grenzen zwischen den Diensten erleichtern zudem die Wartung und ggf e
 <br> Ein weiterer Vorteil hinsichtlich der Performance wird im Zuge der Betrachtung des konkreten [Ablaufs](arc.md#allgemeiner-ablauf) ersichtlich.
 
 ## Allgemeiner Ablauf
-Folgendes Diagramm zeigt den grundsätzlichen funktionalen Ablauf des Systems:
+Folgendes Sequenzdiagramm zeigt den grundsätzlichen funktionalen Ablauf des Systems:
 
-<img src="images/arc/ablauf01.png" alt="ER-Diagram" width="1200"/>
+![sequence-diagram](images/arc/ablauf01.png)
 
 Ein weitere Anforderung, die durch die Architektur gefördert wird ist die [Performance-Qualitätseigenschaft](mvp.md#nicht-funktionale-anforderungen) hinsichtlich Erkennung und Alarmierung bei kritischen Sensorwerten.
 <br> Sobald ein neuer Messwert vom MQTT-Client an das Backend übermittelt wird, wird dieser unmittelbar und ohne Verzögerung an den zuständigen Alarm-Service zur Überprüfung weitergeleitet. Die Prüfung auf Grenzwertverletzungen erfolgt somit, auch wenn die Daten noch nicht in der Datenbank gespeichert sind (das persistente Speichern erfolgt parallel).
@@ -76,7 +76,7 @@ Ein weitere Anforderung, die durch die Architektur gefördert wird ist die [Perf
 * ggf. mit Dependency Injection realisiert (Depdency Injector verwaltet die Instanz der abstrakten Klassen)
 
 
-
-Quellen:
-* [1] Starke, G. (2024). Effektive Softwarearchitektur: Ein praktischer Leitfaden. Hanser Verlag. 48ff
-* [2] https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessagingGateway.html
+---
+Quellen: <br>
+[1] Starke, G. (2024). Effektive Softwarearchitektur: Ein praktischer Leitfaden. Hanser Verlag. 48ff <br>
+[2] https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessagingGateway.html
