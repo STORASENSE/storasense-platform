@@ -15,8 +15,7 @@ theme:
     navigation.tabs: true
     navigation.instant: true
     navigation.tracking: true
-  logo:
-    icon: "docs/images/icon01_transparent.png"
+  logo: "docs/images/icon01_transparent.png"
   palette:
     primary: " blue"
     accent: " blue"
@@ -67,4 +66,5 @@ nav:
       - MVP: mvp.md
   - Technologies: techstack.md
   - Architecture:
-      - Data Domain: old_data.md
+      - Architecture Overview: arc.md
+      - Data Domain: data_eva.md
