@@ -15,7 +15,7 @@ app = FastAPI(
 app.include_router(measurements_router)
 
 
-@app.get("/", tags=["Root"])
+@app.get("/health", tags=["Root"])
 def read_root():
     """
     # checks if the API is running
