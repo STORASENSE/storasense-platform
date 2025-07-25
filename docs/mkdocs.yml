@@ -1,0 +1,75 @@
+site_name: STORASENSE
+docs_dir: docs
+site_url: https://github.com/STORASENSE/storasense-platform
+repo_url: https://github.com/STORASENSE/storasense-platform
+repo_name: "STORASENSE/storasense-platform"
+
+theme:
+  name: "material"
+  language: "en"
+  feature:
+    navigation.indexes: true
+    navigation.sections: true
+    navigation.footer: true
+    navigation.top: true
+    navigation.tabs: true
+    navigation.instant: true
+    navigation.tracking: true
+  logo: "images/icon01.png"
+  palette:
+    primary: "black"
+    accent: "blue"
+    font:
+      text: Roboto
+      code: Roboto Mono
+  favicon: "images/icon01.png"
+
+markdown_extensions:
+    - admonition
+    - footnotes
+    - md_in_html
+    - meta
+    - toc:
+        permalink: true
+        toc_depth: 2
+    - pymdownx.caret
+    - pymdownx.details
+    - pymdownx.arithmatex:
+        generic: true
+    - pymdownx.betterem:
+        smart_enable: all
+    - pymdownx.highlight:
+        anchor_linenums: true
+        line_spans: __span
+        pygments_style: "default"
+    - pymdownx.superfences:
+        custom_fences:
+          - name: mermaid
+            class: mermaid
+            format: !!python/name:pymdownx.superfences.fence_code_format
+    - pymdownx.inlinehilite
+    - pymdownx.mark
+    - pymdownx.tabbed:
+        alternate_style: true
+    - pymdownx.tasklist:
+        custom_checkbox: true
+    - pymdownx.tilde
+
+plugins:
+  - search
+  - minify:
+      minify_html: true
+
+nav:
+  - Home: index.md
+  - About:
+      - Vision: intro_goals.md
+      - MVP: mvp.md
+  - Technologies: techstack.md
+  - Architecture:
+      - Architecture Overview: arc.md
+      - Data Domain: data_eva.md
+      - Arduino Codebase: arduino.md
+
+extra_css:
+  - styles/extra.css
