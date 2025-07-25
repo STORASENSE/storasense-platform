@@ -69,58 +69,64 @@ Wir verwenden einen millis()-basierten Timer und rufen `NVIC_SystemReset()` auf,
 
 2. **Reconnect-Logik und Software-Reset im loop()**
 
-    Im Hauptloop prüfen wir erst, ob die MQTT-Verbindung steht. Wenn ja, pollen wir und setzen den Reset-Timer zurück. Andernfalls versuchen wir bis zu drei Mal, erneut zu verbinden, und starten nach 20 s ohne Erfolg neu.
+    Im Hauptloop wird zunächst geprüft, ob die MQTT-Verbindung aktiv ist. Ist dies der Fall, wird der MQTT-Client gepollt, ein Temperatursensor ausgelesen und der letzte erfolgreiche Connect-Zeitpunkt gespeichert.
     ```cpp
     void loop() {
       unsigned long now = millis();
 
       if (mqttClient.connected()) {
-        // Verbindung ok: Poll beantworten und Reset-Timer zurücksetzen
         mqttClient.poll();
         lastConnect = now;
 
-        // Sensor-Daten lesen und veröffentlichen …
+        float temperature = tempSensor->readData();
+        Serial.print("Temperature: ");
+        Serial.print(temperature);
+        Serial.println("°C\n---");
+        tempSensor->publishData(mqttClient, MQTT_TOPIC_TEMPERATURE);
         delay(5000);
-
-      } else {
-        // Verbindung weg: 30 s-Fenster ggf. zurücksetzen
-        if (now - windowStart > RECONNECT_WINDOW_MS) {
-          windowStart = now;
-          attempts    = 0;
-        }
-        // Bis zu 3 Reconnect-Versuche
-        if (attempts < MAX_ATTEMPTS) {
-          if (tryConnectMQTT()) {
-            // Erfolg setzt counters zurück
-          } else {
-            attempts++;
-          }
-          delay(1000);
-        }
-        // 20-s-Software-Reset nach letztem Poll/Connect
-        if (lastConnect != 0 && now - lastConnect > RESTART_TIMEOUT_MS) {
-          NVIC_SystemReset();
-        }
-      }
+    ```
+    Ist die Verbindung nicht aktiv, beginnt die Fehlerbehandlung. Zuerst wird geprüft, ob das aktuelle Reconnect-Fenster abgelaufen ist – falls ja, wird der Zähler zurückgesetzt:
+    ```cpp
+    } else {
+    if (now - windowStart > RECONNECT_WINDOW_MS) {
+      windowStart = now;
+      attempts = 0;
+      Serial.println("Neues 30s-Fenster – Versuchszähler zurückgesetzt");
     }
     ```
 
-3. **Reconnect-Logik**
-
-    Nach jedem erfolgreichen Connect führt `tryConnectMQTT()` die Rücksetzung von `attempts`, `windowStart` und `lastConnect` durch.
+    Dann wird geprüft, ob der Broker über TCP erreichbar ist. Dies hilft dabei zu unterscheiden, ob der Fehler im VPN oder beim MQTT-Connect liegt:
     ```cpp
-   if (!mqttClient.connected()) {
-      // 30 s-Fenster überwachen
-      if (millis() - windowStart > RECONNECT_WINDOW_MS) {
-        windowStart = millis();
-        attempts    = 0;
-      }
-      // Bis zu 3 Versuche
-      if (attempts < MAX_ATTEMPTS) {
-        if (!tryConnectMQTT()) attempts++;
+    if (!isBrokerReachable()) {
+       attempts++;
+       Serial.print("Broker unreachable, Versuch ");
+       Serial.print(attempts);
+       Serial.println("/3");
+     } else {
+   ```
+
+    Ist der Broker erreichbar, aber MQTT noch nicht verbunden, wird ein Verbindungsversuch unternommen:
+    ```cpp
+    if (tryConnectMQTT()) {
+        Serial.println("MQTT verbunden, ready to publish.");
+        attempts = 0;
+        lastConnect = now;
+      } else {
+        attempts++;
+        Serial.print("MQTT connect fail, Versuch ");
+        Serial.print(attempts);
+        Serial.println("/3");
         delay(1000);
       }
-   }
+    }
+    ```
+    Schließlich wird überwacht, ob seit dem letzten erfolgreichen Connect mehr als 20 Sekunden vergangen sind. Wenn ja, erfolgt ein Neustart des Systems über NVIC_SystemReset():
+    ```cpp
+    if (lastConnect != 0 && now - lastConnect > RESTART_TIMEOUT_MS) {
+      Serial.println("Timeout – Neustart");
+      delay(100);
+      NVIC_SystemReset();
+    }
     ```
 ---
 
