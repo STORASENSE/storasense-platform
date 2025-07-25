@@ -6,41 +6,41 @@ zueinander abbildet. Diese ergeben sich aus den definierten [Anforderungen](mvp.
 
 * **User**: Stellt eine Person dar, die mit dem System interagiert.
 Ein Benutzer beinhaltet folgende Attribute:
-  * Eine eindeutige ID des Benutzers
-  * Ein eindeutiger Benutzername
-  * Ein Passwort (mit Hashing)
-  * Eine Rolle, die den Zugriff auf ein Lagerort einschränkt
-  * Eine optionale Beschreibung des Benutzers
-  * Referenzen auf zugegriffene Lagerorte <br>
+  * _ID_: Eine eindeutige ID des Benutzers
+  * _Username_: Ein eindeutiger Benutzername
+  * _Passwort_: Ein Passwort (mit Hashing)
+  * _Rolle_: Eine Rolle, die den Zugriff auf ein Lagerort einschränkt
+  * _Beschreibung_: Eine optionale Beschreibung des Benutzers
+  * _Lagerorte_: Referenzen auf zugegriffene Lagerorte <br>
   <br>
 * **Storage**: Repräsentiert einen physischen Ort (z.B. "Weinkeller A", "Lagerhalle B"), der überwacht wird. Jeder Lagerort besitzt eindeutige Attribute wie eine ID und einen Namen.
 Ein Lagerort beinhaltet folgende Attribute:
-  * Eine eindeutige ID des Lagerorts
-  * Ein eindeutiger Name des Lagerorts (z\.B\. "Weinkeller A")
-  * Eine optionale Beschreibung des Lagerorts
-  * Referenzen auf Nutzer, die auf den Lagerort Zugriff haben <br>
+  * _ID_: Eine eindeutige ID des Lagerorts
+  * _Name_: Ein eindeutiger Name des Lagerorts (z\.B\. "Weinkeller A")
+  * _Beschreibung_: Eine optionale Beschreibung des Lagerorts
+  * _Nutzer_: Referenzen auf Nutzer, die auf den Lagerort Zugriff haben <br>
   <br>
 * **Sensor**: Stellt einen physischen Sensor dar, der Messwerte erfasst.
 Ein Sensor beinhaltet folgende Attribute:
-  * Eine eindeutige ID des Sensors
-  * Der Typ des Sensors (z\.B\. Temperatur, Luftfeuchtigkeit)
-  * Grenzwerte für den Sensor (min und max)
-  * Eine Referenz auf den Lagerort, an dem sich der Sensor befindet <br>
+  * _ID_: Eine eindeutige ID des Sensors
+  * _Typ_: Der Typ des Sensors (z\.B\. Temperatur, Luftfeuchtigkeit)
+  * _Min & Max_: Grenzwerte für den Sensor
+  * _Lagerort_: Eine Referenz auf den Lagerort, an dem sich der Sensor befindet <br>
   <br>
 * **Measurement**: Repräsentiert eine einzelne, zu einem exakten Zeitpunkt erfasste Messung (z.B. Temperatur, Luftfeuchtigkeit).
 Ein Messwert beinhaltet folgende Attribute:
-  * Eine eindeutige ID der Messung
-  * Der genaue Zeitpunkt der Messung
-  * Der gemessene Wert
-  * Die Einheit des Messwertes (z\.B\. Temperatur in °C, Luftfeuchtigkeit in %)
-  * Eine Referenz auf den Sensor, der die Messung entnommen hat <br>
+  * _ID_: Eine eindeutige ID der Messung
+  * _Erstellungszeit_: Der genaue Zeitpunkt der Messung
+  * _Wert_: Der gemessene Wert
+  * _Einheit_: Die Einheit des Messwertes (z\.B\. Temperatur in °C, Luftfeuchtigkeit in %)
+  * _Sensor_: Eine Referenz auf den Sensor, der die Messung entnommen hat <br>
   <br>
 * **Alert**: Repräsentiert einen Alarm, der ausgelöst wird, wenn ein Messwert außerhalb eines definierten Schwellenwerts liegt.
 Ein Alarm beinhaltet folgende Attribute:
-  * Eine eindeutige ID des Alarms
-  * Eine beschreibung des Alarms (z\.B\. "Temperatur zu hoch")
-  * Der Schweregrad des Alarms (z\.B\. "hoch", "mittel", "niedrig")
-  * Eine Referenz auf die Messung, die den Alarm ausgelöst hat <br>
+  * _ID_: Eine eindeutige ID des Alarms
+  * _Beschreibung_: Eine beschreibung des Alarms (z\.B\. "Temperatur zu hoch")
+  * _Schweregrad_: Der Schweregrad des Alarms (z\.B\. "hoch", "mittel", "niedrig")
+  * _Messung_: Eine Referenz auf die Messung, die den Alarm ausgelöst hat <br>
 
 ### ER-Diagramm
 
