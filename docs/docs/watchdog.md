@@ -1,14 +1,14 @@
 ## Watchdog-Integration
 
-Zur Absicherung des Systems gegen dauerhafte Verbindungsprobleme wurde ein Hardware-Watchdog implementiert. Dieser stellt sicher, dass das System in einem definierten Zeitraum automatisch neu startet, wenn eine Wiederverbindung zum MQTT-Broker nicht gelingt. Diese Funktionalität ist besonders wichtig für produktive Anwendungen mit dauerhafter Datenübertragung, wie im MVP vorgesehen.
+Zur Absicherung des Systems gegen dauerhafte Verbindungsprobleme wurde ein Software-Watchdog implementiert. Dieser stellt sicher, dass das System in einem definierten Zeitraum automatisch neu startet, wenn eine Wiederverbindung zum MQTT-Broker nicht gelingt. Diese Funktionalität ist besonders wichtig für produktive Anwendungen mit dauerhafter Datenübertragung, wie im MVP vorgesehen.
 
 ### Anforderungen
 
 Im MVP war festgelegt, dass das Gerät sich nach einem Verbindungsverlust innerhalb von **30 Sekunden** wieder mit dem MQTT-Broker verbinden soll. Gelingt dies nicht innerhalb von **3 Versuchen**, muss ein automatischer Neustart erfolgen – idealerweise innerhalb von **20 Sekunden nach letztem Versuch**.
 Diese Anforderungen wurden durch folgende Mechanismen erfüllt:
 
-- **Reconnect-Logik** mit Zähler und Zeitfenster
-- **Hardware-Watchdog**, der den Neustart auslöst, falls der Code „hängt“
+- **Reconnect-Logik** mit Zähler und 30 s-Zeitfenster  
+- **In-Sketch Watchdog**, umgesetzt über `millis()`-Timing und Neustart via `NVIC_SystemReset()`
 
 ### Vergleich alternativer Watchdog-Bibliotheken
 
@@ -19,54 +19,87 @@ Für SAMD21-kompatible Boards existieren mehrere Watchdog-Bibliotheken:
 | `WDTZero`         | Ja          | Hoch    | 8 s           | Häufig  |
 | `Sodaq_wdt`       | Ja          | Mittel | 8 s |️ Weniger verbreitet |
 | `WDT_SAMD21`      | Ja          | Mittel | 16 s           |️ Selten |
-| Software-Timer    | Nein        | Hoch    |️ frei wählbar | Häufig  |
+| `In-Software-Watchdog`    | Nein        | Hoch    |️ frei wählbar | Häufig  |
 
-Die Entscheidung fiel auf **WDTZero**, da sie:
+Die Entscheidung fiel auf **In-Sketch Watchdog**, da sie:
 
-- speziell für den verwendeten Mikrocontroller (MKR WiFi 1010, SAMD21) entwickelt wurde,
-- eine saubere Trennung von Setup und Reset bietet,
-- in der Community erprobt ist (GitHub und Arduino Forum),
+- freie Wahl der Timeout-Dauer (z. B. 20 s) ermöglicht  
+- keine zusätzliche Bibliothek benötigt  
+- präzise im Sketch über `millis()` und `NVIC_SystemReset()` arbeitet  
 
 ### Implementierung
 
-Für die Implementierung wurde die Bibliothek `WDTZero` verwendet. Diese bietet direkten Zugriff auf den Watchdog-Timer von SAMD21-basierten Boards und ist damit zuverlässiger als reine Softwarelösungen. Im Setup wird der Watchdog mit einem Timeout von 8 Sekunden aktiviert:
+Die Watchdog-Funktionalität wird direkt im Sketch umgesetzt, ganz ohne externe Bibliothek. 
+Wir verwenden einen millis()-basierten Timer und rufen `NVIC_SystemReset()` auf, wenn seit dem letzten erfolgreichen Poll/Connect mehr als 20 s vergangen sind.
 
-```cpp
-#include <WDTZero.h>
+1. **Parameter und State**
 
-WDTZero wdt;
+    Hier definieren wir die Anzahl der Maximalversuche sowie die Zeitfenster für Reconnect und Reset.
+   ```cpp
+   const int    MAX_ATTEMPTS         = 3;      // max. Reconnect-Versuche
+   const long   RECONNECT_WINDOW_MS  = 30000;  // 30 s-Fenster
+   const long   RESTART_TIMEOUT_MS   = 20000;  // 20 s bis Reset
 
-void setup() {
-    wdt.setup(WDT_SOFTCYCLE8S);  // Timeout auf 8 Sekunden setzen
-    wdt.enable();
-}
-```
+   int          attempts     = 0;
+   unsigned long windowStart = 0;
+   unsigned long lastConnect = 0;  // Zeitstempel letzten Connects
+    ```
+   
+2. **Reconnect-Logik und Software-Reset im loop()**
 
-Im `loop()`-Block wird der Watchdog regelmäßig „gefüttert“ (reset), solange das System erwartungsgemäß funktioniert:
-
-```cpp
-wdt.reset();
-```
-
-Sobald alle Reconnect-Versuche aufgebraucht sind, wird kein `reset()` mehr ausgeführt. Der Watchdog erkennt das als Hängen des Systems und löst einen Neustart aus.
-
-### Reconnect-Logik
-
-Die Wiederverbindung erfolgt durch eine einfache Retry-Schleife:
-
-```cpp
-if (!mqttClient.connected()) {
-    if (reconnectAttempts < 3) {
-        connectToMQTT();  // Bei Erfolg wird wdt.reset() aufgerufen
-        reconnectAttempts++;
-    } else {
-        // Keine weiteren Versuche → kein reset()
+    Im Hauptloop prüfen wir erst, ob die MQTT-Verbindung steht. Wenn ja, pollen wir und setzen den Reset-Timer zurück. Andernfalls versuchen wir bis zu drei Mal, erneut zu verbinden, und starten nach 20 s ohne Erfolg neu.
+    ```cpp
+    void loop() {
+      unsigned long now = millis();
+    
+      if (mqttClient.connected()) {
+        // Verbindung ok: Poll beantworten und Reset-Timer zurücksetzen
+        mqttClient.poll();
+        lastConnect = now;
+    
+        // Sensor-Daten lesen und veröffentlichen …
+        delay(5000);
+    
+      } else {
+        // Verbindung weg: 30 s-Fenster ggf. zurücksetzen
+        if (now - windowStart > RECONNECT_WINDOW_MS) {
+          windowStart = now;
+          attempts    = 0;
+        }
+        // Bis zu 3 Reconnect-Versuche
+        if (attempts < MAX_ATTEMPTS) {
+          if (tryConnectMQTT()) {
+            // Erfolg setzt counters zurück
+          } else {
+            attempts++;
+          }
+          delay(1000);
+        }
+        // 20-s-Software-Reset nach letztem Poll/Connect
+        if (lastConnect != 0 && now - lastConnect > RESTART_TIMEOUT_MS) {
+          NVIC_SystemReset();
+        }
+      }
     }
-}
-```
+    ```
+   
+3. **Reconnect-Logik**
 
-Nach jedem erfolgreichen Verbindungsaufbau wird der Zähler zurückgesetzt. Bleibt die Verbindung über mehrere Intervalle hinweg bestehen, bleibt der Watchdog aktiv, aber ungefährlich – solange `reset()` regelmäßig erfolgt.
-
+    Nach jedem erfolgreichen Connect führt `tryConnectMQTT()` die Rücksetzung von `attempts`, `windowStart` und `lastConnect` durch.
+    ```cpp
+   if (!mqttClient.connected()) {
+      // 30 s-Fenster überwachen
+      if (millis() - windowStart > RECONNECT_WINDOW_MS) {
+        windowStart = millis();
+        attempts    = 0;
+      }
+      // Bis zu 3 Versuche
+      if (attempts < MAX_ATTEMPTS) {
+        if (!tryConnectMQTT()) attempts++;
+        delay(1000);
+      }
+   }
+    ```
 ---
 
 ### Quellen
@@ -74,3 +107,7 @@ Nach jedem erfolgreichen Verbindungsaufbau wird der Zähler zurückgesetzt. Blei
 - [1] [WDTZero GitHub](https://github.com/javos65/WDTZero)
 - [2] [Sodaq_Watchdog Github](https://github.com/SodaqMoja/Sodaq_wdt)
 - [3] [WDT_SAMD21 GitHub (Alternative)](https://github.com/gpb01/wdt_samd21)
+- [4] [Arduino millis()-documentation](https://docs.arduino.cc/language-reference/en/functions/time/millis/)
+- [5] [Long time use of millis](https://forum.arduino.cc/t/using-millis-over-long-time/629975)
+- [6] [MQTT-Reconnect-Logik mit ArduinoMqttClient](https://github.com/arduino-libraries/ArduinoMqttClient)
+- [7] [NVIC_SystemReset() documentation](https://developer.arm.com/documentation/ddi0403/ee/?lang=en)
