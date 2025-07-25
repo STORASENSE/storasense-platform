@@ -203,7 +203,7 @@ Stattdessen identifiziert TimescaleDB sofort, welcher Chunk (oder welche wenigen
 
 Die modellierte Datenbank sieht wie folgt aus:
 
-<img alt="ERD" src="./images/data_eva/erd.svg">
+![](./images/data_eva/erd.svg)
 
 Hierbei wurden die folgenden Konzepte wahrgenommen:
 
