@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "project"
-version = "0.0.0"
+version = "1.0.0"
 description = "Storasense-Platform"
 authors = []
 package-mode= false
