@@ -139,4 +139,3 @@ Wir verwenden einen millis()-basierten Timer und rufen `NVIC_SystemReset()` auf,
 - [5] [Long time use of millis](https://forum.arduino.cc/t/using-millis-over-long-time/629975)
 - [6] [MQTT-Reconnect-Logik mit ArduinoMqttClient](https://github.com/arduino-libraries/ArduinoMqttClient)
 - [7] [NVIC_SystemReset() documentation](https://developer.arm.com/documentation/ddi0403/ee/?lang=en)
-![img.png](img.png)
