@@ -2,55 +2,45 @@
 
 ## Datenmodellierung (Konzeptuell)
 Vor der Auswahl einer spezifischen Datenbanktechnologie wird das fachliche Datenmodell definiert, das alle für das System STORASENSE relevanten Informationen und deren Beziehungen
-zueinander abbildet. Diese ergeben sich aus den definierten [Anforderungen](mvp.md). <br> Insgesamt basiert das Modell auf **sechs Entitäten**:
+zueinander abbildet. Diese ergeben sich aus den definierten [Anforderungen](mvp.md). <br> Insgesamt basiert das Modell auf **fünf Entitäten**:
 
-* **Storage**: Repräsentiert einen physischen Ort (z.B. "Weinkeller A", "Lagerhalle B"), der überwacht wird. Jeder Lagerort besitzt eindeutige Attribute wie eine ID und einen Namen.
-Ein Lagerort beinhaltet folgende Attribute:
-  * `id`: Eindeutige ID des Lagerorts
-  * `name`: Name des Lagerorts (z\.B\. "Weinkeller A")
-  * `description`: Optionale Beschreibung des Lagerorts
-  * `sensor`: Sensor\-IDs, die diesem Lagerort zugeordnet sind <br>
-  <br>
 * **User**: Stellt eine Person dar, die mit dem System interagiert.
 Ein Benutzer beinhaltet folgende Attribute:
-  * `id`: Eindeutige ID des Benutzers
-  * `username`: Eindeutiger Benutzername
-  * `password`: Gehasht gespeichertes Passwort
-  * `role_id`: Referenz auf die Rolle des Benutzers
-  * `description`: Optionale Beschreibung des Benutzers
-  * `storage_id`: Lagerort-IDs, auf die der Benutzer Zugriff hat <br>
+  * _ID_: Eine eindeutige ID des Benutzers
+  * _Username_: Ein eindeutiger Benutzername
+  * _Passwort_: Ein Passwort (mit Hashing)
+  * _Rolle_: Eine Rolle, die den Zugriff auf ein Lagerort einschränkt
+  * _Beschreibung_: Eine optionale Beschreibung des Benutzers
+  * _Lagerorte_: Referenzen auf zugegriffene Lagerorte <br>
   <br>
-* **Role**: Definiert die Rolle eines Benutzers im System, um Zugriffsrechte zu steuern.
-Eine Rolle beinhaltet folgende Attribute:
-  * `id`: Eindeutige ID der Rolle
-  * `name`: Name der Rolle (z\.B\. "Admin", "User")
-  * `description`: Optionale Beschreibung der Rolle <br>
-  <br>
-* **Measurement**: Repräsentiert eine einzelne, zu einem exakten Zeitpunkt erfasste Messung (z.B. Temperatur, Luftfeuchtigkeit).
-Ein Messwert beinhaltet folgende Attribute:
-  * `timestamp`: Zeitpunkt der Messung
-  * `value`: Der gemessene Wert
-  * `unit`: Einheit des Messwertes (z\.B\. Temperatur in °C, Luftfeuchtigkeit in %)
-  * `sensor_type`: Referenz auf den Sensor, der die Messung durchgeführt hat
-  * `storage_id`: Referenz auf den Lagerort, zu dem der Messwert gehört <br>
+* **Storage**: Repräsentiert einen physischen Ort (z.B. "Weinkeller A", "Lagerhalle B"), der überwacht wird. Jeder Lagerort besitzt eindeutige Attribute wie eine ID und einen Namen.
+Ein Lagerort beinhaltet folgende Attribute:
+  * _ID_: Eine eindeutige ID des Lagerorts
+  * _Name_: Ein eindeutiger Name des Lagerorts (z\.B\. "Weinkeller A")
+  * _Beschreibung_: Eine optionale Beschreibung des Lagerorts
+  * _Nutzer_: Referenzen auf Nutzer, die auf den Lagerort Zugriff haben <br>
   <br>
 * **Sensor**: Stellt einen physischen Sensor dar, der Messwerte erfasst.
 Ein Sensor beinhaltet folgende Attribute:
-  * `id`: Eindeutige ID des Sensors
-  * `type`: Typ des Sensors (z\.B\. "temperatur_sensor", "humidity_sensor")
-  * `storage_id`: Referenz auf den Lagerort, an dem der Sensor installiert ist
-  * `description`: Optionale Beschreibung des Sensors <br>
+  * _ID_: Eine eindeutige ID des Sensors
+  * _Typ_: Der Typ des Sensors (z\.B\. Temperatur, Luftfeuchtigkeit)
+  * _Min & Max_: Grenzwerte für den Sensor
+  * _Lagerort_: Eine Referenz auf den Lagerort, an dem sich der Sensor befindet <br>
+  <br>
+* **Measurement**: Repräsentiert eine einzelne, zu einem exakten Zeitpunkt erfasste Messung (z.B. Temperatur, Luftfeuchtigkeit).
+Ein Messwert beinhaltet folgende Attribute:
+  * _ID_: Eine eindeutige ID der Messung
+  * _Erstellungszeit_: Der genaue Zeitpunkt der Messung
+  * _Wert_: Der gemessene Wert
+  * _Einheit_: Die Einheit des Messwertes (z\.B\. Temperatur in °C, Luftfeuchtigkeit in %)
+  * _Sensor_: Eine Referenz auf den Sensor, der die Messung entnommen hat <br>
   <br>
 * **Alert**: Repräsentiert einen Alarm, der ausgelöst wird, wenn ein Messwert außerhalb eines definierten Schwellenwerts liegt.
 Ein Alarm beinhaltet folgende Attribute:
-  * `id`: Eindeutige ID des Alarms
-  * `timestamp`: Zeitpunkt, zu dem der Alarm ausgelöst wurde
-  * `message`: Beschreibung des Alarms (z\.B\. "Temperatur zu hoch")
-  * `severity`: Schweregrad des Alarms (z\.B\. "hoch", "mittel", "niedrig")
-  * `sensor_id`: Referenz auf den Sensor, der den Alarm ausgelöst hat
-  * `storage_id`: Referenz auf den Lagerort, zu dem der Alarm gehört <br>
-
-### ER-Diagramm
+  * _ID_: Eine eindeutige ID des Alarms
+  * _Beschreibung_: Eine beschreibung des Alarms (z\.B\. "Temperatur zu hoch")
+  * _Schweregrad_: Der Schweregrad des Alarms (z\.B\. "hoch", "mittel", "niedrig")
+  * _Messung_: Eine Referenz auf die Messung, die den Alarm ausgelöst hat <br>
 
 ## Datenvolumen
 Das erwartete Datenvolumen ist moderat, da das System in erster Linie Echtzeitdaten von Sensoren erfasst und speichert.
@@ -208,6 +198,34 @@ Stattdessen identifiziert TimescaleDB sofort, welcher Chunk (oder welche wenigen
      * **Löschen**: Das Löschen alter Daten (z.B. "alle Messwerte älter als ein Jahr") wird effizienter, da durch die Chunks ganze Tabellen auf einmal mit (DROP TABLE) entfernt werden können, anstatt Zeile für Zeile zu löschen.
      * **Komprimierung - Speicherbedarf**: TimescaleDB bietet auch eine eingebaute Komprimierung für ältere Chunks, die den Speicherbedarf weiter reduziert.
      * **Komprimierung - Abfragegeschwindigkeit**: TimescaleDB kann auf die Daten im komprimierten Zustand wie in einem spaltenorientierten Format zugreifen. Anstatt eine ganze Zeile mit allen Datenfeldern (timestamp, value, unit etc.) lesen zu müssen (wie es bei klassicher seitenweiser Speicherung der Fall ist), kann die Datenbank gezielt nur die Spalten abrufen, die für die Abfrage benötigt werden – zum Beispiel nur den value.
+
+### Datenbank
+
+Die modellierte Datenbank sieht wie folgt aus:
+
+<img alt="ERD" src="./images/data_eva/erd.svg">
+
+Hierbei wurden die folgenden Konzepte wahrgenommen:
+
+- Jeder Nutzer hat Zugriff auf mehrere Lagerorte und jeder Lagerort kann von mehreren Nutzern zugegriffen werden.
+  Aus diesem Grund gibt es eine many-to-many Beziehung zwischen Nutzern und Lagerorten, bzw. zwischen der `User`
+  und der `Storage` Tabelle. Der Zugriff auf ein Lagerort erfolgt durch den eindeutigen Namen des Lagerorts und
+  des dazugehörigen Passworts.
+- Unterschiedliche Nutzer sollen adequate Rechte auf diesen haben können. Beispielsweise soll es Administratoren
+  und gewöhnliche Nutze geben. Daher existiert ein Feld `user_role` vom Typ `UserRole` in der Tabelle
+  `UserStorageAccess`. Dieser Datentyp ist lediglich ein ENUM.
+- Ein Lagerort soll mehrere Sensore haben, daher die many-to-one Beziehung zwischen den Tabellen `Sensor` und
+  `Storage`. Zusätzlich hat ein Sensor Grenzwerte, zwischen denen Messungen liegen sollten, um Schäden in den
+  Waren zu vermeiden, daher die Felder `allowed_min` und `allowed_max`.
+- Jeder Sensor nimmt daten auf. Daher wurde eine Tabelle `Measurement` eingeführt, die eine many-to-one Beziehung
+  zur Tabelle `Sensor` hat. Das Feld `unit` ist vom ENUM Typ `MeasurementUnit`, welches alle möglichen Einheiten
+  beinhaltet (z.B. `CELSIUS` und `FAHRENHEIT` für die Temperatur, `PERCENT` für die Luftfeuchtigkeit usw.). Dieser
+  Datentyp soll inkonsistenzen vermeiden, die es bei gewöhnlichem Text gibt (z.B. beziehen sich `Celsius` und `C`
+  auf die selbe Einheit). Das Feld `created_at` bezoeht sich auf den genauen Zeitpunkt der Messung der Daten.
+  Diese Tabelle soll eine Hypertable sein, um die Messungen möglichst effizient abrufen zu können.
+- Messungen, die die Grenzwerte des Sensors überschreiten, lösen ein Alarm aus, daher die Tabelle `Alarm`.
+  das Feld `severity` vom ENUM Typ `AlarmSeverity` beschreibt die Schwere des Alarms (`HIGH`, `MEDIUM`, `LOW`).
+  Das Feld `message` ist eine vom System generierte Nachricht, die den Alarm beschreibt und dem Nutzer angezeigt wird.
 ---
 Quellen: <br>
 [1] https://www.tigerdata.com/blog/postgresql-timescaledb-1000x-faster-queries-90-data-compression-and-much-more <br>
