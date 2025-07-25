@@ -70,6 +70,7 @@ nav:
   - Architecture:
       - Architecture Overview: arc.md
       - Data Domain: data_eva.md
+      - Arduino Codebase: arduino.md
 
 extra_css:
   - styles/extra.css
