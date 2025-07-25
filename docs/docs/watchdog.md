@@ -14,12 +14,12 @@ Diese Anforderungen wurden durch folgende Mechanismen erfüllt:
 
 Für SAMD21-kompatible Boards existieren mehrere Watchdog-Bibliotheken:
 
-| Bibliothek        | Hardwarebasiert | Einfachheit | Konfigurierbarkeit | Verbreitung |
+| Bibliothek        | Hardwarebasiert | Einfachheit | Max. Timeout | Verbreitung |
 |------------------|-------------|---------|---------------|---------|
-| `WDTZero`         | Ja          | Hoch    | Gut           | Häufig  |
-| `Sodaq_wdt`       | Ja          | Eingeschränkt | Eingeschränkt |️ Weniger verbreitet |
-| `WDT_SAMD21`      | Ja          | Eingeschränkt | Gut           |️ Selten |
-| Software-Timer    | Nein        | Hoch    |️ Eingeschränkt | Häufig  |
+| `WDTZero`         | Ja          | Hoch    | 8 s           | Häufig  |
+| `Sodaq_wdt`       | Ja          | Mittel | 8 s |️ Weniger verbreitet |
+| `WDT_SAMD21`      | Ja          | Mittel | 16 s           |️ Selten |
+| Software-Timer    | Nein        | Hoch    |️ frei wählbar | Häufig  |
 
 Die Entscheidung fiel auf **WDTZero**, da sie:
 
