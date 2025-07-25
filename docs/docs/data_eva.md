@@ -42,8 +42,6 @@ Ein Alarm beinhaltet folgende Attribute:
   * _Schweregrad_: Der Schweregrad des Alarms (z\.B\. "hoch", "mittel", "niedrig")
   * _Messung_: Eine Referenz auf die Messung, die den Alarm ausgelöst hat <br>
 
-### ER-Diagramm
-
 ## Datenvolumen
 Das erwartete Datenvolumen ist moderat, da das System in erster Linie Echtzeitdaten von Sensoren erfasst und speichert.
 
