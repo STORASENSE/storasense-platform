@@ -7,7 +7,7 @@ Zur Absicherung des Systems gegen dauerhafte Verbindungsprobleme wurde ein Softw
 Im MVP war festgelegt, dass das Gerät sich nach einem Verbindungsverlust innerhalb von **30 Sekunden** wieder mit dem MQTT-Broker verbinden soll. Gelingt dies nicht innerhalb von **3 Versuchen**, muss ein automatischer Neustart erfolgen – idealerweise innerhalb von **20 Sekunden nach letztem Versuch**.
 Diese Anforderungen wurden durch folgende Mechanismen erfüllt:
 
-- **Reconnect-Logik** mit Zähler und 30 s-Zeitfenster  
+- **Reconnect-Logik** mit Zähler und 30 s-Zeitfenster
 - **In-Sketch Watchdog**, umgesetzt über `millis()`-Timing und Neustart via `NVIC_SystemReset()`
 
 ### Vergleich alternativer Watchdog-Bibliotheken
@@ -23,13 +23,13 @@ Für SAMD21-kompatible Boards existieren mehrere Watchdog-Bibliotheken:
 
 Die Entscheidung fiel auf **In-Sketch Watchdog**, da sie:
 
-- freie Wahl der Timeout-Dauer (z. B. 20 s) ermöglicht  
-- keine zusätzliche Bibliothek benötigt  
-- präzise im Sketch über `millis()` und `NVIC_SystemReset()` arbeitet  
+- freie Wahl der Timeout-Dauer (z. B. 20 s) ermöglicht
+- keine zusätzliche Bibliothek benötigt
+- präzise im Sketch über `millis()` und `NVIC_SystemReset()` arbeitet
 
 ### Implementierung
 
-Die Watchdog-Funktionalität wird direkt im Sketch umgesetzt, ganz ohne externe Bibliothek. 
+Die Watchdog-Funktionalität wird direkt im Sketch umgesetzt, ganz ohne externe Bibliothek.
 Wir verwenden einen millis()-basierten Timer und rufen `NVIC_SystemReset()` auf, wenn seit dem letzten erfolgreichen Poll/Connect mehr als 20 s vergangen sind.
 
 1. **Parameter und State**
@@ -44,22 +44,22 @@ Wir verwenden einen millis()-basierten Timer und rufen `NVIC_SystemReset()` auf,
    unsigned long windowStart = 0;
    unsigned long lastConnect = 0;  // Zeitstempel letzten Connects
     ```
-   
+
 2. **Reconnect-Logik und Software-Reset im loop()**
 
     Im Hauptloop prüfen wir erst, ob die MQTT-Verbindung steht. Wenn ja, pollen wir und setzen den Reset-Timer zurück. Andernfalls versuchen wir bis zu drei Mal, erneut zu verbinden, und starten nach 20 s ohne Erfolg neu.
     ```cpp
     void loop() {
       unsigned long now = millis();
-    
+
       if (mqttClient.connected()) {
         // Verbindung ok: Poll beantworten und Reset-Timer zurücksetzen
         mqttClient.poll();
         lastConnect = now;
-    
+
         // Sensor-Daten lesen und veröffentlichen …
         delay(5000);
-    
+
       } else {
         // Verbindung weg: 30 s-Fenster ggf. zurücksetzen
         if (now - windowStart > RECONNECT_WINDOW_MS) {
@@ -82,7 +82,7 @@ Wir verwenden einen millis()-basierten Timer und rufen `NVIC_SystemReset()` auf,
       }
     }
     ```
-   
+
 3. **Reconnect-Logik**
 
     Nach jedem erfolgreichen Connect führt `tryConnectMQTT()` die Rücksetzung von `attempts`, `windowStart` und `lastConnect` durch.
