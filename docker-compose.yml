@@ -2,14 +2,16 @@ version: '3.8'
 
 services:
   app:
-    build: .
+    build:
+        context: .
+        dockerfile: /backend/src/app/Dockerfile
     ports:
       - "8000:8000"
       - "5555:5555"
     volumes:
       - .:/app
     networks:
-        - storasense-platform-network
+      - storasense-platform-network
 
   timescaledb:
     image: timescale/timescaledb:latest-pg15
@@ -21,12 +23,12 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - timescale_data:/var/lib/postgresql/data
+      - storasense_data_volume:/var/lib/postgresql/data
     networks:
-        - storasense-platform-network
+      - storasense-platform-network
 
 volumes:
-  timescale_data:
+  storasense_data_volume:
 
 networks:
   storasense-platform-network:
