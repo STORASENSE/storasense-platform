@@ -1,3 +1,4 @@
+from typing import Optional
 from uuid import UUID
 
 from fastapi import Depends
@@ -18,6 +19,13 @@ from backend.src.app.src.shared.repositories.base_repository import (
 class MeasurementRepository(BaseRepository[MeasurementModel, UUID]):
     def __init__(self, session: Session):
         super().__init__(session)
+
+    def find_by_id(self, object_id: UUID) -> Optional[MeasurementModel]:
+        return self.session.query(MeasurementModel).get(object_id)
+
+    def find_all(self, page_request: PageRequest) -> Page[MeasurementModel]:
+        items = self.session.query(MeasurementModel).all()
+        return Page(items, page_size=len(items), page_number=0, total_pages=1)
 
     def find_all_by_sensor_id(
         self, sensor_id: UUID, page_request: PageRequest

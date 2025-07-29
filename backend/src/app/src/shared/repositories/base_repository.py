@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from typing import Optional
 
 from sqlalchemy.orm import Session
@@ -6,19 +7,20 @@ from backend.src.app.src.shared.database.base_model import BaseModel
 from backend.src.app.src.shared.database.pagination import (
     Page,
     PageRequest,
-    paginate,
 )
 
 
-class BaseRepository[T: BaseModel, ID]:
+class BaseRepository[T: BaseModel, ID](ABC):
     def __init__(self, session: Session):
         self.session = session
 
+    @abstractmethod
     def find_by_id(self, object_id: ID) -> Optional[T]:
-        return self.session.query(T.__class__).get(object_id)
+        pass
 
+    @abstractmethod
     def find_all(self, page_request: [PageRequest]) -> Page[T]:
-        return paginate(self.session.query(T.__class__), page_request)
+        pass
 
     def create(self, obj: T):
         self.session.add(obj)
