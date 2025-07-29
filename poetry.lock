@@ -996,6 +996,17 @@ files = [
 wcwidth = "*"
 
 [[package]]
+name = "py-bcrypt"
+version = "0.4"
+description = "bcrypt password hashing and key derivation"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "py-bcrypt-0.4.tar.gz", hash = "sha256:5fa13bce551468350d66c4883694850570f3da28d6866bb638ba44fe5eabda78"},
+]
+
+[[package]]
 name = "pydantic"
 version = "2.11.7"
 description = "Data validation using Python type hints"
@@ -1938,4 +1949,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.13"
-content-hash = "8fea08131ad98b6442d8e4e79691d6e6508a61063c0f977737e823e5243653d9"
+content-hash = "bca9d0e4478a92edf7d8d03475e96a272770aaca53ee0524dbedd6a8a3172b85"
