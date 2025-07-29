@@ -228,8 +228,8 @@ Hierbei wurden die folgenden Konzepte wahrgenommen:
   Das Feld `message` ist eine vom System generierte Nachricht, die den Alarm beschreibt und dem Nutzer angezeigt wird.
 ---
 Quellen: <br>
-[1] https://www.tigerdata.com/blog/postgresql-timescaledb-1000x-faster-queries-90-data-compression-and-much-more <br>
-[2] https://docs.tigerdata.com/self-hosted/latest/install/installation-docker/ <br>
-https://www.tigerdata.com/blog/storing-iot-data-why-you-should-use-postgresql <br>
-https://www.prisma.io/dataguide/postgresql/benefits-of-postgresql#robust-feature-set <br>
-https://www.ionos.com/digitalguide/server/know-how/postgresql/ <br>
+- [1] [PostgreSQL + TimescaleDB: 1,000x Faster Queries, 90 % Data Compression, and Much More](https://www.tigerdata.com/blog/postgresql-timescaledb-1000x-faster-queries-90-data-compression-and-much-more) <br>
+- [2] [Install TimescaleDB from a Docker container](https://docs.tigerdata.com/self-hosted/latest/install/installation-docker/) <br>
+- [Storing IoT Data: 8 Reasons Why You Should Use PostgreSQL](https://www.tigerdata.com/blog/storing-iot-data-why-you-should-use-postgresql) <br>
+- [The benefits of PostgreSQL](https://www.prisma.io/dataguide/postgresql/benefits-of-postgresql#robust-feature-set) <br>
+- [PostgreSQL: a closer look at the object-relational database management system](https://www.ionos.com/digitalguide/server/know-how/postgresql/) <br>
