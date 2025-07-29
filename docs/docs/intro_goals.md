@@ -15,12 +15,14 @@ Weiter erfolgt die Kontrolle des Lagerraums im Zuge der Überwachung des Zustand
 Es gilt ein System zu entwickeln, das sowohl aus Hardware- als auch aus Softwarekomponenten besteht, die ineinandergreifen.
 
 **Sensorik (Hardware)**: Ein Netzwerk von IoT erfasst die physikalischen Messgrößen alle 30 Sekunden.
-* Temperatursensor (2x)*: Messung der Raumtemperatur (Innen- und Außen- Raum) in Celsius.
-* Luftfeuchtigkeitssensor*: Erfassung der relativen Luftfeuchtigkeit (in %).
+
+* Temperatursensor (2x): Messung der Raumtemperatur (Innen- und Außen- Raum) in Celsius.
+* Luftfeuchtigkeitssensor: Erfassung der relativen Luftfeuchtigkeit (in %).
 * Luftqualitätssensor: Detektion von Verunreinigungen in der Luft.
 * Ultraschallsensor: Zur Überprüfung des Zustandes der Tür – ist die Tür offen oder geschlossen.
 
 **Software-Plattform (Kernsystem)**: Eine zentrale Anwendung, die folgende Funktionalitäten bereitstellt:
+
 * Echtzeit-Dashboard: Grafische Visualisierung aller aktuellen (bspw. alle 30sec veröffentlichten) Sensorwerte.
 * Historische Datenanalyse: Speicherung und Darstellung von Messdaten über Zeit, um Trends und Muster zu erkennen.
 * Konfigurierbare Schwellenwerte / Festlegen eines Toleranzbereichs: Ermöglicht dem Akteur (Lagerverantwortlicher), für jeden Sensor individuelle Min/Max-Grenzwerte zu definieren.
@@ -94,6 +96,7 @@ Zeit (90 Sekunden nach Detektion) zu informieren, um präventive oder mitigieren
 Maßnahmen einzuleiten.
 
 Die Benachrichtigung erfolgt dabei dual:
+
 * **Push-Benachrichtigung** an Endgeräte zur unmittelbaren menschlichen Wahrnehmung
 * **MQTT-Nachricht** an ein vordefiniertes Topic zur automatisierten Weiterverarbeitung durch angeschlossene Systeme
 
