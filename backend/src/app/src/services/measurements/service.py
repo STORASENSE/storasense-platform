@@ -8,7 +8,7 @@ from backend.src.app.src.services.measurements.repository import (
     MeasurementRepository,
     inject_measurement_repository,
 )
-from backend.src.app.src.services.sensors.schemas import (
+from backend.src.app.src.services.measurements.schemas import (
     CreateMeasurementRequest,
 )
 from backend.src.app.src.shared.database.engine import open_session
@@ -25,6 +25,14 @@ class MeasurementService:
     def find_all_by_sensor_id(
         self, sensor_id: UUID, page_request: PageRequest
     ) -> Page[MeasurementModel]:
+        """
+        Finds all measurements that were recorded by the given sensor. The results are
+        ordered from newest to oldest and are stored in a page.
+
+        :param sensor_id: The ID of the sensor whose measurements should be retrieved.
+        :param page_request: The pagination request.
+        :return: The requested measurements.
+        """
         return self.measurement_repository.find_all_by_sensor_id(
             sensor_id, page_request
         )

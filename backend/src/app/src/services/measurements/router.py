@@ -7,7 +7,7 @@ from backend.src.app.src.services.measurements.service import (
     MeasurementService,
     inject_measurement_service,
 )
-from backend.src.app.src.services.sensors.schemas import (
+from backend.src.app.src.services.measurements.schemas import (
     CreateMeasurementRequest,
 )
 from backend.src.app.src.shared.database.pagination import PageRequest
