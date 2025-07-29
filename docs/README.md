@@ -4,5 +4,7 @@ Test rendered output locally with:
 
 ```bash
 poetry install
-poetry rnun mkdocs serve
+```
+```bash
+poetry run mkdocs serve
 ```
