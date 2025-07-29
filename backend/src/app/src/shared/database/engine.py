@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session, sessionmaker
 _database_url = os.getenv("DATABASE_URL")
 
 db_engine: Engine = create_engine(
-    f"postgresql+pg8000://{_database_url}", echo=True
+    f"postgresql+pg5432://{_database_url}", echo=True
 )
 _LocalSessionMaker = sessionmaker(
     bind=db_engine, autoflush=False, autocommit=False
