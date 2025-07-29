@@ -19,5 +19,5 @@ class UserModel(BaseModel):
     password_salt: Mapped[str] = mapped_column()
     description: Mapped[Optional[str]] = mapped_column()
     accessed_storages: Mapped[list["StorageModel"]] = relationship(
-        user_storage_access, back_populates="accessing_users"
+        secondary=user_storage_access, back_populates="accessing_users"
     )

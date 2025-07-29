@@ -20,7 +20,7 @@ class StorageModel(BaseModel):
     password_salt: Mapped[str] = mapped_column()
     description: Mapped[Optional[str]] = mapped_column()
     accessing_users: Mapped[list["UserModel"]] = relationship(
-        user_storage_access, back_populates="accessed_storages"
+        secondary=user_storage_access, back_populates="accessed_storages"
     )
     sensors: Mapped[list["SensorModel"]] = relationship(
         back_populates="storage"

@@ -20,7 +20,7 @@ class MeasurementModel(BaseModel):
     unit: Mapped[MeasurementUnit] = mapped_column(Enum(MeasurementUnit))
     created_at: Mapped[datetime] = mapped_column()
     sensor_id: Mapped[UUID] = mapped_column(ForeignKey("Sensor.id"))
-    sensor: Mapped["SensorModel"] = relationship(back_populates="sensors")
+    sensor: Mapped["SensorModel"] = relationship(back_populates="measurements")
     alarm: Mapped[Optional["AlarmModel"]] = relationship(
         back_populates="measurement"
     )
