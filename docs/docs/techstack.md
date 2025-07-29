@@ -3,6 +3,7 @@
 ## Frontend
 Die Anwendung wird als **Webanwendung** umgesetzt, die in einem Browser läuft. <br/>
 Dies hat mehrere Vorteile:
+
 * **Plattformunabhängigkeit**: Die Anwendung läuft auf jedem Gerät mit einem modernen Webbrowser, unabhängig vom Betriebssystem (Windows, macOS, Linux, Android, iOS).
 * **Einfache Verteilung**: Nutzer müssen keine Software installieren, sondern können die Anwendung direkt über eine URL aufrufen.
 * **Zugänglichkeit**: Die Anwendung ist von überall aus zugänglich, solange eine Internetverbindung besteht.
@@ -35,6 +36,7 @@ Dadurch vereinfacht es die Entwicklung von Webanwendungen und bietet eine besser
 ## Backend
 Die Anwendung wird mit der Programmiersprache **Python** entwickelt. <br/>
 Hierfür lassen sich insbesondere folgende Vorteile anführen:
+
 * Python ist eine weit verbreitete Sprache, die sich mit seinen Frameworks gut für Webanwendungen eignet.
 * Python hat eine große Community und viele Bibliotheken, die die Entwicklung erleichtern.
 * Python ist im Team bereits gut bekannt, was die Einarbeitungszeit reduziert.
@@ -65,6 +67,7 @@ Dies ermöglicht eine klare Trennung zwischen der Benutzeroberfläche und der Lo
 
 
 Quellen:
+
 * [1] [Top 7 Frontend Frameworks to Use in 2025: Pro Advice](https://roadmap.sh/frontend/frameworks)
 * [2] [Angular vs React vs Vue: Which Framework Should You Choose in 2025?](https://7span.com/blog/angular-vs-react-vs-vue)
 * [3] [The Ultimate Frontend Battle](https://content.techgig.com/web-stories/react-vs-vue-vs-angular-which-one-to-choose-in-2025/web_stories/118657485.cms)

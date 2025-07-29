@@ -17,9 +17,10 @@
 
 ### Architekturentscheidung: Entkopplung von Backend und Frontend
 Das System ist nach dem Prinzip einer entkoppelten Architektur konzipiert, bei der eine klare Trennung bzw lose Kopplung [1] zwischen der Benutzeroberfläche (Frontend) und der serverseitigen Geschäftslogik (Backend) besteht.
-* Frontend (Client-Seite): Das Frontend, realisiert mit dem [Next.js-Framework](techstack.md#frontend), ist ausschließlich für die Darstellung und die Benutzerinteraktion verantwortlich. Seine einzige Aufgabe ist es so, dem Benutzer eine intuitive Oberfläche zu bieten und Daten über eine standardisierte Schnittstelle vom Backend abzurufen bzw. Aktionen dorthin zu senden.
 
-* Backend (Server-Seite): Das Backend, entwickelt mit dem [FastAPI-Framework](techstack.md#backend), fungiert als zentrales Gehirn der Anwendung. Es stellt eine klar definierte REST-API bereit, über die alle Datenoperationen und Geschäftslogiken abgewickelt werden. Es ist zuständig für die Authentifizierung von Benutzern, die Verarbeitung von Daten, die Kommunikation mit der Datenbank und die Implementierung des Alarmsystems.
+* **Frontend (Client-Seite)**: Das Frontend, realisiert mit dem [Next.js-Framework](techstack.md#frontend), ist ausschließlich für die Darstellung und die Benutzerinteraktion verantwortlich. Seine einzige Aufgabe ist es so, dem Benutzer eine intuitive Oberfläche zu bieten und Daten über eine standardisierte Schnittstelle vom Backend abzurufen bzw. Aktionen dorthin zu senden.
+
+* **Backend (Server-Seite)**: Das Backend, entwickelt mit dem [FastAPI-Framework](techstack.md#backend), fungiert als zentrales Gehirn der Anwendung. Es stellt eine klar definierte REST-API bereit, über die alle Datenoperationen und Geschäftslogiken abgewickelt werden. Es ist zuständig für die Authentifizierung von Benutzern, die Verarbeitung von Daten, die Kommunikation mit der Datenbank und die Implementierung des Alarmsystems.
 
 Die Kommunikation zwischen diesen beiden Komponenten erfolgt zustandslos über HTTP-Anfragen und das Backend liefert Antworten im JSON-Format.
 
@@ -75,8 +76,8 @@ Ein weitere Anforderung, die durch die Architektur gefördert wird ist die [Perf
 * durchgängig einhalten, zwischen MODULES und zwischen MODULES-SHARED_STUFF
 * ggf. mit Dependency Injection realisiert (Depdency Injector verwaltet die Instanz der abstrakten Klassen)
 
-
 ---
-Quellen: <br>
-- [1] Starke, G. (2024). Effektive Softwarearchitektur: Ein praktischer Leitfaden. Hanser Verlag. 48ff <br>
+Quellen:
+
+- [1] Starke, G. (2024). Effektive Softwarearchitektur: Ein praktischer Leitfaden. Hanser Verlag. 48ff
 - [2] [Enterprise Integration Patterns - Messaging Patterns](https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessagingGateway.html)
