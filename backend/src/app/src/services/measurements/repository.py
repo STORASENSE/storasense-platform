@@ -30,6 +30,14 @@ class MeasurementRepository(BaseRepository[MeasurementModel, UUID]):
     def find_all_by_sensor_id(
         self, sensor_id: UUID, page_request: PageRequest
     ) -> Page[MeasurementModel]:
+        """
+        Finds all measurements that were recorded by the given sensor. The results are
+        ordered from newest to oldest and are stored in a page.
+
+        :param sensor_id: The ID of the sensor whose measurements should be retrieved.
+        :param page_request: The pagination request.
+        :return: The requested measurements.
+        """
         query = (
             self.session.query(MeasurementModel)
             .where(MeasurementModel.sensor_id == sensor_id)

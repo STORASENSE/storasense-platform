@@ -7,8 +7,10 @@ from backend.src.app.src.services.alarms.models import AlarmModel
 
 def discover_models():
     """
-    This method does absolutely nothing, but importing this module is needed for discovering all
-    database models. This function should be called once at the start of the application.
+    This function does absolutely nothing, but importing this module is needed for discovering all
+    database models. Importing this method (or this module) discovers all database models. Invoking this
+    function is only useful to prevent IDE confusions with lack of import usage. This function should be
+    called once at the start of the application.
     """
     pass
 

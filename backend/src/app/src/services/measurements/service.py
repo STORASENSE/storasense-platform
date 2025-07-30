@@ -40,6 +40,12 @@ class MeasurementService:
     def create_measurement(
         self, sensor_id: UUID, request: CreateMeasurementRequest
     ):
+        """
+        Creates a new measurement.
+
+        :param sensor_id: The ID of the sensor that recorded the measurement.
+        :param request: The request for measurement creation.
+        """
         measurement = MeasurementModel()
         measurement.sensor_id = sensor_id
         measurement.value = request.value
