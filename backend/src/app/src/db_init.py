@@ -1,9 +1,8 @@
 """
-This script drops all tables from the connected database (if they exist)
-and then creates all tables.
-
-Note that this script is for development only, and future usage should
-occur via a proper database migration tool, such as Alembic.
+This script initializes the database by creating all standard tables and converting
+marked tables into Hypertables using TimescaleDB. It is designed to be run in both
+production and development environments, while skipping the Hypertable creation
+when running tests against an in-memory SQLite database.
 """
 
 import sys
