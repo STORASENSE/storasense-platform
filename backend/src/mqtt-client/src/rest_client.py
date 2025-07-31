@@ -8,7 +8,8 @@ def send_one_value():
     connection = get_db_connection()
     with connection:
         row = connection.execute(
-            "select kid, timestamp,sensor_id, value from sensor_data limit 1"
+            # "select message_id, timestamp,sensor_id,"
+            # + "value from sensor_data limit 1"
         ).fetchone()
         if row:
             row_id = row[0]
