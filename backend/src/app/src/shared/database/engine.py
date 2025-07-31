@@ -3,26 +3,37 @@ import sys
 
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import Session, sessionmaker
+from dotenv import load_dotenv
 
 from backend.src.app.src.shared.database.model_discovery import discover_models
 
-
 discover_models()
 
+
+load_dotenv(override=True)
+
+# connect to test database (in memory SQLite) when running tests
+
 if "pytest" in sys.modules:
-    # connect to test database (in memory SQLite) when running tests
     _database_url = "sqlite:///:memory:"
     db_engine: Engine = create_engine(
         _database_url, echo=False, connect_args={"check_same_thread": False}
     )
+
+# for production, connect to production database
+
 else:
-    # for production, connect to production database
+    user = os.getenv("POSTGRES_USER")
+    password = os.getenv("POSTGRES_PASSWORD")
+    host = os.getenv("POSTGRES_HOST")
+    port = os.getenv("POSTGRES_PORT")
+    db_name = os.getenv("POSTGRES_DB")
 
-    database_url_env = os.getenv("DATABASE_URL")
-    if not database_url_env:
-        raise ValueError("DATABASE_URL not set!")
+    _database_url_env = f"{user}:{password}@{host}:{port}/{db_name}"
+    if not _database_url_env:
+        raise ValueError("DATABASE-envs not set!")
 
-    _database_url = "postgresql+pg5432://" + database_url_env
+    _database_url = "postgresql+pg8000://" + _database_url_env
     db_engine: Engine = create_engine(_database_url, echo=True)
 
 _LocalSessionMaker = sessionmaker(

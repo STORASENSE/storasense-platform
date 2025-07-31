@@ -2,3 +2,6 @@ buiid:
     docker build -t app:latest
 run:
     docker run --detach app:latest
+
+enter-db:
+    docker exec -it timescaledb psql -U postgres -W
