@@ -14,17 +14,18 @@ if TYPE_CHECKING:
 
 
 class MeasurementModel(BaseModel):
-    __tablename__ = "Measurement"
+    __tablename__ = "Measurements"
     __timescaledb_hypertable__ = {"time_column_name": "created_at"}
 
     id: Mapped[UUID] = mapped_column(
         primary_key=True, default=UUID
     )  # Composite PK
-    value: Mapped[float] = mapped_column()
-    unit: Mapped[MeasurementUnit] = mapped_column(Enum(MeasurementUnit))
     created_at: Mapped[datetime] = mapped_column(
         primary_key=True
     )  # Composite PK
+    value: Mapped[float] = mapped_column()
+    unit: Mapped[MeasurementUnit] = mapped_column(Enum(MeasurementUnit))
+
     sensor_id: Mapped[UUID] = mapped_column(ForeignKey("Sensor.id"))
     sensor: Mapped["SensorModel"] = relationship(back_populates="measurements")
     alarm: Mapped[Optional["AlarmModel"]] = relationship(
