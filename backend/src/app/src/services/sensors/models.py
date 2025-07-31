@@ -15,6 +15,7 @@ if TYPE_CHECKING:
 
 
 class SensorModel(BaseModel):
+    name = None
     __tablename__ = "Sensor"
 
     type: Mapped[SensorType] = mapped_column(Enum(SensorType))

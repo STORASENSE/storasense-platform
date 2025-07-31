@@ -24,8 +24,10 @@ class MeasurementRepository(BaseRepository[MeasurementModel, UUID]):
         return self.session.query(MeasurementModel).get(object_id)
 
     def find_all(self, page_request: PageRequest) -> Page[MeasurementModel]:
-        items = self.session.query(MeasurementModel).all()
-        return Page(items, page_size=len(items), page_number=0, total_pages=1)
+        query = self.session.query(MeasurementModel).order_by(
+            MeasurementModel.created_at.desc()
+        )
+        return paginate(query, page_request)
 
     def find_all_by_sensor_id(
         self, sensor_id: UUID, page_request: PageRequest

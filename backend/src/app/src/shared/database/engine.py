@@ -8,8 +8,6 @@ from dotenv import load_dotenv
 from backend.src.app.src.shared.database.model_discovery import discover_models
 
 discover_models()
-
-
 load_dotenv(override=True)
 
 # connect to test database (in memory SQLite) when running tests
@@ -20,7 +18,7 @@ if "pytest" in sys.modules:
         _database_url, echo=False, connect_args={"check_same_thread": False}
     )
 
-# for production, connect to production database
+# connect to postgres database when being run in production
 
 else:
     user = os.getenv("POSTGRES_USER")

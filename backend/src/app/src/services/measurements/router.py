@@ -1,4 +1,5 @@
 from uuid import UUID
+from typing import List
 
 from fastapi import Depends, APIRouter, status, HTTPException
 
@@ -8,13 +9,18 @@ from backend.src.app.src.services.measurements.service import (
 )
 from backend.src.app.src.services.measurements.schemas import (
     CreateMeasurementRequest,
+    MeasurementResponse,
 )
 from backend.src.app.src.shared.database.pagination import PageRequest
 
 router = APIRouter()
 
 
-@router.get("/measurements/{sensor_id}", status_code=status.HTTP_200_OK)
+@router.get(
+    "/measurements/{sensor_id}",
+    response_model=List[MeasurementResponse],
+    status_code=status.HTTP_200_OK,
+)
 def find_sensor_measurements(
     sensor_id: UUID,
     measurement_service: MeasurementService = Depends(
@@ -22,16 +28,13 @@ def find_sensor_measurements(
     ),
 ):
     page_request = PageRequest(0, 100)
+
     try:
         measurements = measurement_service.find_all_by_sensor_id(
             sensor_id, page_request
         )
-        result = []
-        for measurement in measurements:
-            result.append(
-                {"id": measurement.id, "created_at": measurement.created_at}
-            )
-        return result
+        return measurements
+
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
@@ -48,6 +51,7 @@ def create_measurement(
 ):
     try:
         measurement_service.create_measurement(sensor_id, request)
+
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)

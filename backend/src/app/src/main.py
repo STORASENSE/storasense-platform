@@ -11,10 +11,6 @@ from backend.src.app.src.services.measurements.router import (
 from backend.src.app.src.services.sensors.router import (
     router as sensors_router,
 )
-from dotenv import load_dotenv
-import os
-
-load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
 discover_models()
 
@@ -42,4 +38,4 @@ def read_root():
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="localhost", port=8000)
+    uvicorn.run(app, host="localhost", port=8002)
