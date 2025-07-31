@@ -12,7 +12,7 @@ def init_db():
         connection.execute(
             """
             CREATE TABLE IF NOT EXISTS sensor_data (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                message_id INTEGER PRIMARY KEY AUTOINCREMENT,
                 sensor_id INTEGER NOT NULL,
                 timestamp INTEGER NOT NULL,
                 value decimal(10, 2) NOT NULL);
