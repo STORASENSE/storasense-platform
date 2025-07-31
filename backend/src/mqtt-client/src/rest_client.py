@@ -27,7 +27,7 @@ def send_one_value():
             )
             if response.status_code == int(os.getenv("MQTT_HTTP_RESPONSE_OK")):
                 connection.execute(
-                    #         "DELETE FROM sensor_data WHERE id = ?", (row_id,)
+                    "DELETE FROM sensor_data WHERE message_id = ?", (row_id,)
                 )
 
 
