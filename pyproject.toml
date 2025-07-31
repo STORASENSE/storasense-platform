@@ -30,7 +30,7 @@ structlog = "^25.4.0"
 paho-mqtt = "^2.1.0"
 python-dotenv = "^1.1.1"
 sqlalchemy = "^2.0.41"
-py-bcrypt = "^0.4"
+pg8000 = "^1.31.4"
 
 [tool.poetry.group.dev.dependencies]
 commitizen = "^4.8.3"
