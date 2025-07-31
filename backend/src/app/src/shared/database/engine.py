@@ -17,7 +17,12 @@ if "pytest" in sys.modules:
     )
 else:
     # for production, connect to production database
-    _database_url = "postgresql+pg5432://" + os.getenv("DATABASE_URL")
+
+    database_url_env = os.getenv("DATABASE_URL")
+    if not database_url_env:
+        raise ValueError("DATABASE_URL not set!")
+
+    _database_url = "postgresql+pg5432://" + database_url_env
     db_engine: Engine = create_engine(_database_url, echo=True)
 
 _LocalSessionMaker = sessionmaker(
