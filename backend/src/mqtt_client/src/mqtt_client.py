@@ -1,5 +1,5 @@
-import json
 import os
+import time
 
 import paho.mqtt.client as mqtt
 from database import get_db_connection
@@ -19,17 +19,21 @@ def on_subscribe(client, userdata, mid, reason_code_list, properties):
 
 
 def on_message(client, userdata, message):
-    message_data = json.load(message.payload.decode("utf-8"))
     sensor_id = message.topic.split("/")[-1]
+    """message_data = json.loads(message.payload.decode("utf-8"))
+
     value = message_data["value"][1]
-    timestamp = message_data["timestamp"]
+    timestamp = message_data["timestamp"]"""
+    value = message.payload.decode("utf-8")
+    print(f"received {value}")
+    timestamp = time.time()
     with get_db_connection() as connection:
         connection.execute(
             """
-        INSERT INTO sensor_data (sensor_id, value,timestamp),values (?,?,?)""",
+        INSERT INTO sensor_data (sensor_id, value,timestamp) values (?,?,?)""",
             (sensor_id, value, timestamp),
         )
-    connection.close(get_topics())
+    connection.close()
 
 
 def on_connect(client, userdata, flags, reason_code, properties):
