@@ -13,13 +13,13 @@ RUN apk add --no-cache gcc musl-dev libffi-dev sqlite-dev
 RUN pip install "poetry==$POETRY_VERSION"
 
 # Copy only requirements to cache them in docker layer
-COPY pyproject.toml poetry.lock* /mqttclient/
+COPY pyproject.toml poetry.lock* ./
 
 # Project initialization
 RUN poetry config virtualenvs.create false \
     && poetry install --no-interaction --no-ansi --no-root
 
-COPY . /mqttclient
+COPY ./backend/src/mqtt_client .
 
 # Run the application
-CMD ["python", "main.py"]
+CMD ["python", "src/main.py"]

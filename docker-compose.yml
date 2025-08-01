@@ -2,7 +2,7 @@ services:
   mqtt-client:
     build:
       context: .
-      dockerfile: /backend/src/mqtt_client/Dockerfile
+      dockerfile: ./backend/src/mqtt_client/Dockerfile
     restart: always
 #    networks:
 #      - storasense-network
