@@ -57,7 +57,7 @@ add_request_middleware(app)
 
 ## 4. Schnellstart (Inbetriebnahme)
 
-Damit das Shared-Logging sofort aktiv ist, führst du diese Schritte in deinem Hauptskript (z.B. `main.py` oder `app.py`) aus:
+Damit das Shared-Logging sofort aktiv ist, führt man diese Schritte in dem Hauptskript (z.B. `main.py` oder `app.py`) aus:
 
 ```python
 from fastapi import FastAPI
