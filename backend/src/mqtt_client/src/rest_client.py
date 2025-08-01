@@ -19,10 +19,9 @@ def send_one_value():
             value = row[3]
             try:
                 response_code = requests.post(
-                    os.getenv("MQTT_BACKEND_URL"),
+                    f"{os.getenv('MQTT_BACKEND_URL')}/{sensor_id}",
                     json={
                         "timestamp": timestamp,
-                        "sensor_id": sensor_id,
                         "value": value,
                     },
                 ).status_code
