@@ -6,7 +6,7 @@ from database import get_db_connection
 
 
 def get_topics():
-    topics = os.getenv("MQTT_TOPICS").split(",")
+    topics = os.getenv("MQTT_TOPICS", "").split(",")
 
     topic_tuples = []
     for topic in topics:
@@ -36,7 +36,7 @@ def on_connect(client, userdata, flags, reason_code, properties):
     if reason_code.is_failure:
         print(f"Failed to connect: {reason_code}.")
     else:
-        client.subscribe()
+        client.subscribe(get_topics())
 
 
 def start_mqtt_client():
