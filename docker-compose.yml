@@ -4,8 +4,8 @@ services:
       context: .
       dockerfile: /backend/src/mqtt_client/Dockerfile
     restart: always
-    networks:
-      - storasense-network
+#    networks:
+#      - storasense-network
 
 #  app:
 #    build:
@@ -37,6 +37,6 @@ services:
 #volumes:
 #  storasense_data_volume:
 #
-networks:
-  storasense-network:
-    driver: bridge
+#networks:
+#  storasense-network:
+#    driver: bridge
