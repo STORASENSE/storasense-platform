@@ -1,22 +1,18 @@
 FROM python:3.13-slim
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
 ENV POETRY_VERSION=1.8.3
 ENV PYTHONPATH=/app
 
-# Set the working directory
 WORKDIR /app
 
-# Install Poetry
 RUN pip install "poetry==$POETRY_VERSION"
 
-# Copy only requirements to cache them in docker layer
-COPY ../pyproject.toml poetry.lock* /app/
+COPY pyproject.toml poetry.lock* /app/
 
-# Project initialization
 RUN poetry config virtualenvs.create false \
     && poetry install --no-interaction --no-ansi --no-root
 
-# Run the application
-CMD ["./start.sh"]
+COPY . /app
+
+# Run the application server
+CMD ["uvicorn", "backend.src.app.src.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
