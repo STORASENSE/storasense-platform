@@ -1,0 +1,69 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+Enum UserRole {
+  ADMIN
+  CONTRIBUTOR
+}
+
+Enum SensorType {
+  TEMPERATURE
+  HUMIDITY
+}
+
+Enum MeasurementUnit {
+  CELSIUS
+  FAHRENHEIT
+  PERCENT
+}
+
+Enum AlertSeverity {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+Table User {
+  id UUID [PK]
+  username varchar [unique]
+  password_hash varchar
+  password_salt varchar
+  description varchar
+}
+
+Table Storage {
+  id UUID [PK]
+  name varchar [unique]
+  password_hash varchar
+  password_salt varchar
+  description varchar
+}
+
+Table UserStorageAccess {
+  user_id UUID [PK, ref: <> User.id]
+  storage_id UUID [PK, ref: <> Storage.id]
+  userRole UserRole
+}
+
+Table Sensor {
+  id UUID [PK]
+  storage_id UUID [ref: > Storage.id]
+  type SensorType
+  allowed_min real
+  allowed_max real
+}
+
+Table Measurement {
+  id UUID [PK]
+  sensor_id UUID [ref: > Sensor.id]
+  value real
+  unit MeasurementUnit
+  created_at timestamp
+}
+
+Table Alert {
+  id UUID [PK]
+  measurement_id UUID [ref: - Measurement.id]
+  severity AlertSeverity
+  message varchar
+}
