@@ -11,13 +11,13 @@ services:
     networks:
       - storasense-network
 
-  #mqtt-client:
-  #  build:
-  #    context: .
-  #    dockerfile: /backend/src/mqtt-client/Dockerfile
-  #  restart: always
-  #  networks:
-  #    - storasense-network
+  mqtt-client:
+    build:
+        context: .
+        dockerfile: ./backend/src/mqtt_client/Dockerfile
+    restart: always
+    networks:
+        - storasense-network
 
   timescaledb:
     image: timescale/timescaledb:latest-pg15
