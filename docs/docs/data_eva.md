@@ -49,6 +49,7 @@ Das erwartete Datenvolumen ist moderat, da das System in erster Linie Echtzeitda
 #### Measurement:
 Wie eingangs im [Projektüberblick](mvp.md#funktionale-anforderungen) beschrieben, besteht die Sensorik des Systems aus vier Sensoren die täglich für 2.5 Monate alle 30 Sekunden Messwerte erfassen.
 Folgende Rechnung verdeutlicht die erwartete Datenmenge:
+
 * Anzahl der Sensoren: 4
 * Jeder Sensor sendet alle 30 Sekunden einen Messwert.
 * Das ergibt:
@@ -61,6 +62,7 @@ Insgesamt werden also ca. **864.000 Messpunkte** erwartet, die in der Datenbank 
 
 #### Weitere Entitäten:
 Die weiteren Entitäten haben eine deutlich geringere Anzahl an Instanzen:
+
 * Wie bereits im [Projektüberblick](mvp.md#funktionale-anforderungen) beschrieben unterstützt das System bis zu 500 Benutzer und 50 Lagerorte.
 * Weiter sind 2 Rollen vorgesehen, die den Benutzern zugeordnet werden können.
 * Die letzten 500 Alarme eines Lagerorts werden ebenfalls gespeichert. So ergibt sich eine maximale Anzahl von 25.000 Alarm-Einträgen (500 Alarme x 50 Lagerorte).
@@ -112,19 +114,22 @@ Die definierten nicht-funktionalen Anforderungen beinflussen ggf. direkt die Aus
 #### **Performance und schnelle Alarmierung**
 
 Die Anforderung, einen Alarm innerhalb von 90 Sekunden auszulösen, *nachdem* ein Grenzwert für über 30 Sekunden verletzt wurde, stellt eine hohe Anforderung an die Datenbank-Performance. Dies erfordert mehr als nur eine schnelle Einzelabfrage. Die Datenbank muss folgende Operationen sehr effizient unterstützen:
-1.  **Schnelles Schreiben (Ingestion):** Jeder neue `Measurement`-Datensatz muss mit minimaler Latenz gespeichert werden, damit die Alarmierungskette sofort starten kann.
+
+1. **Schnelles Schreiben (Ingestion):** Jeder neue `Measurement`-Datensatz muss mit minimaler Latenz gespeichert werden, damit die Alarmierungskette sofort starten kann.
 2.  **Effiziente Zeitfenster-Abfragen:** Um eine 30-sekündige Grenzwertverletzung zu erkennen, muss das System eine Abfrage wie "Gib mir alle Messwerte von `sensor_x` der letzten 30-40 Sekunden" sehr schnell ausführen können. Dies verlangt Indexierungsfähigkeiten, insbesondere auf den Feldern `timestamp` und `sensor_id`.
 
 #### **Hohe Verfügbarkeit**
 
 Die geforderte Verfügbarkeit von 99% über einen Zeitraum von drei Tagen erlaubt eine maximale Ausfallzeit von ca. 43 Minuten.
-*   **Stabilität und Datenpersistenz:** Die Datenbank muss ein robuster, stabiler Dienst sein, der Daten zuverlässig auf die Festplatte schreibt. Bei einem Neustart dürfen so keine Daten verloren gehen (was beispielsweise reine In-Memory-Datenbanken ausschließt). Basierend auf der Anforderung einer Verfügbarkeit von 99% muss die Technologie stabil innerhalb einer Docker-Umgebung laufen.
+
+* **Stabilität und Datenpersistenz:** Die Datenbank muss ein robuster, stabiler Dienst sein, der Daten zuverlässig auf die Festplatte schreibt. Bei einem Neustart dürfen so keine Daten verloren gehen (was beispielsweise reine In-Memory-Datenbanken ausschließt). Basierend auf der Anforderung einer Verfügbarkeit von 99% muss die Technologie stabil innerhalb einer Docker-Umgebung laufen.
 *   **Unterstützung für Resilienz:** Die Anforderung des automatischen Neustarts wird von der Infrastruktur (Docker Compose) umgesetzt. Die Datenbank muss diesen Prozess jedoch zuverlässig unterstützen, d.h. nach einem unerwarteten Herunterfahren schnell und konsistent wieder hochfahren.
 
 #### **Sicherheit (Authentifizierung & Autorisierung)**
 
 Diese Anforderung betrifft primär die Anwendungslogik, aber die Datenbank muss die sichere Implementierung unterstützen:
-*   **Sichere Datenspeicherung:** Die Datenbank muss sensible Daten wie gehashte Passwörter in der `User`-Entität sicher speichern.
+
+* **Sichere Datenspeicherung:** Die Datenbank muss sensible Daten wie gehashte Passwörter in der `User`-Entität sicher speichern.
 *   **Unterstützung relationaler Integrität:** Um die Autorisierung (wer darf auf welchen `Storage` zugreifen?) sicherzustellen, muss die Datenbank die Beziehungen zwischen `User`, `Role` und `Storage` zuverlässig abbilden können. Ein System, das diese Beziehungen durch **Constraints** und **Fremdschlüssel** auf Datenbankebene garantiert, ist hier also wichtig, da es das Risiko von Fehlern in der Anwendungslogik reduziert.
 
 ## Datenbankauswahl - Kriterien
@@ -171,6 +176,7 @@ Um einerseits die einfachen, zeitabhängigen Messreihen effizient verwalten zu k
 Diese hat sich als eine der leistungsfähigsten Open-Source-Datenbanken etabliert und bietet neben dem klassichen relationalen Ansatz auch Unterstützung für zeitbasierte Daten durch die Erweiterung **TimescaleDB**. <br>
 TimescaleDB ist eine Erweiterung für PostgreSQL, die speziell für die Speicherung und Abfrage von Zeitreihendaten entwickelt wurde. Sie bietet Funktionen wie automatische Partitionierung (Chunking) und Indizierung, die die Performance bei zeitbasierten Abfragen erheblich verbessern [1]. <br>
 Für das Projekt bietet diese Kombination folgende Vorteile, die direkt auf die zuvor definierten Auswahlkriterien abzielen:
+
 * Optimale Performance für die Alarmierung: Die zentrale Anforderung des schnellen Alarmsystems wird durch TimescaleDB ideal unterstützt. Die Measurement-Tabelle wird als sogenannte Hypertable konfiguriert. Dadurch werden die Messdaten im Hintergrund automatisch nach Zeit partitioniert, was Abfragen auf kurzen Zeitfenstern ("alle Werte der letzten 30 Sekunden") extrem performant macht.
 * Hohe Datenintegrität bei geringer Komplexität: Während TimescaleDB die Zeitreihendaten optimiert, kümmert sich der PostgreSQL-Kern um die relationalen Daten. Die Beziehungen zwischen User, Role und Storage werden durch Foreign Keys und ACID-Transaktionen auf Datenbankebene abgesichert. Dies ermöglicht die Datenkonsistenz, reduziert den Entwicklungsaufwand im Backend und vermeidet Komplexität.
 * Python-Entwickler-Unterstützung: PostgreSQL ist im Python-Ökosystem integriert und wird von Bibliotheken wie SQLAlchemy optimal unterstützt. Die Verwendung von standardisiertem SQL erleichtert zudem die Anbindung von Visualisierungs-Tools und die Formulierung komplexer Abfragen für das Analyse-Dashboard.
@@ -227,9 +233,10 @@ Hierbei wurden die folgenden Konzepte wahrgenommen:
   das Feld `severity` vom ENUM Typ `AlarmSeverity` beschreibt die Schwere des Alarms (`HIGH`, `MEDIUM`, `LOW`).
   Das Feld `message` ist eine vom System generierte Nachricht, die den Alarm beschreibt und dem Nutzer angezeigt wird.
 ---
-Quellen: <br>
-[1] https://www.tigerdata.com/blog/postgresql-timescaledb-1000x-faster-queries-90-data-compression-and-much-more <br>
-[2] https://docs.tigerdata.com/self-hosted/latest/install/installation-docker/ <br>
-https://www.tigerdata.com/blog/storing-iot-data-why-you-should-use-postgresql <br>
-https://www.prisma.io/dataguide/postgresql/benefits-of-postgresql#robust-feature-set <br>
-https://www.ionos.com/digitalguide/server/know-how/postgresql/ <br>
+Quellen:
+
+- [1] [PostgreSQL + TimescaleDB: 1,000x Faster Queries, 90 % Data Compression, and Much More](https://www.tigerdata.com/blog/postgresql-timescaledb-1000x-faster-queries-90-data-compression-and-much-more)
+- [2] [Install TimescaleDB from a Docker container](https://docs.tigerdata.com/self-hosted/latest/install/installation-docker/)
+- [Storing IoT Data: 8 Reasons Why You Should Use PostgreSQL](https://www.tigerdata.com/blog/storing-iot-data-why-you-should-use-postgresql)
+- [The benefits of PostgreSQL](https://www.prisma.io/dataguide/postgresql/benefits-of-postgresql#robust-feature-set)
+- [PostgreSQL: a closer look at the object-relational database management system](https://www.ionos.com/digitalguide/server/know-how/postgresql/)

@@ -30,6 +30,8 @@ structlog = "^25.4.0"
 paho-mqtt = "^2.1.0"
 python-dotenv = "^1.1.1"
 pysqlite3 = "^0.5.4"
+sqlalchemy = "^2.0.41"
+pg8000 = "^1.31.4"
 
 [tool.poetry.group.dev.dependencies]
 commitizen = "^4.8.3"
@@ -78,7 +80,7 @@ exclude = [
 ]
 
 # Same as Black.
-line-length = 88
+line-length = 79
 indent-width = 4
 
 # Assume Python 3.9
