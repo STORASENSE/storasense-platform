@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING, Optional
+from uuid import UUID, uuid4
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -14,6 +15,8 @@ if TYPE_CHECKING:
 
 class StorageModel(BaseModel):
     __tablename__ = "Storage"
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
 
     name: Mapped[str] = mapped_column(unique=True)
     password_hash: Mapped[str] = mapped_column()
