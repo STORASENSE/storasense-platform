@@ -6,10 +6,11 @@ when running tests against an in-memory SQLite database.
 """
 
 import sys
-from sqlalchemy import text
+from sqlalchemy import text, inspect
 
+from backend.src.app.src.seed import seed_initial_data
 from backend.src.app.src.shared.database.base_model import BaseModel
-from backend.src.app.src.shared.database.engine import db_engine
+from backend.src.app.src.shared.database.engine import db_engine, open_session
 from backend.src.app.src.shared.database.model_discovery import discover_models
 
 
@@ -25,16 +26,45 @@ discover_models()
 #    print("Done")
 
 
+def check_if_tables_exist() -> bool:
+    """
+    Checks if the database schema already exists.
+    Returns True if the schema exists, False otherwise.
+    This is used to avoid unnecessary re-initialization of the database.
+    """
+
+    # Create an inspector to check the database schema
+    inspector = inspect(db_engine)
+
+    # Check if the "Sensor" table exists
+    if inspector.has_table("Sensor"):
+        print("Database schema already exists. Skipping initialization.")
+        return True
+    return False
+
+
 def initialize_database():
     """
     Initializes the database:
     1. Creates all standard tables using BaseModel.metadata.create_all.
     2. Converts marked tables into Hypertables (only when not in test mode).
     """
-    print("Starting database initialization...")
 
+    print("Checking if database initialization is needed...")
+    if check_if_tables_exist():
+        print("Database already initialized. Skipping further initialization.")
+        return
+
+    print("Database schema not found. Starting database initialization...")
+
+    # Idempotent - check if tables already exist before creating them
     BaseModel.metadata.create_all(db_engine)
     print("Standard tables successfully checked/created.")
+
+    # Seed initial data into the database
+    print("Seeding initial data...")
+    with open_session() as session:
+        seed_initial_data(session)
 
     # IMPORTANT: We do not execute the TimescaleDB logic when testing against the in-memory SQLite database.
     if "pytest" in sys.modules:

@@ -43,7 +43,7 @@ class SensorService:
         if sensor:
             raise ValueError(f"Sensor with ID {sensor_id} already exists.")
 
-        storage = self._sensor_repository.find_by_id(request.storage_id)
+        storage = self._storage_repository.find_by_id(request.storage_id)
         if not storage:
             raise ValueError(f"Storage with ID {sensor_id} does not exist.")
 
@@ -52,6 +52,9 @@ class SensorService:
         sensor.type = request.type
         sensor.storage_id = request.storage_id
         sensor.storage = request.storage
+        sensor.name = request.name
+        sensor.allowed_min = request.allowed_min
+        sensor.allowed_max = request.allowed_max
 
         self._sensor_repository.create(sensor)
         self._session.commit()
