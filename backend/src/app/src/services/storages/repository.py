@@ -26,3 +26,7 @@ class StorageRepository(BaseRepository[StorageModel, UUID]):
             .order_by(MeasurementModel.created_at.desc())
         )
         return self.session.scalars(query).all()
+
+
+def inject_storage_repository():
+    return None
