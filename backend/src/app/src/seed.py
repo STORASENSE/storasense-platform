@@ -28,7 +28,7 @@ def seed_initial_data(session: Session):
                 "allowed_max": 40.0,
             },
             {
-                "id": "9f34ef74-44 5a-3aef-8ecd-2b9803062cbf",
+                "id": "9f34ef74-445a-3aef-8ecd-2b9803062cbf",
                 "name": "Humidity",
                 "type": SensorType.HUMIDITY,
                 "allowed_min": 20.0,
@@ -49,7 +49,7 @@ def seed_initial_data(session: Session):
                 "allowed_max": 50.0,
             },
             {
-                "id": "a1dbbc27-2da2-316c-9125-4a2d1c629f50",
+                "id": "86c9381d-7265-3f3b-bef2-68b9742d30b9",
                 "name": "Air",
                 "type": SensorType.AIR,
                 "allowed_min": 10.0,
