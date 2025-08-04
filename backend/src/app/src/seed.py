@@ -21,35 +21,35 @@ def seed_initial_data(session: Session):
         # Define 5 sensors with predefined values
         sensors_to_create = [
             {
-                "id": "00000000-0000-0000-0000-000000000001",
+                "id": "3f8f788a-a6d0-34ee-9cc0-2a762338cfda",
                 "name": "Temperature-Inside",
                 "type": SensorType.TEMPERATURE,
                 "allowed_min": 0.0,
                 "allowed_max": 40.0,
             },
             {
-                "id": "00000000-0000-0000-0000-000000000002",
+                "id": "9f34ef74-44 5a-3aef-8ecd-2b9803062cbf",
                 "name": "Humidity",
                 "type": SensorType.HUMIDITY,
                 "allowed_min": 20.0,
                 "allowed_max": 80.0,
             },
             {
-                "id": "00000000-0000-0000-0000-000000000003",
+                "id": "ad5b8443-aef7-39a8-a530-75282ecb075f",
                 "name": "Ultrasonic",
                 "type": SensorType.ULTRASONIC,
                 "allowed_min": 100.0,
                 "allowed_max": 100.0,
             },
             {
-                "id": "00000000-0000-0000-0000-000000000004",
+                "id": "e2cab404-1e6b-31f1-8f90-840273670527",
                 "name": "Temperature-Outside",
                 "type": SensorType.TEMPERATURE,
                 "allowed_min": -10.0,
                 "allowed_max": 50.0,
             },
             {
-                "id": "00000000-0000-0000-0000-000000000005",
+                "id": "a1dbbc27-2da2-316c-9125-4a2d1c629f50",
                 "name": "Air",
                 "type": SensorType.AIR,
                 "allowed_min": 10.0,

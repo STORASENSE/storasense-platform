@@ -6,7 +6,8 @@ when running tests against an in-memory SQLite database.
 """
 
 import sys
-from sqlalchemy import text, inspect
+
+from sqlalchemy import text
 
 from backend.src.app.src.seed import seed_initial_data
 from backend.src.app.src.shared.database.base_model import BaseModel
@@ -26,21 +27,25 @@ discover_models()
 #    print("Done")
 
 
-def check_if_tables_exist() -> bool:
+def check_if_tables_exist() -> (
+    bool
+):  # TODO: check if the sensor with seeded id already exists
     """
     Checks if the database schema already exists.
     Returns True if the schema exists, False otherwise.
     This is used to avoid unnecessary re-initialization of the database.
     """
-
-    # Create an inspector to check the database schema
-    inspector = inspect(db_engine)
-
-    # Check if the "Sensor" table exists
-    if inspector.has_table("Sensor"):
-        print("Database schema already exists. Skipping initialization.")
-        return True
-    return False
+    # try:
+    #     known_sensor_id = UUID("584ccf3a-0239-3b39-a07d-917a6417234a")
+    #     statement = select(SensorModel).where(
+    #         SensorModel.id == known_sensor_id
+    #     )
+    #     # result = db_engine.execute(statement).fetchone()
+    #     # return result is not None
+    #
+    # except Exception as e:
+    #     print(f"Error checking if tables exist: {e}")
+    #     return False
 
 
 def initialize_database():
