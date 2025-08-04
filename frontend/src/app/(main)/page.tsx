@@ -9,6 +9,9 @@ const HomePage: FC = () => {
                     StoraSense
                 </h1>
             </header>
+            <section>
+
+            </section>
         </div>
     );
 }
