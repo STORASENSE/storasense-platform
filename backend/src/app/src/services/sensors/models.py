@@ -15,12 +15,14 @@ if TYPE_CHECKING:
 
 
 class SensorModel(BaseModel):
-    name = None
     __tablename__ = "Sensor"
 
     type: Mapped[SensorType] = mapped_column(Enum(SensorType))
+    name: Mapped[str] = mapped_column(nullable=True)
     storage_id: Mapped[UUID] = mapped_column(ForeignKey("Storage.id"))
     storage: Mapped[StorageModel] = relationship(back_populates="sensors")
+    allowed_min: Mapped[float] = mapped_column(nullable=True)
+    allowed_max: Mapped[float] = mapped_column(nullable=True)
     measurements: Mapped[list["MeasurementModel"]] = relationship(
         back_populates="sensor"
     )
