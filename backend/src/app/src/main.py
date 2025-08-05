@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from backend.src.app.shared import logging
 
@@ -47,6 +48,16 @@ app = FastAPI(
 # app.include_router(storages_router)
 app.include_router(measurements_router)
 app.include_router(sensors_router)
+
+# configure CORS
+origins = ["http://localhost:3000"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/health", tags=["Root"])
