@@ -69,7 +69,9 @@ nav:
   - Architecture:
       - Architecture Overview: arc.md
       - Data Domain: data_eva.md
-      - Arduino Codebase: arduino.md
+  - Components:
+      - Storasense-Sensoric (Arduino): arduino.md
+      - Backend: backend.md
 
 extra_css:
   - styles/extra.css
