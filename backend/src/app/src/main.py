@@ -4,7 +4,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.src.app.shared import logging
+from backend.src.shared.logging import logging
 
 # ... DB imports ...
 from backend.src.app.src.shared.database.model_discovery import discover_models
@@ -22,7 +22,7 @@ from backend.src.app.src.services.sensors.router import (
 
 discover_models()
 
-_logger = logging.get_logger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
