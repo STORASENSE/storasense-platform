@@ -2,6 +2,9 @@ import os
 
 import paho.mqtt.client as mqtt
 from database import get_db_connection
+from backend.src.shared.logging import get_logger
+
+logger = get_logger(__name__)
 import json
 
 
@@ -15,7 +18,7 @@ def get_topics():
 
 
 def on_subscribe(client, userdata, mid, reason_code_list, properties):
-    print("Subscribed")
+    logger.info("Subscribed")
 
 
 def on_message(client, userdata, message):
@@ -25,7 +28,7 @@ def on_message(client, userdata, message):
     value = message_data["value"][0]
     timestamp = message_data["timestamp"]
     unit = message_data["meta"]["unit"]
-    print(f"received {value}")
+    logger.info(f"received {value}")
     with get_db_connection() as connection:
         connection.execute(
             """
@@ -37,7 +40,7 @@ def on_message(client, userdata, message):
 
 def on_connect(client, userdata, flags, reason_code, properties):
     if reason_code.is_failure:
-        print(f"Failed to connect: {reason_code}.")
+        logger.error(f"Failed to connect: {reason_code}.")
     else:
         client.subscribe(get_topics())
 
