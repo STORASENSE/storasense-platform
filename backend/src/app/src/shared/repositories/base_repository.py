@@ -30,7 +30,6 @@ class BaseRepository[T: BaseModel, ID](ABC):
         """
         pass
 
-    @abstractmethod
     def find_all(self, page_request: [PageRequest]) -> Page[T]:
         """
         Finds all entities and paginates the result.

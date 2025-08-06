@@ -14,4 +14,4 @@ class BaseModel(DeclarativeBase):
         id (UUID): The model's primary key.
     """
 
-    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4())
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
