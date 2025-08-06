@@ -11,7 +11,7 @@ import sqlalchemy
 from sqlalchemy import text
 from sqlalchemy.orm import sessionmaker
 
-from backend.src.app.shared import logging
+from backend.src.shared.logging import logging
 from backend.src.app.src.seed_dev import seed_dev_data
 from backend.src.app.src.seed_prod import seed_prod_data
 from backend.src.app.src.shared.database.base_model import BaseModel
@@ -22,7 +22,7 @@ discover_models()
 
 _environment = os.getenv("ENVIRONMENT")  # TEST / DEV / PROD
 
-_logger = logging.get_logger(__name__)
+_logger = logging.getLogger(__name__)
 
 _LocalSessionMaker = sessionmaker(
     bind=db_engine, autoflush=False, autocommit=False

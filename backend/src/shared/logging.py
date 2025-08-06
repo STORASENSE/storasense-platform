@@ -35,13 +35,17 @@ def configure_logging():
     stdout_handler.setLevel(logging.INFO)
     # Nur Levels unter ERROR durchlassen
     stdout_handler.addFilter(lambda record: record.levelno < logging.ERROR)
-    stdout_handler.setFormatter(logging.Formatter("%(message)s"))
+    stdout_handler.setFormatter(
+        logging.Formatter("%(asctime)s %(levelname)s %(message)s", "%H:%M:%S")
+    )
     root_logger.addHandler(stdout_handler)
 
     # ERROR und höher -> stderr
     stderr_handler = logging.StreamHandler(sys.stderr)
     stderr_handler.setLevel(logging.ERROR)
-    stderr_handler.setFormatter(logging.Formatter("%(message)s"))
+    stderr_handler.setFormatter(
+        logging.Formatter("%(asctime)s %(levelname)s %(message)s", "%H:%M:%S")
+    )
     root_logger.addHandler(stderr_handler)
 
     # Log-Rotation: Rotating file handler
@@ -51,7 +55,9 @@ def configure_logging():
         backupCount=int(os.getenv("LOG_BACKUP_COUNT", "5")),
     )
     file_handler.setLevel(log_level_value)
-    file_handler.setFormatter(logging.Formatter("%(message)s"))
+    file_handler.setFormatter(
+        logging.Formatter("%(asctime)s %(levelname)s %(message)s", "%H:%M:%S")
+    )
     root_logger.addHandler(file_handler)
 
     # Uvicorn/FastAPI Integration: use the same handlers for uvicorn loggers
@@ -61,7 +67,7 @@ def configure_logging():
         uv_logger.setLevel(log_level_value)
         uv_logger.propagate = False
 
-    # Optional Monitoring: HTTP handler for ELK/Logstash
+    # Optional Monitoring: HTTP handler für ELK/Logstash
     logstash_url = os.getenv("LOGSTASH_URL")
     if logstash_url:
         http_handler = logging.handlers.HTTPHandler(

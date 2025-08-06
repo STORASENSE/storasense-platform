@@ -3,9 +3,9 @@ from datetime import datetime
 
 import requests
 from database import get_db_connection
-from backend.src.shared.logging import get_logger
+from backend.src.shared.logging import logging
 
-logger = get_logger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 def send_one_value():
@@ -38,7 +38,7 @@ def send_one_value():
                         "DELETE FROM sensor_data WHERE message_id = ?",
                         (row_id,),
                     )
-                logger.info("sent {value}")
+                _logger.info("sent {value}")
 
 
 def start_rest_client(stop_event):

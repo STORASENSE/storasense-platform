@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 from sqlalchemy.orm import Session
 
-from backend.src.app.shared import logging
+from backend.src.shared.logging import logging
 from backend.src.app.src.services.measurements.models import MeasurementModel
 from backend.src.app.src.services.sensors.models import SensorModel
 from backend.src.app.src.services.storages.models import StorageModel
@@ -13,7 +13,7 @@ from backend.src.app.src.shared.database.enums import (
 )
 
 
-_logger = logging.get_logger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 def seed_users(session: Session):
