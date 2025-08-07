@@ -48,7 +48,7 @@ class AuthService:
             request.session["user_id"] = str(local_user.id)
             request.session["email"] = local_user.email
 
-        return RedirectResponse(url="/docs")
+        return RedirectResponse(url="http://app.storasense.de/docs")
 
 
 def inject_auth_service(
