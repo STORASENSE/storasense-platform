@@ -27,7 +27,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.tinyauth.entrypoints=web"
       - "traefik.http.routers.tinyauth.rule=Host(`tinyauth.storasense.de`)"
-      - "traefik.http.services.tinyauth.loadbalancer.server.port=80"
+      - "traefik.http.services.tinyauth.loadbalancer.server.port=3000"
 
   app:
     build:
