@@ -1,9 +1,12 @@
 "use client"
 
-import {FC, useCallback, useEffect, useMemo, useState} from "react";
+import {FC, useEffect, useMemo, useState} from "react";
 import {useGetMeasurementsQuery} from "@/redux/api/storaSenseApi";
 import {ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent} from "@/components/ui/chart";
 import {Area, AreaChart, CartesianGrid, XAxis} from "recharts";
+import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
+import {AlertCircleIcon} from "lucide-react";
+import {Skeleton} from "@/components/ui/skeleton";
 
 
 const chartConfig = {
@@ -15,18 +18,23 @@ const chartConfig = {
 
 
 const TemperatureChart: FC = () => {
-    /*
-    const [maxDate, setMaxDate] = useState<Date>();
-    const getMaxDate = useCallback(() => {
-        const now = new Date();
-        now.setFullYear(2030)
-        now.setMinutes(now.getMinutes() - 30);
-        return now;
+    const [maxDate, setMaxDate] = useState<Date>(new Date());
+
+    useEffect(() => {
+        const counter = setTimeout(() => {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() + 30);
+            setMaxDate(now);
+        }, 30000);
+
+        return () => {
+            clearTimeout(counter);
+        }
     }, []);
-    */
-    const {data} = useGetMeasurementsQuery({
-        sensor_id: '3a46e98b-b358-4763-9017-7238787b30b5',
-        max_date: '2030-08-05 12:58:13.585000+00:00'
+
+    const {data, isLoading, isError} = useGetMeasurementsQuery({
+        sensor_id: '3f8f788a-a6d0-34ee-9cc0-2a762338cfda',
+        max_date: maxDate.toISOString()
     });
 
     const transformedData = useMemo(() => {
@@ -38,8 +46,28 @@ const TemperatureChart: FC = () => {
         }));
     }, [data]);
 
-    if (!data) {
-        return <></>;
+    if (isLoading) {
+        return (
+            <>
+                <Skeleton className="mt-2 mb-3 w-full h-[100px]"/>
+                <Skeleton className="mb-3 w-full h-[40px]"/>
+                <Skeleton className="w-full h-[40px]"/>
+            </>
+        );
+    }
+
+    if (isError) {
+        return (
+            <Alert variant="destructive" className="mt-2 p-2">
+                <AlertCircleIcon />
+                <AlertTitle>
+                    Error while fetching temperature data.
+                </AlertTitle>
+                <AlertDescription>
+                    An error occurred while contacting the server.
+                </AlertDescription>
+            </Alert>
+        );
     }
 
     return (
