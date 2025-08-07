@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI
+from starlette.middleware.sessions import SessionMiddleware
 
 from fastapi.middleware.cors import CORSMiddleware
 from backend.src.app.src.shared.logging import logging
@@ -55,6 +56,8 @@ app.include_router(users_router)
 # app.include_router(storages_router)
 app.include_router(measurements_router)
 app.include_router(sensors_router)
+
+app.add_middleware(SessionMiddleware, secret_key=os.environ.get("SECRET_KEY"))
 
 # configure CORS
 origins = ["http://localhost:3000"]

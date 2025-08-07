@@ -12,9 +12,10 @@ stop:
     echo "Stopping the application..."
     docker-compose down
 
-softreset:
+reset-all:
     just stop
     docker system prune
+    docker volume prune
 
 prune-builds:
     echo "Pruning old builds..."
@@ -33,7 +34,10 @@ logs:
     echo "Displaying logs..."
     docker-compose logs -f
 
-delete-volume:
+enter-db:
+    docker exec -it timescaledb psql -U postgres -W
+
+delete-dbvolume:
     echo "Deleting the database..."
     docker volume rm timescaledb_data
 
