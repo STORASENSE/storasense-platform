@@ -8,6 +8,7 @@ from rest_client import start_rest_client
 
 def main():
     load_dotenv(dotenv_path="../../../../.env")
+
     init_db()
     stop_event = threading.Event()
     threading.Thread(target=start_rest_client, args=(stop_event,)).start()
