@@ -1,8 +1,10 @@
+from datetime import datetime
 from uuid import UUID
 
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
+from backend.src.app.shared import logging
 from backend.src.app.src.services.measurements.models import MeasurementModel
 from backend.src.app.src.services.measurements.repository import (
     MeasurementRepository,
@@ -11,12 +13,16 @@ from backend.src.app.src.services.measurements.repository import (
 from backend.src.app.src.services.measurements.schemas import (
     CreateMeasurementRequest,
 )
+from backend.src.app.src.services.sensors.errors import SensorDoesNotExistError
 from backend.src.app.src.services.sensors.repository import (
     SensorRepository,
     inject_sensor_repository,
 )
 from backend.src.app.src.shared.database.engine import open_session
 from backend.src.app.src.shared.database.pagination import Page, PageRequest
+
+
+_logger = logging.get_logger(__name__)
 
 
 class MeasurementService:
@@ -44,6 +50,27 @@ class MeasurementService:
         return self._measurement_repository.find_all_by_sensor_id(
             sensor_id, page_request
         )
+
+    def find_all_by_sensor_id_and_max_date(
+        self, sensor_id: UUID, max_date: datetime
+    ) -> list[MeasurementModel]:
+        _logger.info(
+            f"Finding measurements for sensor '{sensor_id}' after date '{max_date}'"
+        )
+
+        if not self._sensor_repository.exists(sensor_id):
+            _logger.info(f"Requested sensor '{sensor_id}' does not exist!")
+            raise SensorDoesNotExistError(
+                f"Sensor with ID '{sensor_id}' does not exist"
+            )
+
+        result = (
+            self._measurement_repository.find_all_by_sensor_id_and_max_date(
+                sensor_id, max_date
+            )
+        )
+        _logger.info(f"Found {len(result)} measurements")
+        return result
 
     def create_measurement(
         self, sensor_id: UUID, request: CreateMeasurementRequest

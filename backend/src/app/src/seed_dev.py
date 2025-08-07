@@ -2,6 +2,7 @@ import random
 from datetime import datetime, timedelta
 
 from sqlalchemy.orm import Session
+from uuid import UUID
 
 from backend.src.app.shared import logging
 from backend.src.app.src.services.measurements.models import MeasurementModel
@@ -33,6 +34,7 @@ def seed_storages(session: Session):
 def seed_sensors(session: Session):
     for storage in session.query(StorageModel).all():
         temp_inside = SensorModel(
+            id=UUID("3f8f788a-a6d0-34ee-9cc0-2a762338cfda"),
             name="Temperature (Inside)",
             type=SensorType.TEMPERATURE,
             storage_id=storage.id,

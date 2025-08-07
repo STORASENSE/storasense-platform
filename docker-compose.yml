@@ -23,6 +23,16 @@ services:
     networks:
         - storasense-network
 
+  frontend:
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+    restart: always
+    ports:
+      - "3000:3000"
+    networks:
+      - storasense-network
+
   timescaledb:
     image: timescale/timescaledb:latest-pg15
     container_name: timescaledb

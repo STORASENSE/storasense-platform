@@ -1,8 +1,7 @@
 """
 This script initializes the database by creating all standard tables and converting
-marked tables into Hypertables using TimescaleDB. It is designed to be run in both
-production and development environments, while skipping the Hypertable creation
-when running tests against an in-memory SQLite database.
+marked tables into Hypertables using TimescaleDB.
+It is designed to be run in all environments.
 """
 
 import os
