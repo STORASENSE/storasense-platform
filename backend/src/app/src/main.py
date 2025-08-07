@@ -4,7 +4,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.src.shared.logging import logging
+from backend.src.app.src.shared.logging import logging
 
 # ... DB imports ...
 from backend.src.app.src.shared.database.model_discovery import discover_models
@@ -19,6 +19,7 @@ from backend.src.app.src.services.measurements.router import (
 from backend.src.app.src.services.sensors.router import (
     router as sensors_router,
 )
+
 
 discover_models()
 

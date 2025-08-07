@@ -12,6 +12,11 @@ stop:
     echo "Stopping the application..."
     docker-compose down
 
+reset-all:
+    just stop
+    docker system prune
+    docker volume prune
+
 prune-builds:
     echo "Pruning old builds..."
     docker container prune
