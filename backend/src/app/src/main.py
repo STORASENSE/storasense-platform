@@ -1,7 +1,10 @@
+import os
 from contextlib import asynccontextmanager
 
 import uvicorn
+from dotenv import load_dotenv
 from fastapi import FastAPI
+from starlette.middleware.sessions import SessionMiddleware
 
 from backend.src.app.shared import logging
 
@@ -18,8 +21,12 @@ from backend.src.app.src.services.measurements.router import (
 from backend.src.app.src.services.sensors.router import (
     router as sensors_router,
 )
+from backend.src.app.src.services.auth.router import (
+    router as auth_router,
+)
 
 discover_models()
+load_dotenv()
 
 _logger = logging.get_logger(__name__)
 
@@ -39,7 +46,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="STORASENSE-Platform-Backend API",
     version="1.0.0",
-    description="STORASENSE-Platform-Backend API for IoT-Datamanagement",
+    description="STORASENSE-Platform-Backend API",
     lifespan=lifespan,
 )
 
@@ -47,6 +54,9 @@ app = FastAPI(
 # app.include_router(storages_router)
 app.include_router(measurements_router)
 app.include_router(sensors_router)
+app.include_router(auth_router)
+
+app.add_middleware(SessionMiddleware, secret_key=os.environ.get("SECRET_KEY"))
 
 
 @app.get("/health", tags=["Root"])
