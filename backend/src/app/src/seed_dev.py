@@ -74,15 +74,31 @@ def seed_sensors(session: Session):
 def seed_measurements(session: Session):
     for sensor in session.query(SensorModel).all():
         _logger.info(f"Generating measurements for sensor {sensor.name}")
-        measurements: list[MeasurementModel] = [
-            MeasurementModel(
-                value=random.uniform(sensor.allowed_min, sensor.allowed_max),
-                unit=MeasurementUnit.CELSIUS,
-                sensor_id=sensor.id,
-                created_at=datetime.now() - timedelta(seconds=30 * i),
+
+        # Decides randomly wether 15 measurements should be under the allowed minimum or above the allowed maximum
+        outlier_type = random.choice(["min", "max"])
+        outlier_value = (
+            sensor.allowed_min - 0.1
+            if outlier_type == "min"
+            else sensor.allowed_max + 0.1
+        )
+
+        measurements: list[MeasurementModel] = []
+
+        for i in range(100):
+            if 20 <= i < 35:  # 15 measurements from index 20
+                value = outlier_value
+            else:
+                value = random.uniform(sensor.allowed_min, sensor.allowed_max)
+            measurements.append(
+                MeasurementModel(
+                    value=value,
+                    unit=MeasurementUnit.CELSIUS,
+                    sensor_id=sensor.id,
+                    created_at=datetime.now() - timedelta(seconds=30 * i),
+                )
             )
-            for i in range(100)
-        ]
+
         session.add_all(measurements)
         session.flush()
 

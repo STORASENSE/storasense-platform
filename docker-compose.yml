@@ -1,25 +1,25 @@
 services:
-#  app:
-#    build:
-#        context: .
-#        dockerfile: /backend/src/app/Dockerfile
-#    env_file:
-#      - .env
-#    restart: always
-#    ports:
-#      - "8000:8000"
-#    networks:
-#      - storasense-network
-#    depends_on:
-#      - timescaledb
+  app:
+    build:
+        context: .
+        dockerfile: /backend/src/app/Dockerfile
+    env_file:
+      - .env
+    restart: always
+    ports:
+      - "8000:8000"
+    networks:
+      - storasense-network
+    depends_on:
+      - timescaledb
 
-#  mqtt-client:
-#    build:
-#        context: .
-#        dockerfile: ./backend/src/mqtt_client/Dockerfile
-#    restart: always
-#    networks:
-#        - storasense-network
+  mqtt-client:
+    build:
+        context: .
+        dockerfile: ./backend/src/mqtt_client/Dockerfile
+    restart: always
+    networks:
+        - storasense-network
 
   timescaledb:
     image: timescale/timescaledb:latest-pg15
