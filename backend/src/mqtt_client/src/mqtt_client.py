@@ -1,8 +1,12 @@
 import os
+import time
 
 import paho.mqtt.client as mqtt
 from database import get_db_connection
-import json
+
+from backend.src.shared.logging import logging
+
+_logger = logging.getLogger(__name__)
 
 
 def get_topics():
@@ -15,29 +19,30 @@ def get_topics():
 
 
 def on_subscribe(client, userdata, mid, reason_code_list, properties):
-    print("Subscribed")
+    _logger.info("Subscribed")
 
 
 def on_message(client, userdata, message):
     sensor_id = message.topic.split("/")[-1]
-    message_data = json.loads(message.payload.decode("utf-8"))
+    """message_data = json.loads(message.payload.decode("utf-8"))
 
-    value = message_data["value"][0]
-    timestamp = message_data["timestamp"]
-    unit = message_data["meta"]["unit"]
-    print(f"received {value}")
+    value = message_data["value"][1]
+    timestamp = message_data["timestamp"]"""
+    value = message.payload.decode("utf-8")
+    _logger.info(f"received {value}")
+    timestamp = time.time()
     with get_db_connection() as connection:
         connection.execute(
             """
-        INSERT INTO sensor_data (sensor_id, value,timestamp,unit) values (?,?,?,?)""",
-            (sensor_id, value, timestamp, unit),
+        INSERT INTO sensor_data (sensor_id, value,timestamp) values (?,?,?)""",
+            (sensor_id, value, timestamp),
         )
     connection.close()
 
 
 def on_connect(client, userdata, flags, reason_code, properties):
     if reason_code.is_failure:
-        print(f"Failed to connect: {reason_code}.")
+        _logger.error(f"Failed to connect: {reason_code}.")
     else:
         client.subscribe(get_topics())
 
@@ -50,8 +55,6 @@ def start_mqtt_client():
     mqtt_client.username_pw_set(
         os.getenv("MQTT_USER_NAME"), password=os.getenv("MQTT_USER_PASSWORD")
     )
-
-    print(os.getenv("MQTT_BROKER_ADRESS"))
     mqtt_client.connect(
         os.getenv("MQTT_BROKER_ADRESS"),
         port=int(os.getenv("MQTT_BROKER_PORT")),
