@@ -15,17 +15,16 @@ if TYPE_CHECKING:
 class UserModel(BaseModel):
     __tablename__ = "User"
 
-    email: Mapped[str] = mapped_column(
+    keycloak_id: Mapped[str] = mapped_column(
         String(255), unique=True, index=True, nullable=False
     )
-    provider_sub: Mapped[str] = mapped_column(
+    username: Mapped[str] = mapped_column(
         String(255), unique=True, index=True, nullable=False
+    )
+    email: Mapped[Optional[str]] = mapped_column(
+        String(255), unique=True, index=True, nullable=True
     )
     name: Mapped[Optional[str]] = mapped_column(String(255))
-    role: Mapped[str] = mapped_column(
-        String(50), nullable=False, default="user"
-    )
-
     description: Mapped[Optional[str]] = mapped_column()
     accessed_storages: Mapped[list["StorageModel"]] = relationship(
         secondary=user_storage_access, back_populates="accessing_users"
