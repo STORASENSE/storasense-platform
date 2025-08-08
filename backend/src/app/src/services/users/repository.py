@@ -21,27 +21,18 @@ class UserRepository(BaseRepository[UserModel, UUID]):
         query = select(UserModel).where(UserModel.id == user_id)
         return self.session.scalars(query).one_or_none()
 
-    def find_by_provider_sub(self, provider_sub: str) -> Optional[UserModel]:
-        """Finds a user by their id from the OIDC provider."""
-        query = select(UserModel).where(UserModel.provider_sub == provider_sub)
+    def find_by_keycloak_id(self, keycloak_id: str) -> Optional[UserModel]:
+        """Finds a user by their ID ('sub'-Claim of JWT)."""
+        query = select(UserModel).where(UserModel.keycloak_id == keycloak_id)
         return self.session.scalars(query).one_or_none()
 
-    def find_by_email(self, email: str) -> Optional[UserModel]:
-        """Finds a user by their email address."""
-        query = select(UserModel).where(UserModel.email == email)
-        return self.session.scalars(query).one_or_none()
-
-    def create_from_oidc(self, oidc_user_info: dict) -> UserModel:
-        """Creates a new user from OIDC user information."""
-        user = UserModel()
-        user.email = oidc_user_info.get("email")
-        user.provider_sub = oidc_user_info.get("sub")
-        user.name = oidc_user_info.get("name")
-        user.role = "user"
-
-        self.session.add(user)
-        self.session.flush()  # Don't commit here => Service has to do that!
-        return user
+    def create_user(self, user_data: dict) -> UserModel:
+        """
+        Creates a new user in the database - based on the provided Keycloak user data.
+        """
+        new_user = UserModel(**user_data)
+        self.session.add(new_user)
+        return new_user
 
 
 def inject_user_repository(
