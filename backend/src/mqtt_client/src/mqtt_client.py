@@ -3,6 +3,7 @@ import time
 
 import paho.mqtt.client as mqtt
 from database import get_db_connection
+
 from backend.src.shared.logging import logging
 
 _logger = logging.getLogger(__name__)
