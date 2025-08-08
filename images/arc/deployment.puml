@@ -1,0 +1,94 @@
+```puml
+@startuml
+!theme spacelab
+
+skinparam shadowing true
+skinparam actorStyle awesome
+skinparam defaultTextColor #000000
+skinparam arrowFontColor #333333
+skinparam defaultTextColor #000000
+
+skinparam node {
+    FontColor #000000
+}
+skinparam component {
+    FontColor #000000
+}
+skinparam database {
+    FontColor #000000
+}
+skinparam rectangle {
+    FontColor #000000
+}
+skinparam package {
+    FontColor #000000
+}
+skinparam actor {
+    FontColor #000000
+}
+
+skinparam rectangle {
+    borderRadius 10
+    BackgroundColor #F5F7FA
+    BorderColor #4A90E2
+}
+skinparam database {
+    borderRadius 10
+    BackgroundColor #FDF6E3
+    BorderColor #E67E22
+}
+skinparam component {
+    borderRadius 10
+    BackgroundColor #E3F2FD
+    BorderColor #1976D2
+}
+skinparam node {
+    borderRadius 10
+    BackgroundColor #F0F4C3
+    BorderColor #8BC34A
+}
+skinparam package {
+    borderColor #333333
+    borderStyle dashed
+    BackgroundColor #F8F9FA
+}
+
+actor " Client (Webbrowser)" as User
+node " IoT-Mikrocontroller\n(Arduino)" as Device
+
+node " Server-Infrastruktur\n(Docker Host)" as Server {
+    package "Docker Compose Network" as DockerNetwork {
+
+        node "Frontend-Container" as FrontendContainer {
+            component "Frontend\n(Next.js)" as Frontend
+        }
+
+        node "FastAPI-Container" as FastAPIContainer {
+            component "Backend\n(FastAPI)" as Backend
+        }
+
+        node "MQTT-Client-Container" as MqttClientContainer {
+            component "MQTT Client\n(Python-Skript)" as MqttClient
+        }
+
+        node "PostgreSQL-Container" as PostgresContainer {
+           database "TimescaleDB\n(PostgreSQL)" as Postgres
+        }
+    }
+
+    node "MQTT-Broker-Container" as MqttBrokerContainer {
+        component "MQTT Broker" as MqttBroker
+    }
+}
+
+User -right-> Frontend : Nutzt das Dashboard\n(HTTPS)
+Device .up.> MqttBroker: Sendet Sensordaten\n(MQTT)
+
+MqttBroker .down.> MqttClient : Sensordaten\n(MQTT Subscribe)
+MqttClient .left.> Backend : Datenweitergabe\n(HTTP POST)
+Frontend .down.> Backend : API Requests
+Backend --> Postgres : Speichert & liest Daten\n(DB)
+Backend .up.> MqttBroker : Sendet Alarme\n(MQTT Publish)
+
+@enduml
+```
