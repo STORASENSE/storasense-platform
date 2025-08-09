@@ -4,7 +4,6 @@ from contextlib import asynccontextmanager
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI
-from starlette.middleware.sessions import SessionMiddleware
 
 from fastapi.middleware.cors import CORSMiddleware
 from backend.src.app.src.shared.logging import logging
@@ -24,10 +23,13 @@ from backend.src.app.src.services.sensors.router import (
     router as sensors_router,
 )
 
+
 discover_models()
 load_dotenv()
 
 _logger = logging.getLogger(__name__)
+
+CLIENT_ID = os.environ.get("KEYCLOAK_CLIENT_ID")
 
 CLIENT_ID = os.environ.get("KEYCLOAK_CLIENT_ID")
 
