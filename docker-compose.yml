@@ -21,8 +21,6 @@ services:
     container_name: keycloak
     restart: unless-stopped
     environment:
-      - KEYCLOAK_ADMIN=${KEYCLOAK_ADM}
-      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_PW}
       - KC_DB=postgres # Use timescaledb as the database
       - KC_DB_URL_HOST=timescaledb
       - KC_DB_URL_DATABASE=${POSTGRES_DB}
@@ -41,7 +39,7 @@ services:
       - storasense-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.keycloak.rule=Host(`auth.storasense.de`)"
+      - "traefik.http.routers.keycloak.rule=Host(`auth.storasense.de`)&& !PathPrefix(`/admin`)"
       - "traefik.http.routers.keycloak.entrypoints=web"
       - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
 
