@@ -16,7 +16,7 @@ CLIENT_ID = os.environ.get("KEYCLOAK_CLIENT_ID")
 
 if not all([KEYCLOAK_URL, REALM_NAME, CLIENT_ID]):
     raise RuntimeError(
-        "Keycloak nicht korrekt konfiguriert. Bitte Umgebungsvariablen prüfen."
+        "Keycloak is not configured correctly. Please check environment variables."
     )
 
 # URLs for browser flow
@@ -44,7 +44,7 @@ class AuthService:
         if not token:
             raise HTTPException(
                 status_code=401,
-                detail="Nicht authentifiziert: Kein Token vorhanden.",
+                detail="Not authenticated: No token provided.",
             )
 
         try:
@@ -70,7 +70,7 @@ class AuthService:
             if not user_id or not username:
                 raise HTTPException(
                     status_code=401,
-                    detail="Token fehlen wichtige Claims ('sub', 'preferred_username').",
+                    detail="Token is missing required claims ('sub', 'preferred_username').",
                 )
 
             return TokenData(
@@ -82,9 +82,7 @@ class AuthService:
             )
 
         except jwt.PyJWTError as e:
-            raise HTTPException(
-                status_code=401, detail=f"Ungültiges Token: {e}"
-            )
+            raise HTTPException(status_code=401, detail=f"Invalid token: {e}")
 
     async def get_current_user(
         self, token: str = Depends(oauth2_scheme)
@@ -101,7 +99,7 @@ class AuthService:
             if required_role not in token_data.roles:
                 raise HTTPException(
                     status_code=403,
-                    detail=f"Zugriff verweigert: Benötigt Rolle '{required_role}'.",
+                    detail=f"Access denied: Requires role '{required_role}'.",
                 )
             return token_data
 
