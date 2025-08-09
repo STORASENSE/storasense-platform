@@ -28,15 +28,6 @@ _LocalSessionMaker = sessionmaker(
 )
 
 
-# if __name__ == "__main__":
-#    print("Dropping tables...")
-#    BaseModel.metadata.drop_all(db_engine)
-#    print("Done")
-#    print("Creating tables...")
-#    BaseModel.metadata.create_all(db_engine)
-#    print("Done")
-
-
 def is_prod_initialized() -> bool:
     """
     This function is used to check if the production database has already been

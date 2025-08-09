@@ -21,17 +21,17 @@ services:
     container_name: keycloak
     restart: unless-stopped
     environment:
-      - KC_DB=postgres # Use timescaledb as the database
-      - KC_DB_URL_HOST=timescaledb
-      - KC_DB_URL_DATABASE=${POSTGRES_DB}
-      - KC_DB_USERNAME=${POSTGRES_USER}
-      - KC_DB_PASSWORD=${POSTGRES_PASSWORD}
+      - KC_DB=postgres
+      - KC_DB_URL_HOST=${POSTGRES_HOST} # Use timescaledb as the database
+      - KC_DB_URL_DATABASE=${POSTGRES_KC_DB_NAME}
+      - KC_DB_USERNAME=${POSTGRES_KC_DB_USER}
+      - KC_DB_PASSWORD=${POSTGRES_KC_DB_PASSWORD}
       - KC_HTTP_ENABLED=true
       - KC_HOSTNAME=auth.storasense.de
       - KC_PROXY=edge
       - KC_PROXY_HEADERS=xforwarded
       - KC_CACHE=local
-      - KEYCLOAK_INTERNAL_URL={KEYCLOAK_INTERNAL_URL}
+      - KEYCLOAK_INTERNAL_URL=${KEYCLOAK_INTERNAL_URL}
     command: start
     ports:
       - "8088:8080"
@@ -42,6 +42,9 @@ services:
       - "traefik.http.routers.keycloak.rule=Host(`auth.storasense.de`)&& !PathPrefix(`/admin`)"
       - "traefik.http.routers.keycloak.entrypoints=web"
       - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
+    depends_on:
+      timescaledb:
+        condition: service_healthy
 
   app:
     build:
@@ -51,15 +54,16 @@ services:
     restart: always
     networks:
       - storasense-network
-    depends_on:
-      - timescaledb
-      - keycloak
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.app.entrypoints=web"
       - "traefik.http.routers.app.rule=Host(`api.storasense.de`)"
       - "traefik.http.services.app.loadbalancer.server.port=8000"
-
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
 
   mqtt-client:
     build:
@@ -69,21 +73,28 @@ services:
     restart: always
     networks:
       - storasense-network
-    depends_on:
-      - app
 
   timescaledb:
     image: timescale/timescaledb:latest-pg15
     container_name: timescaledb
     restart: always
     environment:
+      - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_KC_DB_NAME=${POSTGRES_KC_DB_NAME}
+      - POSTGRES_KC_DB_USER=${POSTGRES_KC_DB_USER}
+      - POSTGRES_KC_DB_PASSWORD=${POSTGRES_KC_DB_PASSWORD}
     volumes:
       - storasense_data_volume:/var/lib/postgresql/data
+      - ./db-init:/docker-entrypoint-initdb.d
     networks:
       - storasense-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   storasense_data_volume:
