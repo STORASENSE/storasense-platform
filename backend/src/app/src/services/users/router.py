@@ -20,4 +20,15 @@ async def read_users_me(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Authenticated user not found and couldn't be created.",
         )
-    return db_user
+
+    user_response = UserResponse(
+        id=db_user.id,
+        keycloak_id=db_user.keycloak_id,
+        username=db_user.username,
+        email=db_user.email,
+        name=db_user.name,
+        description=db_user.description,
+        roles=token_data.roles,  # Single value coming from Keycloak token instead of db (cannot be stored in db due to Keycloak as "single source of truth")
+    )
+
+    return user_response
