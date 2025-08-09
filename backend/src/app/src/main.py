@@ -1,9 +1,10 @@
 from contextlib import asynccontextmanager
 
 import uvicorn
+from dotenv import load_dotenv
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 
+from fastapi.middleware.cors import CORSMiddleware
 from backend.src.app.src.shared.logging import logging
 
 # ... DB imports ...
@@ -11,7 +12,8 @@ from backend.src.app.src.shared.database.model_discovery import discover_models
 from backend.src.app.src.db_init import initialize_database
 
 # ... Router imports ...
-# from .services.users.router import router as users_router
+from .services.users.router import router as users_router
+
 # from .services.storages.router import router as storages_router
 from backend.src.app.src.services.measurements.router import (
     router as measurements_router,
@@ -22,8 +24,11 @@ from backend.src.app.src.services.sensors.router import (
 
 
 discover_models()
+load_dotenv()
 
 _logger = logging.getLogger(__name__)
+
+CLIENT_ID = os.environ.get("KEYCLOAK_CLIENT_ID")
 
 
 @asynccontextmanager
@@ -41,11 +46,12 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="STORASENSE-Platform-Backend API",
     version="1.0.0",
-    description="STORASENSE-Platform-Backend API for IoT-Datamanagement",
+    description="STORASENSE-Platform-Backend API",
     lifespan=lifespan,
+    swagger_ui_init_oauth={"clientId": CLIENT_ID, "appName": "Storasense API"},
 )
 
-# app.include_router(users_router)
+app.include_router(users_router)
 # app.include_router(storages_router)
 app.include_router(measurements_router)
 app.include_router(sensors_router)

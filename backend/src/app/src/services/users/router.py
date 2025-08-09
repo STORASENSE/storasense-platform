@@ -13,7 +13,7 @@ async def read_users_me(
     user_service: UserService = Depends(inject_user_service),
 ):
     db_user: UserModel = user_service.get_or_create_user_by_keycloak_id(
-        keycloak_id=token_data.id, username=token_data.username
+        token_data=token_data
     )
     if not db_user:
         raise HTTPException(

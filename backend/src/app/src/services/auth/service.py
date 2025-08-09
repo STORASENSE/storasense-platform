@@ -1,69 +1,46 @@
 import os
+import jwt
+from jwt import PyJWKClient
 
-import httpx
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2AuthorizationCodeBearer
-from jose import jwt, jwk
-from jose.exceptions import JWTError
 
 from backend.src.app.src.services.auth.schemas import TokenData
 
+# External configuration for browser flow
 KEYCLOAK_URL = os.environ.get("KEYCLOAK_URL")
+# Internal URL for service communication
+KEYCLOAK_INTERNAL_URL = os.environ.get("KEYCLOAK_INTERNAL_URL", KEYCLOAK_URL)
 REALM_NAME = os.environ.get("KEYCLOAK_REALM")
 CLIENT_ID = os.environ.get("KEYCLOAK_CLIENT_ID")
 
 if not all([KEYCLOAK_URL, REALM_NAME, CLIENT_ID]):
     raise RuntimeError(
-        "Keycloack not properly configured. Please set KEYCLOAK_URL, KEYCLOAK_REALM, and KEYCLOAK_CLIENT_ID environment variables."
+        "Keycloak nicht korrekt konfiguriert. Bitte Umgebungsvariablen prüfen."
     )
 
-# URLS for Keycloak endpoints
+# URLs for browser flow
 AUTHORIZATION_URL = (
     f"{KEYCLOAK_URL}/realms/{REALM_NAME}/protocol/openid-connect/auth"
 )
 TOKEN_URL = f"{KEYCLOAK_URL}/realms/{REALM_NAME}/protocol/openid-connect/token"
-JWKS_URL = f"{KEYCLOAK_URL}/realms/{REALM_NAME}/protocol/openid-connect/certs"
+# URL for internal service communication
+JWKS_URL = f"{KEYCLOAK_INTERNAL_URL}/realms/{REALM_NAME}/protocol/openid-connect/certs"
 
 oauth2_scheme = OAuth2AuthorizationCodeBearer(
     authorizationUrl=AUTHORIZATION_URL,
     tokenUrl=TOKEN_URL,
+    scopes={"openid": "Standard OpenID Connect scope"},
 )
 
 
 class AuthService:
     def __init__(self):
-        # Cache for public keys (JWKS) to avoid frequent network calls
-        self._jwks_cache = {}
-
-    async def _get_public_key(self, kid: str):
-        # gets the public key from the JWKS endpoint to verify JWT signatures
-        if not self._jwks_cache:
-            async with httpx.AsyncClient() as client:
-                response = await client.get(JWKS_URL)
-                response.raise_for_status()
-                self._jwks_cache = response.json()
-
-        key_data = next(
-            (
-                key
-                for key in self._jwks_cache.get("keys", [])
-                if key["kid"] == kid
-            ),
-            None,
-        )
-        if not key_data:
-            raise HTTPException(
-                status_code=401,
-                detail="Public Key für die Token-Signatur nicht gefunden.",
-            )
-
-        return jwk.construct(key_data)
+        # PyJWKClient automatically fetches and caches the JWKS (JSON Web Key Set)
+        self.jwks_client = PyJWKClient(JWKS_URL)
 
     async def validate_token(self, token: str) -> TokenData:
-        """
-        Validates the JWT token and extracts user information.
-        Raises HTTPException if the token is invalid or missing required claims.
-        """
+        """Validates the JWT token and extracts user information."""
         if not token:
             raise HTTPException(
                 status_code=401,
@@ -71,26 +48,24 @@ class AuthService:
             )
 
         try:
-            headers = jwt.get_unverified_headers(token)
-            kid = headers.get("kid")
-            if not kid:
-                raise HTTPException(
-                    status_code=401,
-                    detail="Token fehlt der 'kid' (Key ID) Header.",
-                )
+            # Client gets the signing key from token
+            signing_key = self.jwks_client.get_signing_key_from_jwt(token)
 
-            public_key = await self._get_public_key(kid)
-
+            # Decrypt payload using the signing key
             payload = jwt.decode(
                 token,
-                public_key.to_pem().decode("utf-8"),
+                signing_key.key,
                 algorithms=["RS256"],
+                # Checking "Audience": Value of CLIENT_ID must match the "aud" claim in the token.
                 audience=CLIENT_ID,
             )
 
+            # Extract information for backend
             user_id = payload.get("sub")
             username = payload.get("preferred_username")
             roles = payload.get("realm_access", {}).get("roles", [])
+            email = payload.get("email")
+            name = payload.get("name")
 
             if not user_id or not username:
                 raise HTTPException(
@@ -98,9 +73,15 @@ class AuthService:
                     detail="Token fehlen wichtige Claims ('sub', 'preferred_username').",
                 )
 
-            return TokenData(id=user_id, username=username, roles=roles)
+            return TokenData(
+                id=user_id,
+                username=username,
+                roles=roles,
+                email=email,
+                name=name,
+            )
 
-        except JWTError as e:
+        except jwt.PyJWTError as e:
             raise HTTPException(
                 status_code=401, detail=f"Ungültiges Token: {e}"
             )
@@ -108,10 +89,12 @@ class AuthService:
     async def get_current_user(
         self, token: str = Depends(oauth2_scheme)
     ) -> TokenData:
-        """Verifys and returns the current user based on the provided JWT token (auth header)."""
+        """Dependency to get and validate the current user."""
         return await self.validate_token(token)
 
     def has_role(self, required_role: str):
+        """Dependency to check if the user has a specific role."""
+
         async def role_checker(
             token_data: TokenData = Depends(self.get_current_user),
         ):
@@ -125,5 +108,5 @@ class AuthService:
         return role_checker
 
 
-# global instance of AuthService for dependency injection
+# Global instance of AuthService
 auth_service = AuthService()

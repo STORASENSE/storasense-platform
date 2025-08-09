@@ -1,8 +1,7 @@
-# backend/src/app/src/services/users/service.py
-
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
+from ..auth.schemas import TokenData
 from .models import UserModel
 from .repository import (
     UserRepository,
@@ -17,18 +16,32 @@ class UserService:
         self._user_repository = user_repository
 
     def get_or_create_user_by_keycloak_id(
-        self, keycloak_id: str, username: str
+        self, token_data: TokenData
     ) -> UserModel:
-        user = self._user_repository.find_by_keycloak_id(keycloak_id)
+        """
+        Looks for a user in the database by their Keycloak ID.
+        If the user does not exist, it creates a new user profile with the data provided in the token.
+        """
+        # Wir suchen weiterhin nach der eindeutigen ID aus dem Token
+        user = self._user_repository.find_by_keycloak_id(token_data.id)
 
         if user:
             return user
         else:
+            # creates a new user profile with the data provided in the token
             new_user_data = {
-                "keycloak_id": keycloak_id,
-                "username": username,
+                "keycloak_id": token_data.id,
+                "username": token_data.username,
+                "email": token_data.email,
+                "name": token_data.name,
             }
-            user = self._user_repository.create_user(new_user_data)
+
+            # filter out None values to avoid inserting them into the database
+            new_user_data_filtered = {
+                k: v for k, v in new_user_data.items() if v is not None
+            }
+
+            user = self._user_repository.create_user(new_user_data_filtered)
             self._session.commit()
             return user
 
