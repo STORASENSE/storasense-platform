@@ -18,7 +18,7 @@ if "pytest" in sys.modules:
         _database_url, echo=False, connect_args={"check_same_thread": False}
     )
 
-# connect to postgres database when being run in production
+# connect to postgres database when being run in production / dev
 else:
     max_retries = 3
     retry_delay = 1  # Initial delay in seconds
