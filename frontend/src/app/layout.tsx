@@ -28,11 +28,9 @@ export const metadata: Metadata = {
 const RootLayout: FC<{ children: ReactNode }> = ({ children }) => {
     return (
         <html lang="en">
-            <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+            <body className={`${geistSans.variable} ${geistMono.variable} antialiased box-border`}>
                 <Providers>
-                    <main>
-                        {children}
-                    </main>
+                    {children}
                 </Providers>
             </body>
         </html>

@@ -16,7 +16,15 @@ class CreateMeasurementRequest(BaseModel):
 
 class MeasurementResponse(BaseModel):
     id: UUID
+    value: float
+    unit: MeasurementUnit
     created_at: datetime
 
     class Config:
         from_attributes = True
+
+
+class GetMeasurementsResponse(BaseModel):
+    measurements: list[MeasurementResponse]
+
+    model_config = ConfigDict()

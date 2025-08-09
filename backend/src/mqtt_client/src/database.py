@@ -15,6 +15,7 @@ def init_db():
                 message_id INTEGER PRIMARY KEY AUTOINCREMENT,
                 sensor_id INTEGER NOT NULL,
                 timestamp INTEGER NOT NULL,
+                unit TEXT NOT NULL,
                 value decimal(10, 2) NOT NULL);
             """
         )

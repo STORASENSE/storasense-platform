@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
@@ -46,6 +47,17 @@ class MeasurementRepository(BaseRepository[MeasurementModel, UUID]):
             .order_by(MeasurementModel.created_at.desc())
         )
         return paginate(query, page_request)
+
+    def find_all_by_sensor_id_and_max_date(
+        self, sensor_id: UUID, max_date: datetime
+    ) -> list[MeasurementModel]:
+        query = (
+            self.session.query(MeasurementModel)
+            .where(MeasurementModel.sensor_id == sensor_id)
+            .where(MeasurementModel.created_at <= max_date)
+            .order_by(MeasurementModel.created_at.desc())
+        )
+        return query.all()
 
 
 def inject_measurement_repository(session: Session = Depends(open_session)):

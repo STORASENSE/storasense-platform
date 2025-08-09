@@ -2,6 +2,9 @@ from contextlib import asynccontextmanager
 
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from backend.src.shared.logging import logging
 
 # ... DB imports ...
 from backend.src.app.src.shared.database.model_discovery import discover_models
@@ -19,6 +22,8 @@ from backend.src.app.src.services.sensors.router import (
 
 discover_models()
 
+_logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -26,10 +31,9 @@ async def lifespan(app: FastAPI):
     Lifespan event handler for FastAPI.
     Initializes the database at startup and cleans up resources at shutdown.
     """
-    print("Initializing database...")
+    _logger.info("Initializing database...")
     initialize_database()
-    print("Database initialized successfully.")
-
+    _logger.info("Database initialization completed successfully!")
     yield
 
 
@@ -44,6 +48,16 @@ app = FastAPI(
 # app.include_router(storages_router)
 app.include_router(measurements_router)
 app.include_router(sensors_router)
+
+# configure CORS
+origins = ["http://localhost:3000"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/health", tags=["Root"])

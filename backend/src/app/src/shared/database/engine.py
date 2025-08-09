@@ -7,6 +7,9 @@ from sqlalchemy.orm import Session, sessionmaker
 from dotenv import load_dotenv
 
 from backend.src.app.src.shared.database.model_discovery import discover_models
+from backend.src.shared.logging import get_logger
+
+logger = get_logger(__name__)
 
 discover_models()
 load_dotenv(override=True)
@@ -55,7 +58,7 @@ else:
             with db_engine.connect() as connection:
                 pass
 
-            print("Database connection successfully established.")
+            logger.info("Database connection successfully established.")
             break  # Connection successful, exit loop
 
         except (SQLAlchemyError, ValueError) as e:
@@ -63,11 +66,11 @@ else:
                 wait_time = retry_delay * (
                     2 ** (attempt - 1)
                 )  # Exponential backoff
-                print(f"Connection attempt {attempt} failed: {e}")
-                print(f"Retrying in {wait_time} seconds...")
+                logger.warning(f"Connection attempt {attempt} failed: {e}")
+                logger.info(f"Retrying in {wait_time} seconds...")
                 time.sleep(wait_time)
             else:
-                print(
+                logger.error(
                     f"All connection attempts failed. Last error: {e}",
                     file=sys.stderr,
                 )

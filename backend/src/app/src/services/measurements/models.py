@@ -17,9 +17,7 @@ class MeasurementModel(BaseModel):
     __tablename__ = "Measurements"
     __timescaledb_hypertable__ = {"time_column_name": "created_at"}
 
-    id: Mapped[UUID] = mapped_column(
-        primary_key=True, default=UUID
-    )  # Composite PK
+    # Composite PK
     created_at: Mapped[datetime] = mapped_column(
         primary_key=True
     )  # Composite PK
