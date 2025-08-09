@@ -4,7 +4,6 @@ from contextlib import asynccontextmanager
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI
-from starlette.middleware.sessions import SessionMiddleware
 
 from backend.src.app.shared import logging
 
@@ -13,7 +12,8 @@ from backend.src.app.src.shared.database.model_discovery import discover_models
 from backend.src.app.src.db_init import initialize_database
 
 # ... Router imports ...
-# from .services.users.router import router as users_router
+from .services.users.router import router as users_router
+
 # from .services.storages.router import router as storages_router
 from backend.src.app.src.services.measurements.router import (
     router as measurements_router,
@@ -21,14 +21,13 @@ from backend.src.app.src.services.measurements.router import (
 from backend.src.app.src.services.sensors.router import (
     router as sensors_router,
 )
-from backend.src.app.src.services.auth.router import (
-    router as auth_router,
-)
 
 discover_models()
 load_dotenv()
 
 _logger = logging.get_logger(__name__)
+
+CLIENT_ID = os.environ.get("KEYCLOAK_CLIENT_ID")
 
 
 @asynccontextmanager
@@ -48,15 +47,13 @@ app = FastAPI(
     version="1.0.0",
     description="STORASENSE-Platform-Backend API",
     lifespan=lifespan,
+    swagger_ui_init_oauth={"clientId": CLIENT_ID, "appName": "Storasense API"},
 )
 
-# app.include_router(users_router)
+app.include_router(users_router)
 # app.include_router(storages_router)
 app.include_router(measurements_router)
 app.include_router(sensors_router)
-app.include_router(auth_router)
-
-app.add_middleware(SessionMiddleware, secret_key=os.environ.get("SECRET_KEY"))
 
 
 @app.get("/health", tags=["Root"])
