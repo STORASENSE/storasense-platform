@@ -22,7 +22,6 @@ class UserService:
         Looks for a user in the database by their Keycloak ID.
         If the user does not exist, it creates a new user profile with the data provided in the token.
         """
-        # Wir suchen weiterhin nach der eindeutigen ID aus dem Token
         user = self._user_repository.find_by_keycloak_id(token_data.id)
 
         if user:
