@@ -27,8 +27,6 @@ async def read_users_me(
         username=db_user.username,
         email=db_user.email,
         name=db_user.name,
-        description=db_user.description,
-        roles=token_data.roles,  # Single value coming from Keycloak token instead of db (cannot be stored in db due to Keycloak as "single source of truth")
     )
 
     return user_response

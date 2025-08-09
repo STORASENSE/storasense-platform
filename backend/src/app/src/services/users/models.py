@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -21,11 +21,13 @@ class UserModel(BaseModel):
     username: Mapped[str] = mapped_column(
         String(255), unique=True, index=True, nullable=False
     )
-    email: Mapped[Optional[str]] = mapped_column(
-        String(255), unique=True, index=True, nullable=True
+    email: Mapped[str] = mapped_column(
+        String(255), unique=True, index=True, nullable=False
     )
-    name: Mapped[Optional[str]] = mapped_column(String(255))
-    description: Mapped[Optional[str]] = mapped_column()
+    name: Mapped[str] = mapped_column(
+        String(255), unique=False, index=False, nullable=False
+    )
+
     accessed_storages: Mapped[list["StorageModel"]] = relationship(
         secondary=user_storage_access, back_populates="accessing_users"
     )
