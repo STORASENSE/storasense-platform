@@ -30,11 +30,3 @@ async def read_users_me(
     )
 
     return user_response
-async def read_users_me(
-    token_data: TokenData = Depends(auth_service.get_current_user),
-    user_service: UserService = Depends(inject_user_service),
-):
-    db_user: UserModel = user_service.get_or_create_user_by_keycloak_id(
-        token_data=token_data
-    )
-    if not db_user:
