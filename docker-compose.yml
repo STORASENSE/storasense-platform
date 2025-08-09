@@ -4,10 +4,11 @@ services:
     container_name: "traefik"
     restart: unless-stopped
     command:
-      - "--api.insecure=true"
+      - "--api.dashboard=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
+      - "--entrypoints.dashboard.address=:8080"
     ports:
       - "80:80"
       - "8080:8080" # Traefik Dashboard
@@ -15,6 +16,13 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     networks:
       - storasense-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.entrypoints=dashboard"
+      - "traefik.http.routers.dashboard.rule=Host(`localhost`)"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.middlewares=dashboard-auth"
+      - "traefik.http.middlewares.dashboard-auth.basicauth.users=${TRAEFIK_HASHED}"
 
   keycloak:
     image: quay.io/keycloak/keycloak:latest
@@ -42,6 +50,10 @@ services:
       - "traefik.http.routers.keycloak.rule=Host(`auth.storasense.de`) && !PathPrefix(`/admin`)"
       - "traefik.http.routers.keycloak.entrypoints=web"
       - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
+      - "traefik.http.routers.keycloak.middlewares=secure-headers"
+      - "traefik.http.middlewares.secure-headers.headers.framedeny=true"
+      - "traefik.http.middlewares.secure-headers.headers.contenttypenosniff=true"
+      - "traefik.http.middlewares.secure-headers.headers.browserxssfilter=true"
     depends_on:
       timescaledb:
         condition: service_healthy
