@@ -2,6 +2,94 @@
 
 <!-- version list -->
 
+## v1.2.0 (2025-08-09)
+
+### Bug Fixes
+
+- Changed logging from print
+  ([`d980f38`](https://github.com/STORASENSE/storasense-platform/commit/d980f382346393460780a3211d73a367a4ad34bd))
+
+- Changed logging from print
+  ([`ec80d06`](https://github.com/STORASENSE/storasense-platform/commit/ec80d067d1c1e4aa264becb35cccfcf618893d98))
+
+- Changed uuids for sensors
+  ([`8f6237f`](https://github.com/STORASENSE/storasense-platform/commit/8f6237fa30f18ebf8386efb220e60f8fab5bcf08))
+
+- Fixed .env.example
+  ([`0be90e4`](https://github.com/STORASENSE/storasense-platform/commit/0be90e459afdb7e7026de03e7f197fd52d47ffc1))
+
+- Fixed env example
+  ([`4f1faff`](https://github.com/STORASENSE/storasense-platform/commit/4f1faff2b21fbae5629a4ab363e6637dc43f1da6))
+
+- Fixed fe-dockerfile
+  ([`6737e49`](https://github.com/STORASENSE/storasense-platform/commit/6737e49bec51213fb804cd4ea28042f62d5b7c0e))
+
+- Fixed issue where UUIDs were not generated uniquely
+  ([`96d89c9`](https://github.com/STORASENSE/storasense-platform/commit/96d89c99ef1fdd9a3d1579e8b846f5b8ef2d7428))
+
+- Fixed issues with database seeding
+  ([`fc6ce34`](https://github.com/STORASENSE/storasense-platform/commit/fc6ce345c6624da05a9f714f59dead53105bc543))
+
+- Fixed logging
+  ([`2452e4a`](https://github.com/STORASENSE/storasense-platform/commit/2452e4a80f9463e43e87cd702a02dcdb73291732))
+
+- Fixed omr-creation
+  ([`a66a7cc`](https://github.com/STORASENSE/storasense-platform/commit/a66a7cce5e58b23f954180580123cae92c24ad5d))
+
+- Fixed wrongly ignored lib folder
+  ([`c32ca7a`](https://github.com/STORASENSE/storasense-platform/commit/c32ca7a58cd8e5c26b4f9fb2b48785a7b5314aa2))
+
+- Mqtt client
+  ([`0bd4137`](https://github.com/STORASENSE/storasense-platform/commit/0bd413792c63029e46c398acdd413f6ec51d2171))
+
+- Update formatter and ensure early setup
+  ([`b890503`](https://github.com/STORASENSE/storasense-platform/commit/b890503a06d0d254989ca9ad2737cdfda0049420))
+
+- Update formatter and ensure early setup
+  ([`f97e7cf`](https://github.com/STORASENSE/storasense-platform/commit/f97e7cf4dc4ae2d3bdbf9392c3effcef14f5b980))
+
+### Features
+
+- Added dashboard layout in the UI
+  ([`e87825d`](https://github.com/STORASENSE/storasense-platform/commit/e87825d74c3d5192d52757c2c4f19aeb24d06e2a))
+
+- Added frontend to docker network
+  ([`242030d`](https://github.com/STORASENSE/storasense-platform/commit/242030d7182cd25d154438366df6a71444be24a5))
+
+- Changed comment
+  ([`4915bab`](https://github.com/STORASENSE/storasense-platform/commit/4915bab7a1d5ecdfb395d0aaea176d3563a3f4e1))
+
+- Configured CORS for backend API
+  ([`6d808bf`](https://github.com/STORASENSE/storasense-platform/commit/6d808bf65cf3aa9da5ebe57e3bbdfeac71680435))
+
+- Extended db init process with db seeding
+  ([`5afd40d`](https://github.com/STORASENSE/storasense-platform/commit/5afd40d83d441e48022950448511cce3e9b4596f))
+
+- Extended orm - sensors
+  ([`03094fa`](https://github.com/STORASENSE/storasense-platform/commit/03094fac748984218449d5c3d883ae38c76f2c2b))
+
+- Extended test-seeding and finished be-deployment
+  ([`718bfb2`](https://github.com/STORASENSE/storasense-platform/commit/718bfb2b7033b6e541d6cd35bffbe92a8e25441b))
+
+- Frontend now differentiates PROD and DEV environments
+  ([`25480e1`](https://github.com/STORASENSE/storasense-platform/commit/25480e141d156a26acde91b2d1910d38e21348e5))
+
+- Init sensors for seeding
+  ([`52872ac`](https://github.com/STORASENSE/storasense-platform/commit/52872ac528de5ea99a754e6d01a0c223008e953b))
+
+- Introduced functionality for displaying temperature
+  ([`0061c42`](https://github.com/STORASENSE/storasense-platform/commit/0061c42278fd9407afcc9c1cefb30a7e9691ae4d))
+
+- Introduced seeding for development database
+  ([`a50ca0a`](https://github.com/STORASENSE/storasense-platform/commit/a50ca0a8c2b033727b87985e1421aac7048b40cf))
+
+- Introduced shadcn to frontend
+  ([`e579176`](https://github.com/STORASENSE/storasense-platform/commit/e5791762d504877421e5ed453d947c1ee0f1eac7))
+
+- Temperature chart now displays errors and loading skeleton
+  ([`41ec179`](https://github.com/STORASENSE/storasense-platform/commit/41ec1790310a831dc31ef72b72df09a6ee07df91))
+
+
 ## v1.1.0 (2025-08-02)
 
 ### Bug Fixes
