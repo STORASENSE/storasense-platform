@@ -107,14 +107,27 @@ services:
       keycloak:
         condition: service_started
 
-#  mqtt-client:
-#    build:
-#      context: .
-#      dockerfile: ./backend/src/mqtt_client/Dockerfile
-#    env_file: .env
-#    restart: always
-#    networks:
-#      - storasense-network
+  mqtt-client:
+    build:
+      context: .
+      dockerfile: ./backend/src/mqtt_client/Dockerfile
+    env_file: .env
+    restart: always
+    networks:
+      - storasense-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+    restart: always
+    networks:
+      - storasense-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`storasense.de`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
 
 volumes:
   storasense_data_volume:
