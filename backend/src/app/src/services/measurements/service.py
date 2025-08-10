@@ -4,7 +4,7 @@ from uuid import UUID
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
-from backend.src.app.shared import logging
+from backend.src.shared import logging
 from backend.src.app.src.services.measurements.models import MeasurementModel
 from backend.src.app.src.services.measurements.repository import (
     MeasurementRepository,

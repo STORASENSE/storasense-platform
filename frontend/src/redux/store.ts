@@ -1,11 +1,13 @@
 import {configureStore} from "@reduxjs/toolkit/react";
 import {setupListeners} from "@reduxjs/toolkit/query/react";
 import {storaSenseApi} from "@/redux/api/storaSenseApi";
+import storageSlice from "@/redux/slices/storageSlice";
 
 
 export const store = configureStore({
     reducer: {
         [storaSenseApi.reducerPath]: storaSenseApi.reducer,
+        storage: storageSlice
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(storaSenseApi.middleware),
