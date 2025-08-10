@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from uuid import UUID
 
-from backend.src.shared.logging import logging
+from backend.src.app.src.shared.logging import logging
 from backend.src.app.src.services.storages.models import StorageModel
 from backend.src.app.src.services.sensors.models import SensorModel
 from backend.src.app.src.shared.database.enums import SensorType

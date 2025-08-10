@@ -1,3 +1,4 @@
+import os
 from contextlib import asynccontextmanager
 
 import uvicorn
@@ -21,7 +22,6 @@ from backend.src.app.src.services.measurements.router import (
 from backend.src.app.src.services.sensors.router import (
     router as sensors_router,
 )
-
 
 discover_models()
 load_dotenv()
