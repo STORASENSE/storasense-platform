@@ -7,10 +7,11 @@ class UserRole(Enum):
 
 
 class SensorType(Enum):
-    TEMPERATURE = "TEMPERATURE"
+    TEMPERATURE_INSIDE = "TEMPERATURE_INSIDE"
+    TEMPERATURE_OUTSIDE = "TEMPERATURE_OUTSIDE"
     HUMIDITY = "HUMIDITY"
+    GAS = "GAS"
     ULTRASONIC = "ULTRASONIC"
-    AIR = "AIR"
 
 
 class MeasurementUnit(Enum):
