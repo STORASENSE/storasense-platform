@@ -59,8 +59,6 @@ app.include_router(users_router)
 app.include_router(measurements_router)
 app.include_router(sensors_router)
 
-app.add_middleware(SessionMiddleware, secret_key=os.environ.get("SECRET_KEY"))
-
 # configure CORS
 origins = ["http://localhost:3000"]
 app.add_middleware(
