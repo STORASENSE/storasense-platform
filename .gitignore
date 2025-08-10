@@ -1,4 +1,8 @@
-# JetBrains config
+# Data
+keycloak-data
+storasense_data_volume_backup
+
+#JetBrains config
 **/.idea
 
 # node modules

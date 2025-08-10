@@ -1,8 +1,9 @@
 services:
+
   traefik:
     image: "traefik:v3.0"
     container_name: "traefik"
-    restart: unless-stopped
+    restart: always
     command:
       - "--api.dashboard=true"
       - "--providers.docker=true"
@@ -27,7 +28,7 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:latest
     container_name: keycloak
-    restart: unless-stopped
+    restart: always
     environment:
       - KC_DB=postgres
       - KC_DB_URL_HOST=${POSTGRES_HOST} # Use timescaledb as the database
@@ -58,6 +59,47 @@ services:
       timescaledb:
         condition: service_healthy
 
+  timescaledb:
+    image: timescale/timescaledb:latest-pg15
+    container_name: timescaledb
+    restart: always
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_KC_DB_NAME=${POSTGRES_KC_DB_NAME}
+      - POSTGRES_KC_DB_USER=${POSTGRES_KC_DB_USER}
+      - POSTGRES_KC_DB_PASSWORD=${POSTGRES_KC_DB_PASSWORD}
+    volumes:
+      - storasense_data_volume:/var/lib/postgresql/data
+      - ./db-init:/docker-entrypoint-initdb.d
+    networks:
+      - storasense-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backup:
+    image: offen/docker-volume-backup
+    container_name: storasense-backup
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - storasense_data_volume:/volume/storasense_data_volume:ro # Mount the data volume to back-up
+      - ./storasense_data_volume_backup:/backup # Location to store backups (here: local directory)
+    networks:
+      - storasense-network
+    environment:
+      - "BACKUP_CRON_EXPRESSION=0 3 * * *" # Every day at 3 AM
+      - "BACKUP_SOURCES=/volume/storasense_data_volume" # Source to back-up
+      - "BACKUP_FILENAME=storasense_db_backup-%Y-%m-%d_%H-%M-%S.tar.gz"
+      - "BACKUP_PRUNE_AFTER_DAYS=7" # Delete backups older than 7 days
+      - "BACKUP_TARGET=file:///backup" # Backup destination (here: local directory)
+    depends_on:
+      - timescaledb
+
   app:
     build:
       context: .
@@ -85,28 +127,6 @@ services:
     restart: always
     networks:
       - storasense-network
-
-  timescaledb:
-    image: timescale/timescaledb:latest-pg15
-    container_name: timescaledb
-    restart: always
-    environment:
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_KC_DB_NAME=${POSTGRES_KC_DB_NAME}
-      - POSTGRES_KC_DB_USER=${POSTGRES_KC_DB_USER}
-      - POSTGRES_KC_DB_PASSWORD=${POSTGRES_KC_DB_PASSWORD}
-    volumes:
-      - storasense_data_volume:/var/lib/postgresql/data
-      - ./db-init:/docker-entrypoint-initdb.d
-    networks:
-      - storasense-network
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
 
 volumes:
   storasense_data_volume:
