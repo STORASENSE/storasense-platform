@@ -109,7 +109,7 @@ are inferred from the formatted commit messages.
   * Open the Keycloak Admin Console in your browser at `http://localhost:8088/admin`.
   * Login with the temporary admin user credentials you set in the first step.
   * Create a new realm named `storasense-realm`.
-  * Create a new client with the following settings:
+  * Create two new clients - for the **backend** and **frontend** - with the following settings:
     * Client ID: `fastapi-backend-client`
     * Name: `STORASENSE-Backend`
     * `Client authentication` should be disabled.

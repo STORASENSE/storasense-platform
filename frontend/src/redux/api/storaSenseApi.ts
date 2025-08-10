@@ -13,9 +13,9 @@ function getBaseUrl(): string {
     switch (process.env.NODE_ENV) {
         case "test":
         case "development":
-            return "http://localhost:8000";
+            return "http://api.storasense.de"; "localhost:3000";
         case "production":
-            return "http://localhost:8000";
+            return "http://api.storasense.de"; "localhost:3000";
         default:
             throw new Error("Environment variable NODE_ENV was not set by node environment!");
     }

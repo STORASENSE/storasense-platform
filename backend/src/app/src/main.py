@@ -60,7 +60,10 @@ app.include_router(measurements_router)
 app.include_router(sensors_router)
 
 # configure CORS-middleware
-origins = ["http://localhost:3000"]
+origins = [
+    "http://storasense.de",
+    "http://localhost:3000",
+]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
