@@ -59,7 +59,7 @@ app.include_router(users_router)
 app.include_router(measurements_router)
 app.include_router(sensors_router)
 
-# configure CORS-middleware
+# configure CORS
 origins = ["http://localhost:3000"]
 app.add_middleware(
     CORSMiddleware,
