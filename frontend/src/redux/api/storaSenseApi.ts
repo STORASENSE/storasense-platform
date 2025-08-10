@@ -1,5 +1,12 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
-import {GetMeasurementsRequest, GetMeasurementsResponse} from "@/redux/api/storaSenseApiSchemas";
+import {
+    GetMeasurementsRequest,
+    GetMeasurementsResponse,
+    GetSensorsByStorageIdRequest,
+    GetSensorsByStorageIdResponse,
+    GetStoragesByUserIdRequest,
+    GetStoragesByUserIdResponse
+} from "@/redux/api/storaSenseApiSchemas";
 
 
 function getBaseUrl(): string {
@@ -22,6 +29,18 @@ export const storaSenseApi = createApi({
     }),
     endpoints: (build) => ({
 
+        getStoragesByUserId: build.query<GetStoragesByUserIdResponse, GetStoragesByUserIdRequest>({
+            query: ({ user_id }) => ({
+                url: `/storages/byUserId/${user_id}`
+            })
+        }),
+
+        getSensors: build.query<GetSensorsByStorageIdResponse, GetSensorsByStorageIdRequest>({
+            query: ({ storage_id }) => ({
+                url: `/sensors/byStorageId/${storage_id}`
+            })
+        }),
+
         getMeasurements: build.query<GetMeasurementsResponse, GetMeasurementsRequest>({
             query: ({ sensor_id, max_date }) => ({
                 url: `/measurements/${sensor_id}/filter`,
@@ -32,4 +51,8 @@ export const storaSenseApi = createApi({
     })
 });
 
-export const { useGetMeasurementsQuery } = storaSenseApi;
+export const {
+    useGetStoragesByUserIdQuery,
+    useGetSensorsQuery,
+    useGetMeasurementsQuery,
+} = storaSenseApi;
