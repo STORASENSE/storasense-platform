@@ -4,7 +4,7 @@ from uuid import UUID
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
-from backend.src.shared import logging
+from backend.src.app.src.shared.logging import logging
 from backend.src.app.src.services.measurements.models import MeasurementModel
 from backend.src.app.src.services.measurements.repository import (
     MeasurementRepository,
@@ -22,7 +22,7 @@ from backend.src.app.src.shared.database.engine import open_session
 from backend.src.app.src.shared.database.pagination import Page, PageRequest
 
 
-_logger = logging.get_logger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 class MeasurementService:
