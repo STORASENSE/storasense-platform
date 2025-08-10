@@ -13,9 +13,9 @@ const Layout: FC<{ children: ReactNode }> = ({ children }) => (
             <TopBar />
         </nav>
 
-        <div className="w-full h-full flex">
+        <div className="w-full h-[calc(100%-75px)] flex">
             <Sidebar />
-            <main className="h-full p-5 grow bg-alabaster">
+            <main className="h-full p-5 grow bg-alabaster overflow-y-auto">
                 {children}
             </main>
         </div>

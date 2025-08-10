@@ -30,6 +30,14 @@ class SensorService:
         """Finds a sensor by its ID."""
         return self._sensor_repository.find_by_id(sensor_id)
 
+    def find_sensors_by_storage_id(
+        self, storage_id: UUID
+    ) -> list[SensorModel]:
+        storage = self._storage_repository.find_by_id(storage_id)
+        if not storage:
+            raise ValueError(f"Storage with ID {storage} does not exist.")
+        return self._sensor_repository.find_all_by_storage_id(storage_id)
+
     def create_sensor(self, sensor_id: UUID, request):
         """
         Creates a new sensor.

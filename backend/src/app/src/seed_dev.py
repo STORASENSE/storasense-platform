@@ -24,7 +24,10 @@ def seed_users(session: Session):
 def seed_storages(session: Session):
     storages: list[StorageModel] = [
         StorageModel(
-            name="MyStorage", password_hash="1234", password_salt="1234"
+            id=UUID("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
+            name="MyStorage",
+            password_hash="1234",
+            password_salt="1234",
         )
     ]
     session.add_all(storages)
@@ -34,16 +37,15 @@ def seed_storages(session: Session):
 def seed_sensors(session: Session):
     for storage in session.query(StorageModel).all():
         temp_inside = SensorModel(
-            id=UUID("3f8f788a-a6d0-34ee-9cc0-2a762338cfda"),
             name="Temperature (Inside)",
-            type=SensorType.TEMPERATURE,
+            type=SensorType.TEMPERATURE_INSIDE,
             storage_id=storage.id,
             allowed_min=1.0,
             allowed_max=5.0,
         )
         temp_outside = SensorModel(
             name="Temperature (Outside)",
-            type=SensorType.TEMPERATURE,
+            type=SensorType.TEMPERATURE_OUTSIDE,
             storage_id=storage.id,
             allowed_min=10.0,
             allowed_max=30.0,
@@ -64,7 +66,7 @@ def seed_sensors(session: Session):
         )
         air = SensorModel(
             name="Air Quality",
-            type=SensorType.AIR,
+            type=SensorType.GAS,
             storage_id=storage.id,
             allowed_min=10.0,
             allowed_max=20.0,

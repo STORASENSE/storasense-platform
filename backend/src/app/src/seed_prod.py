@@ -30,7 +30,7 @@ def seed_sensors(session: Session):
     temp_inside = SensorModel(
         id=UUID("3f8f788a-a6d0-34ee-9cc0-2a762338cfda"),
         name="Temperature (Inside)",
-        type=SensorType.TEMPERATURE,
+        type=SensorType.TEMPERATURE_INSIDE,
         storage_id=_known_storage_id,
         allowed_min=1.0,
         allowed_max=5.0,
@@ -38,7 +38,7 @@ def seed_sensors(session: Session):
     temp_outside = SensorModel(
         id=UUID("e2cab404-1e6b-31f1-8f90-840273670527"),
         name="Temperature (Outside)",
-        type=SensorType.TEMPERATURE,
+        type=SensorType.TEMPERATURE_OUTSIDE,
         storage_id=_known_storage_id,
         allowed_min=-10.0,
         allowed_max=40.0,
@@ -62,7 +62,7 @@ def seed_sensors(session: Session):
     air = SensorModel(
         id=UUID("86c9381d-7265-3f3b-bef2-68b9742d30b9"),
         name="Air Quality",
-        type=SensorType.AIR,
+        type=SensorType.GAS,
         storage_id=_known_storage_id,
         allowed_min=10.0,
         allowed_max=20.0,

@@ -4,7 +4,7 @@ from typing import List
 
 from fastapi import Depends, APIRouter, status, HTTPException
 
-from backend.src.app.shared import logging
+from backend.src.shared import logging
 from backend.src.app.src.services.measurements.service import (
     MeasurementService,
     inject_measurement_service,

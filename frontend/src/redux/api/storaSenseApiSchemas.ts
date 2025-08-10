@@ -31,6 +31,19 @@ export enum SensorType {
 /// Model Types
 /////////////////////////////////////////////////////////////////////////
 
+export interface StoraSenseStorge {
+    id: string;
+    name: string;
+}
+
+export interface Sensor {
+    id: string;
+    name: string;
+    type: SensorType;
+    allowed_min: number;
+    allowed_max: number;
+}
+
 export interface Measurement {
     id: string;
     value: number;
@@ -40,6 +53,22 @@ export interface Measurement {
 
 /////////////////////////////////////////////////////////////////////////
 /// Requests & Responses
+/////////////////////////////////////////////////////////////////////////
+
+export interface GetStoragesByUserIdRequest {
+    user_id: string;
+}
+
+export type GetStoragesByUserIdResponse = StoraSenseStorge[];
+
+/////////////////////////////////////////////////////////////////////////
+
+export interface GetSensorsByStorageIdRequest {
+    storage_id: string;
+}
+
+export type GetSensorsByStorageIdResponse = Sensor[];
+
 /////////////////////////////////////////////////////////////////////////
 
 export interface GetMeasurementsRequest {

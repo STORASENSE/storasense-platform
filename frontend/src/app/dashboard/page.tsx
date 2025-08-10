@@ -1,6 +1,5 @@
 import {FC} from "react";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
-import TemperatureChart from "@/components/dashboard/TemperatureChart";
+import DashboardOverview from "@/components/dashboard/DashboardOverview";
 
 const Page: FC = () => {
     return (
@@ -11,19 +10,7 @@ const Page: FC = () => {
                 </h1>
             </header>
             <section>
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-blue-whale">
-                            Temperature Overview
-                        </CardTitle>
-                        <CardDescription>
-                            Last updated: 30s ago
-                        </CardDescription>
-                        <CardContent>
-                            <TemperatureChart />
-                        </CardContent>
-                    </CardHeader>
-                </Card>
+                <DashboardOverview />
             </section>
         </>
     );
