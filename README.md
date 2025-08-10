@@ -119,7 +119,7 @@ are inferred from the formatted commit messages.
     * Name: `audience-mapper-storasense-be`
     * Included Client Audience: `fastapi-backend-client`
     * Add to access token: `enabled`
-  * Configure thecroles and user groups as needed.
+  * Configure the roles and user groups as needed.
   * Setup a user with the role `admin` in the `storasense-realm`.
   * Configure optionally identity providers (e.g., Google, GitHub).
   * Make sure that the **User profile attributes** (go to `Realm settings` -> `User profile`) match with our database schema (except the intern managed attributes - such as the ids).

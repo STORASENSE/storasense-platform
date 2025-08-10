@@ -128,6 +128,21 @@ services:
     networks:
       - storasense-network
 
+  frontend:
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+    restart: always
+    networks:
+      - storasense-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`storasense.de`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+    depends_on:
+      - app
+
 volumes:
   storasense_data_volume:
 
