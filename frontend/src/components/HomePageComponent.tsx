@@ -1,40 +1,38 @@
 'use client';
 
-import { useKeycloak } from '@/components/KeycloakProvider';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import useKeycloak from '../app/(main)/useKeycloak';
+import AuthenticationMessage from "@/components/AuthenticationMessage";
 
 function HomePageComponent() {
-    const { keycloak, isAuthenticated } = useKeycloak();
+    const { keycloak, authenticated } = useKeycloak();
+    const router = useRouter();
 
-    if (!keycloak) {
-        return <div className="text-center p-10">Page is loading...</div>;
-    }
+    useEffect(() => {
+        if (authenticated) {
+            router.push('/dashboard');
+        }
+    }, [authenticated, router]);
 
-    if (isAuthenticated) {
-        return (
-            <div className="text-center p-10">
-                <h1 className="text-2xl mb-4">Welcome, {keycloak.tokenParsed?.preferred_username}!</h1>
-                <p>You're signed in.</p>
-                <button
-                    onClick={() => keycloak.logout()}
-                    className="mt-4 px-4 py-2 bg-red-500 text-white rounded"
-                >
-                    Sign out
-                </button>
-            </div>
+    if (!authenticated || !keycloak) {
+        return(
+            <>
+                <AuthenticationMessage/>
+                <div className="text-center">
+                    <button
+                        onClick={() => keycloak?.login()}
+                        className="px-4 py-2 bg-blue-500 text-white rounded"
+                    >
+                        Login
+                    </button>
+                </div>
+            </>
         );
     }
 
-    return (
-        <div className="text-center p-10">
-            <h1 className="text-2xl mb-4">Please sign in</h1>
-            <button
-                onClick={() => keycloak.login()}
-                className="px-4 py-2 bg-blue-500 text-white rounded"
-            >
-                Sign in
-            </button>
-        </div>
-    );
+    // Fallback if useEffect hasnt been triggered yet
+    return null;
 }
 
 export default HomePageComponent;

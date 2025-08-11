@@ -94,7 +94,7 @@ are inferred from the formatted commit messages.
 ### 1.  DNS Configuration
 - Create a DNS record for `storasense.de` in your OS pointing to the server's IP address (loopback-adress): `127.0.0.1 storasense.de api.storasense.de auth.storasense.de`
 ### 2. .env Configuration
-- Verify `.env` configuration (root directory) - checkout `.env.example` for reference (Tipp: Pay attention to the `ENV` variable).
+- Verify `.env` configuration (root directory) - checkout `.env.example` for reference.
 ### 3. Docker Configuration
 - Ensure Docker is installed and running on your system.
 - Build the Docker-Compose Setup: `docker-compose up -d --build`
@@ -110,25 +110,30 @@ are inferred from the formatted commit messages.
   * Login with the temporary admin user credentials you set in the first step.
   * Create a new realm named `storasense-realm`.
   * Create two new clients - for the **backend** and **frontend** - with the following settings:
-    * Client ID: `fastapi-backend-client`
-    * Name: `STORASENSE-Backend`
+    * Client ID: `fastapi-backend-client` / `frontend-client`
+    * Name: `STORASENSE-Backend` / `STORASENSE-Frontend`
     * `Client authentication` should be disabled.
     * `Standard flow` and `Direct access grants` should be enabled.
-    * Add Valid redirect URIs: `http://api.storasense.de/docs/oauth2-redirect` and `http://localhost:*`
-  * Add Client-Mapping regarding Audience: Go to Clients -> fastapi-backend-client -> Client scopes -> fastapi-backend-client -> Add mapper -> Configure the following:
+    * For Backend:
+      - Add `Valid redirect URIs`: `https://api.storasense.de/docs/oauth2-redirect` and `http://localhost:*`
+    * For Frontend:
+      - Add `Valid redirect URIs`: `https://storasense.de/*` and `https://auth.storasense.de/`
+      - Add `Valid post logout redirect URIs`: `https://storasense.de/*`
+      - Add `Web Origins`: `https://storasense.de`
+  * Add Client-Mapping regarding Audience: Go to Clients -> fastapi-backend-client / frontend-client -> Client scopes -> fastapi-backend-client / frontend-client -> Add mapper -> Configure the following:
     * Mapper Type: `Audience`
     * Name: `audience-mapper-storasense-be`
-    * Included Client Audience: `fastapi-backend-client`
+    * Included Client Audience: `fastapi-backend-client` / `frontend-client`
     * Add to access token: `enabled`
-  * Configure thecroles and user groups as needed.
+  * Configure the roles and user groups as needed.
   * Setup a user with the role `admin` in the `storasense-realm`.
   * Configure optionally identity providers (e.g., Google, GitHub).
   * Make sure that the **User profile attributes** (go to `Realm settings` -> `User profile`) match with our database schema (except the intern managed attributes - such as the ids).
-  * Remove the temporary admin user from the `docker-compose.yml` file after the initial setup is complete.
+  * Remove the temporary admin user from the `docker-compose.yml` file after the initial setup is completed.
 ---
 ## URLs:
-| URL Type                                   | URL                                                                                                                    |
-|--------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
-| Frontend                                   | [http://storasense.de](http://storasense.de)
-| Backend-API Documentation <br> (SwaggerUI) | [http://api.storasense.de/docs](http://api.storasense.de/docs)                                                         |
-| Keycloak-Configuration / Admin-Console     | [http://localhost:8088/admin](http://localhost:8088/admin) <br> [http://auth.storasense.de](http://auth.storasense.de) |
+| URL Type                                   | URL                                                                                                                     |
+|--------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| Frontend                                   | [https://storasense.de](http://storasense.de)
+| Backend-API Documentation <br> (SwaggerUI) | [https://api.storasense.de/docs](http://api.storasense.de/docs)                                                         |
+| Keycloak-Configuration / Admin-Console     | [http://localhost:8088/admin](http://localhost:8088/admin) <br> [https://auth.storasense.de](http://auth.storasense.de) |

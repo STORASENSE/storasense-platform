@@ -3,19 +3,32 @@ services:
   traefik:
     image: "traefik:v3.0"
     container_name: "traefik"
-    restart: always
+    restart: unless-stopped
     command:
-      - "--api.insecure=true"
+      - "--api.dashboard=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.dashboard.address=:8080"
     ports:
       - "80:80"
+      - "443:443"
       - "8080:8080" # Traefik Dashboard
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     networks:
       - storasense-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.entrypoints=dashboard"
+      - "traefik.http.routers.dashboard.rule=Host(`localhost`)"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.middlewares=dashboard-auth"
+      - "traefik.http.middlewares.dashboard-auth.basicauth.users=${TRAEFIK_HASHED}"
+      # Global Middleware for HTTPS redirection
+      - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.https-redirect.redirectscheme.permanent=true"
 
   keycloak:
     image: quay.io/keycloak/keycloak:latest
@@ -40,9 +53,19 @@ services:
       - storasense-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.keycloak.rule=Host(`auth.storasense.de`) && !PathPrefix(`/admin`)"
-      - "traefik.http.routers.keycloak.entrypoints=web"
+      - "traefik.http.routers.keycloak-http.rule=Host(`auth.storasense.de`)"
+      - "traefik.http.routers.keycloak-http.entrypoints=web"
+      - "traefik.http.routers.keycloak-http.middlewares=https-redirect@docker"
+
+      - "traefik.http.routers.keycloak-https.rule=Host(`auth.storasense.de`) && !PathPrefix(`/admin`)"
+      - "traefik.http.routers.keycloak-https.entrypoints=websecure"
+      - "traefik.http.routers.keycloak-https.tls=true"
       - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
+
+      - "traefik.http.routers.keycloak-https.middlewares=secure-headers"
+      - "traefik.http.middlewares.secure-headers.headers.contenttypenosniff=true"
+      - "traefik.http.middlewares.secure-headers.headers.browserxssfilter=true"
+
     depends_on:
       timescaledb:
         condition: service_healthy
@@ -98,8 +121,13 @@ services:
       - storasense-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.app.entrypoints=web"
-      - "traefik.http.routers.app.rule=Host(`api.storasense.de`)"
+      - "traefik.http.routers.app-http.rule=Host(`api.storasense.de`)"
+      - "traefik.http.routers.app-http.entrypoints=web"
+      - "traefik.http.routers.app-http.middlewares=https-redirect@docker"
+
+      - "traefik.http.routers.app-https.rule=Host(`api.storasense.de`)"
+      - "traefik.http.routers.app-https.entrypoints=websecure"
+      - "traefik.http.routers.app-https.tls=true"
       - "traefik.http.services.app.loadbalancer.server.port=8000"
     depends_on:
       timescaledb:
@@ -125,9 +153,19 @@ services:
       - storasense-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`storasense.de`)"
-      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.routers.frontend-http.rule=Host(`storasense.de`)"
+      - "traefik.http.routers.frontend-http.entrypoints=web"
+      - "traefik.http.routers.frontend-http.middlewares=https-redirect@docker"
+
+      - "traefik.http.routers.frontend-https.rule=Host(`storasense.de`)"
+      - "traefik.http.routers.frontend-https.entrypoints=websecure"
+      - "traefik.http.routers.frontend-https.tls=true"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+    depends_on:
+      keycloak:
+        condition: service_started
+      app:
+        condition: service_started
 
 volumes:
   storasense_data_volume:

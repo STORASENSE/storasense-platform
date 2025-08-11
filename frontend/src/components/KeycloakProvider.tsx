@@ -1,70 +1,67 @@
-'use client';
+import React, {
+  createContext,
+  useEffect,
+  useState,
+  useRef,
+} from 'react'
+import Keycloak from 'keycloak-js'
 
-import React, { useState, useEffect, createContext, useContext, ReactNode } from 'react';
-import Keycloak, { KeycloakConfig } from 'keycloak-js';
-
-// Das Interface und der Context bleiben unverändert
-interface IKeycloakContext {
-    keycloak: Keycloak | null;
-    isAuthenticated: boolean;
+interface KeycloakContextProps {
+  keycloak: Keycloak | null
+  authenticated: boolean
 }
-const KeycloakContext = createContext<IKeycloakContext | undefined>(undefined);
 
-// Der benutzerdefinierte Hook bleibt unverändert
-export const useKeycloak = () => {
-    const context = useContext(KeycloakContext);
-    if (!context) {
-        throw new Error('useKeycloak must be used within a KeycloakProvider');
-    }
-    return context;
-};
+const KeycloakContext = createContext<KeycloakContextProps | undefined>(
+  undefined,
+)
 
-// Die Provider-Komponente mit der neuen, refaktorisierten Logik
-export const KeycloakProvider = ({ children }: { children: ReactNode }) => {
-    const [keycloak, setKeycloak] = useState<Keycloak | null>(null);
-    const [isAuthenticated, setAuthenticated] = useState(false);
+interface KeycloakProviderProps {
+  children: React.ReactNode
+}
 
-    useEffect(() => {
-        // Konfiguration aus den Next.js Umgebungsvariablen laden
-        // (Angepasst von import.meta.env zu process.env)
-        const keycloakConfig: KeycloakConfig = {
-            url: "auth.storasense.de",
-            realm: "storasense-realm",
-            clientId: "frontend-client",
-        };
+const KeycloakProvider: React.FC<KeycloakProviderProps> = ({ children }) => {
+  const isRun = useRef<boolean>(false)
+  const [keycloak, setKeycloak] = useState<Keycloak | null>(null)
+  const [authenticated, setAuthenticated] = useState<boolean>(false)
 
-        const keycloakInstance = new Keycloak(keycloakConfig);
+  useEffect(() => {
+    if (isRun.current) return
 
-        console.log("Initializing Keycloak with new promise structure...");
+    isRun.current = true
 
-        // Die neue Initialisierungslogik aus Ihrem Beispiel,
-        // kombiniert mit unserer Lösung für den Silent Check.
-        keycloakInstance.init({
-            onLoad: 'check-sso',
-            // WICHTIG: Diese Zeile ist entscheidend, um das Hängenbleiben zu verhindern!
-            silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
+    const initKeycloak = async () => {
+      const keycloackConfig = {
+        url: "https://auth.storasense.de",
+        realm: "storasense-realm",
+        clientId: "frontend-client",
+      }
+      const keycloakInstance: Keycloak = new Keycloak(keycloackConfig)
+
+      keycloakInstance
+        .init({
+          onLoad: 'check-sso',
         })
         .then((authenticated: boolean) => {
-            console.log(`User is ${authenticated ? 'authenticated' : 'not authenticated'}.`);
-            setAuthenticated(authenticated);
+          setAuthenticated(authenticated)
         })
         .catch((error) => {
-            console.error('Keycloak initialization failed:', error);
-            setAuthenticated(false);
+          console.error('Keycloak initialization failed:', error)
+          setAuthenticated(false)
         })
         .finally(() => {
-            // Setzt die Keycloak-Instanz, nachdem der Prozess abgeschlossen ist
-            console.log('Keycloak instance is now available.');
-            setKeycloak(keycloakInstance);
-        });
+          setKeycloak(keycloakInstance)
+          console.log('keycloak', keycloakInstance)
+        })
+    }
 
-    }, []); // Leeres Array, damit es nur einmal beim Mounten ausgeführt wird
+    initKeycloak()
+  }, [])
 
-    const contextValue = { keycloak, isAuthenticated };
+  return (
+    <KeycloakContext.Provider value={{ keycloak, authenticated }}>
+      {children}
+    </KeycloakContext.Provider>
+  )
+}
 
-    return (
-        <KeycloakContext.Provider value={contextValue}>
-            {children}
-        </KeycloakContext.Provider>
-    );
-};
+export { KeycloakProvider, KeycloakContext }
