@@ -97,6 +97,10 @@ are inferred from the formatted commit messages.
 - Verify `.env` configuration (root directory) - checkout `.env.example` for reference.
 ### 3. Docker Configuration
 - Ensure Docker is installed and running on your system.
+- Make the db-init script executable:
+```bash
+chmod +x ./db-init/db-init.sh
+```
 - Build the Docker-Compose Setup: `docker-compose up -d --build`
 ### 4. Optional: Keycloak Configuration
 - If you don't have our original volume of the timescaledb (**storasense_data_volume**) then you have to setup the Keycloak configuration from scratch by yourself.
