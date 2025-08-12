@@ -116,6 +116,7 @@ are inferred from the formatted commit messages.
     * `Standard flow` and `Direct access grants` should be enabled.
     * For Backend:
       - Add `Valid redirect URIs`: `https://api.storasense.de/docs/oauth2-redirect` and `http://localhost:*`
+      - Add `Web Origins`: `https://storasense.de` and `https://api.storasense.de`
     * For Frontend:
       - Add `Valid redirect URIs`: `https://storasense.de/*` and `https://auth.storasense.de/`
       - Add `Valid post logout redirect URIs`: `https://storasense.de/*`
