@@ -7,7 +7,7 @@ psql --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
     CREATE DATABASE ${POSTGRES_KC_DB_NAME} WITH OWNER = ${POSTGRES_KC_DB_USER};
 EOSQL
 
-# Connects to application database and actovates TimescaleDB extension
+# Connects to application database and activates TimescaleDB extension
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
     CREATE EXTENSION IF NOT EXISTS timescaledb;
 EOSQL

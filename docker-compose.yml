@@ -45,7 +45,6 @@ services:
       - KC_PROXY=edge
       - KC_PROXY_HEADERS=xforwarded
       - KC_CACHE=local
-      - KEYCLOAK_INTERNAL_URL=${KEYCLOAK_INTERNAL_URL}
     command: start
     ports:
       - "8088:8080"
@@ -110,7 +109,7 @@ services:
       - "BACKUP_PRUNE_AFTER_DAYS=7" # Delete backups older than 7 days
       - "BACKUP_TARGET=file:///backup" # Backup destination (here: local directory)
     depends_on:
-      - timescaledb
+      - frontend # Start after the whole system is up
 
   app:
     build:
