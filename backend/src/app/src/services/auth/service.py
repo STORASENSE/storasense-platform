@@ -39,6 +39,20 @@ class AuthService:
         # PyJWKClient automatically fetches and caches the JWKS (JSON Web Key Set)
         self.jwks_client = PyJWKClient(JWKS_URL)
 
+    def warmup(self):
+        """
+        Forces the JWKS client to fetch the keys from Keycloak immediately
+        to ensure the service is ready on startup.
+        """
+        try:
+            _logger.info("AuthService: Warming up by fetching JWKS...")
+            self.jwks_client.get_jwk_set()
+            _logger.debug("AuthService: Warmup successful. Keys are cached.")
+        except Exception as e:
+            _logger.debug(
+                f"FATAL: Could not warm up auth service. Token validation might fail. Error: {e}"
+            )
+
     async def validate_token(self, token: str) -> TokenData:
         """Validates the JWT token and extracts user information."""
         if not token:

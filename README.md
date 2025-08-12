@@ -113,11 +113,11 @@ chmod +x ./db-init/db-init.sh
   * Open the Keycloak Admin Console in your browser at `http://localhost:8088/admin`.
   * Login with the temporary admin user credentials you set in the first step.
   * Create a new realm named `storasense-realm`.
-  * Create two new clients - for the **backend** and **frontend** - with the following settings:
-    * Client ID: `fastapi-backend-client` / `frontend-client`
-    * Name: `STORASENSE-Backend` / `STORASENSE-Frontend`
-    * `Client authentication` should be disabled.
-    * `Standard flow` and `Direct access grants` should be enabled.
+  * Create three new clients - for the **backend**, **frontend** and **mqtt-client** - with the following settings:
+    * Client ID: `fastapi-backend-client` / `frontend-client` / `mqtt-client`
+    * Name: `STORASENSE-Backend` / `STORASENSE-Frontend` / `STORASENSE-MQTT`
+    * `Client authentication` should be disabled - except for the **mqtt-client**.
+    * `Standard flow` and `Direct access grants` should be enabled - except for the **mqtt-client**.
     * For Backend:
       - Add `Valid redirect URIs`: `https://api.storasense.de/docs/oauth2-redirect` and `http://localhost:*`
       - Add `Web Origins`: `https://storasense.de` and `https://api.storasense.de`
@@ -125,6 +125,10 @@ chmod +x ./db-init/db-init.sh
       - Add `Valid redirect URIs`: `https://storasense.de/*` and `https://auth.storasense.de/`
       - Add `Valid post logout redirect URIs`: `https://storasense.de/*`
       - Add `Web Origins`: `https://storasense.de`
+    * For MQTT:
+      - Enable `Client authentication`
+      - Enable `Service accounts roles`
+      - Copy the `Client secret` (go to `Credentials` section) after saving the client configuration.
   * Add Client-Mapping regarding Audience: Go to Clients -> fastapi-backend-client / frontend-client -> Client scopes -> fastapi-backend-client / frontend-client -> Add mapper -> Configure the following:
     * Mapper Type: `Audience`
     * Name: `audience-mapper-storasense-be`

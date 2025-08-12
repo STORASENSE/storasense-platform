@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 
 from fastapi.middleware.cors import CORSMiddleware
+
+from backend.src.app.src.services.auth.service import auth_service
 from backend.src.app.src.shared.logging import logging
 
 # ... DB imports ...
@@ -45,6 +47,10 @@ async def lifespan(app: FastAPI):
     _logger.info("Initializing database...")
     initialize_database()
     _logger.info("Database initialization completed successfully!")
+
+    _logger.info("Warming up authentication service...")
+    auth_service.warmup()
+
     yield
 
 
