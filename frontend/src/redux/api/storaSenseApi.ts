@@ -7,15 +7,15 @@ import {
     GetStoragesByUserIdRequest,
     GetStoragesByUserIdResponse
 } from "@/redux/api/storaSenseApiSchemas";
-
+import type { RootState } from '../store';
 
 function getBaseUrl(): string {
     switch (process.env.NODE_ENV) {
         case "test":
         case "development":
-            return "http://api.storasense.de"; "localhost:3000";
+            return "https://api.storasense.de";
         case "production":
-            return "http://api.storasense.de"; "localhost:3000";
+            return "https://api.storasense.de";
         default:
             throw new Error("Environment variable NODE_ENV was not set by node environment!");
     }
@@ -26,6 +26,13 @@ export const storaSenseApi = createApi({
     reducerPath: 'storaSenseApi',
     baseQuery: fetchBaseQuery({
         baseUrl: getBaseUrl(),
+        prepareHeaders: (headers, {getState }) => {
+            const token = (getState() as RootState).auth.token;
+            if (token) {
+                headers.set('Authorization', `Bearer ${token}`);
+            }
+            return headers;
+        }
     }),
     endpoints: (build) => ({
 

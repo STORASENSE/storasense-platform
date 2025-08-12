@@ -6,11 +6,11 @@ from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2AuthorizationCodeBearer
 
 from backend.src.app.src.services.auth.schemas import TokenData
+from backend.src.app.src.shared.logging import logging
 
-# External configuration for browser flow
+_logger = logging.getLogger(__name__)
+
 KEYCLOAK_URL = os.environ.get("KEYCLOAK_URL")
-# Internal URL for service communication
-KEYCLOAK_INTERNAL_URL = os.environ.get("KEYCLOAK_INTERNAL_URL", KEYCLOAK_URL)
 REALM_NAME = os.environ.get("KEYCLOAK_REALM")
 CLIENT_ID = os.environ.get("KEYCLOAK_CLIENT_ID")
 
@@ -25,7 +25,7 @@ AUTHORIZATION_URL = (
 )
 TOKEN_URL = f"{KEYCLOAK_URL}/realms/{REALM_NAME}/protocol/openid-connect/token"
 # URL for internal service communication
-JWKS_URL = f"{KEYCLOAK_INTERNAL_URL}/realms/{REALM_NAME}/protocol/openid-connect/certs"
+JWKS_URL = f"http://auth.storasense.de:8080/realms/{REALM_NAME}/protocol/openid-connect/certs"
 
 oauth2_scheme = OAuth2AuthorizationCodeBearer(
     authorizationUrl=AUTHORIZATION_URL,
@@ -50,6 +50,8 @@ class AuthService:
         try:
             # Client gets the signing key from token
             signing_key = self.jwks_client.get_signing_key_from_jwt(token)
+            _logger.info(f"Attempting to decode token: {token[:30]}...")
+            _logger.info(f"Expected vClient ID (Audience): {CLIENT_ID}")
 
             # Decrypt payload using the signing key
             payload = jwt.decode(

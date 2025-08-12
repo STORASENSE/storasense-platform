@@ -50,7 +50,9 @@ services:
     ports:
       - "8088:8080"
     networks:
-      - storasense-network
+      storasense-network:
+        aliases:
+          - auth.storasense.de # use url auth.storasense.de for internal communication
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.keycloak-http.rule=Host(`auth.storasense.de`)"
@@ -65,7 +67,6 @@ services:
       - "traefik.http.routers.keycloak-https.middlewares=secure-headers"
       - "traefik.http.middlewares.secure-headers.headers.contenttypenosniff=true"
       - "traefik.http.middlewares.secure-headers.headers.browserxssfilter=true"
-
     depends_on:
       timescaledb:
         condition: service_healthy

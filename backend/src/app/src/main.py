@@ -30,8 +30,10 @@ load_dotenv()
 _logger = logging.getLogger(__name__)
 
 CLIENT_ID = os.environ.get("KEYCLOAK_CLIENT_ID")
-
-CLIENT_ID = os.environ.get("KEYCLOAK_CLIENT_ID")
+if not CLIENT_ID:
+    raise RuntimeError(
+        "Keycloak is not configured correctly. Please check environment variables."
+    )
 
 
 @asynccontextmanager
