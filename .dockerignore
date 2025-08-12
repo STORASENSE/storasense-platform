@@ -1,0 +1,52 @@
+# ========================
+# Global ignores for monorepo
+# ========================
+.git
+.gitignore
+.dockerignore
+# .env
+*.log
+*.tmp
+*.swp
+*.bak
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# ========================
+# Python (Backend)
+# ========================
+backend/__pycache__/
+backend/*.pyc
+backend/*.pyo
+backend/.pytest_cache/
+backend/.mypy_cache/
+backend/venv/
+backend/env/
+backend/.coverage
+backend/coverage.xml
+
+# ========================
+# Node.js / Frontend
+# ========================
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.cache/
+frontend/npm-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# ========================
+# Common build artifacts
+# ========================
+build/
+dist/
+tmp/
+.cache/
+coverage/

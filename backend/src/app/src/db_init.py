@@ -10,7 +10,7 @@ import sqlalchemy
 from sqlalchemy import text
 from sqlalchemy.orm import sessionmaker
 
-from backend.src.shared.logging import logging
+from backend.src.app.src.shared.logging import logging
 from backend.src.app.src.seed_dev import seed_dev_data
 from backend.src.app.src.seed_prod import seed_prod_data
 from backend.src.app.src.shared.database.base_model import BaseModel
@@ -26,15 +26,6 @@ _logger = logging.getLogger(__name__)
 _LocalSessionMaker = sessionmaker(
     bind=db_engine, autoflush=False, autocommit=False
 )
-
-
-# if __name__ == "__main__":
-#    print("Dropping tables...")
-#    BaseModel.metadata.drop_all(db_engine)
-#    print("Done")
-#    print("Creating tables...")
-#    BaseModel.metadata.create_all(db_engine)
-#    print("Done")
 
 
 def is_prod_initialized() -> bool:

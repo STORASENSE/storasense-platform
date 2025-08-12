@@ -16,21 +16,23 @@ class UserRepository(BaseRepository[UserModel, UUID]):
     def __init__(self, session: Session):
         super().__init__(session)
 
-    def find_by_username(self, username: str) -> Optional[UserModel]:
-        query = select(UserModel).where(UserModel.username == username)
+    def find_by_id(self, user_id: UUID) -> Optional[UserModel]:
+        """Finds a user by their ID."""
+        query = select(UserModel).where(UserModel.id == user_id)
         return self.session.scalars(query).one_or_none()
 
-    def create_user(
-        self, username: str, password_hash: str, password_salt: str
-    ) -> UserModel:
-        user = UserModel()
-        user.username = username
-        user.password_hash = password_hash
-        user.password_salt = password_salt
+    def find_by_keycloak_id(self, keycloak_id: str) -> Optional[UserModel]:
+        """Finds a user by their ID ('sub'-Claim of JWT)."""
+        query = select(UserModel).where(UserModel.keycloak_id == keycloak_id)
+        return self.session.scalars(query).one_or_none()
 
-        self.session.add(user)
-        self.session.flush()
-        return user
+    def create_user(self, user_data: dict) -> UserModel:
+        """
+        Creates a new user in the database - based on the provided Keycloak user data.
+        """
+        new_user = UserModel(**user_data)
+        self.session.add(new_user)
+        return new_user
 
 
 def inject_user_repository(

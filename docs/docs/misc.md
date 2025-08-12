@@ -42,7 +42,7 @@ Alle Log-Einträge werden über **structlog** als JSON ausgegeben. Automatisch e
 Die Funktion `add_request_middleware(app: FastAPI)` bindet eine Middleware ein, die bei **jedem** Request automatisch loggt:
 
 ```python
-from shared.logging import add_request_middleware
+from backend.src.app.src.shared.logging import add_request_middleware
 from fastapi import FastAPI
 
 app = FastAPI()
@@ -61,7 +61,7 @@ Damit das Shared-Logging sofort aktiv ist, führt man diese Schritte in dem Haup
 
 ```python
 from fastapi import FastAPI
-from shared.logging import configure_logging, add_request_middleware, get_logger
+from backend.src.app.src.shared.logging import logging, add_request_middleware, configure_logging
 
 # 1) Globale Logging-Konfiguration aktivieren
 configure_logging()
@@ -73,8 +73,8 @@ app = FastAPI()
 add_request_middleware(app)
 
 # 4) Logger für dieses Modul holen und einen Start-Eintrag schreiben
-logger = get_logger(__name__)
-logger.info("Application startup complete")
+_logger = logging.getLogger(__name__)
+_logger.info("Application startup complete")
 ```
 ### Erklärung der Schritte
 

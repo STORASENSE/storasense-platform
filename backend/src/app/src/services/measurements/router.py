@@ -4,7 +4,7 @@ from typing import List
 
 from fastapi import Depends, APIRouter, status, HTTPException
 
-from backend.src.shared import logging
+from backend.src.app.src.shared.logging import logging
 from backend.src.app.src.services.measurements.service import (
     MeasurementService,
     inject_measurement_service,
@@ -20,7 +20,7 @@ from backend.src.app.src.shared.database.pagination import PageRequest
 
 router = APIRouter()
 
-_logger = logging.get_logger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 @router.get(
