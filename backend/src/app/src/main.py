@@ -6,7 +6,11 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 
 from fastapi.middleware.cors import CORSMiddleware
-from backend.src.app.src.shared.logging import logging
+
+from backend.src.app.src.shared.logger import (
+    get_logger,
+    add_request_middleware,
+)
 
 # ... DB imports ...
 from backend.src.app.src.shared.database.model_discovery import discover_models
@@ -23,11 +27,10 @@ from backend.src.app.src.services.sensors.router import (
     router as sensors_router,
 )
 
-
 discover_models()
 load_dotenv()
 
-_logger = logging.getLogger(__name__)
+_logger = get_logger(__name__)
 
 CLIENT_ID = os.environ.get("KEYCLOAK_CLIENT_ID")
 if not CLIENT_ID:
@@ -45,7 +48,9 @@ async def lifespan(app: FastAPI):
     _logger.info("Initializing database...")
     initialize_database()
     _logger.info("Database initialization completed successfully!")
+
     yield
+    _logger.info("Shutting down application...")
 
 
 app = FastAPI(
@@ -55,6 +60,8 @@ app = FastAPI(
     lifespan=lifespan,
     swagger_ui_init_oauth={"clientId": CLIENT_ID, "appName": "Storasense API"},
 )
+
+add_request_middleware(app)
 
 app.include_router(users_router)
 # app.include_router(storages_router)

@@ -6,9 +6,9 @@ from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2AuthorizationCodeBearer
 
 from backend.src.app.src.services.auth.schemas import TokenData
-from backend.src.app.src.shared.logging import logging
+from backend.src.app.src.shared.logger import get_logger
 
-_logger = logging.getLogger(__name__)
+_logger = get_logger(__name__)
 
 KEYCLOAK_URL = os.environ.get("KEYCLOAK_URL")
 REALM_NAME = os.environ.get("KEYCLOAK_REALM")
@@ -50,7 +50,6 @@ class AuthService:
         try:
             # Client gets the signing key from token
             signing_key = self.jwks_client.get_signing_key_from_jwt(token)
-            _logger.info(f"Attempting to decode token: {token[:30]}...")
             _logger.info(f"Expected vClient ID (Audience): {CLIENT_ID}")
 
             # Decrypt payload using the signing key

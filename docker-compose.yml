@@ -143,6 +143,8 @@ services:
     restart: always
     networks:
       - storasense-network
+    depends_on:
+      - app
 
   frontend:
     build:
@@ -173,3 +175,6 @@ volumes:
 networks:
   storasense-network:
     driver: bridge
+  host:
+    external: true
+    name: host

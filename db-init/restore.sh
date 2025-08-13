@@ -1,15 +1,11 @@
 #!/bin/bash
 
-# =================================================================
-#  Configuration - Adjust these variables if needed
-# =================================================================
 # The name of the volume to be restored (from docker-compose.yml)
 VOLUME_NAME="storasense_data_volume"
 # The name of the database service using this volume
 DB_SERVICE_NAME="timescaledb"
 # The local folder where your backups are stored
 BACKUP_DIR="./storasense_data_volume_backup"
-# =================================================================
 
 
 # Safety check: Verify that a backup filename was provided

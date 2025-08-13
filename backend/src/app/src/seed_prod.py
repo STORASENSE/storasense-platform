@@ -1,13 +1,13 @@
 from sqlalchemy.orm import Session
 from uuid import UUID
 
-from backend.src.app.src.shared.logging import logging
+from backend.src.app.src.shared.logger import get_logger
 from backend.src.app.src.services.storages.models import StorageModel
 from backend.src.app.src.services.sensors.models import SensorModel
 from backend.src.app.src.shared.database.enums import SensorType
 
 
-_logger = logging.getLogger(__name__)
+_logger = get_logger(__name__)
 
 _known_storage_id = UUID("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 
