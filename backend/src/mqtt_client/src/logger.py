@@ -1,4 +1,3 @@
-# shared/logging.py
 import logging
 import logging.handlers
 import os
@@ -14,33 +13,33 @@ from structlog.typing import BindableLogger
 
 def configure_logging():
     """
-    Zentraler Setup-Aufruf, idealerweise ganz am Anfang deiner Anwendung:
+    Central setup call, ideally at the very beginning of your application:
       from shared.logging import configure_logging
       configure_logging()
     """
-    # 1) Standard-Logger konfigurieren
+    # 1) Configure standard logger
     log_level = os.getenv("LOG_LEVEL", "INFO").upper()
     log_level_value = getattr(logging, log_level, logging.INFO)
 
-    # Wurzel-Logger holen und Level setzen
-    root_logger = logging.getLogger()
+    # Get root logger and set level
+    root_logger = get_logger()
     root_logger.setLevel(log_level_value)
 
-    # Vorhandene Handler entfernen
+    # Remove existing handlers
     for handler in list(root_logger.handlers):
         root_logger.removeHandler(handler)
 
-    # INFO und WARNING -> stdout
+    # INFO and WARNING -> stdout
     stdout_handler = logging.StreamHandler(sys.stdout)
     stdout_handler.setLevel(logging.INFO)
-    # Nur Levels unter ERROR durchlassen
+    # Only allow levels below ERROR
     stdout_handler.addFilter(lambda record: record.levelno < logging.ERROR)
     stdout_handler.setFormatter(
         logging.Formatter("%(asctime)s %(levelname)s %(message)s", "%H:%M:%S")
     )
     root_logger.addHandler(stdout_handler)
 
-    # ERROR und höher -> stderr
+    # ERROR and higher -> stderr
     stderr_handler = logging.StreamHandler(sys.stderr)
     stderr_handler.setLevel(logging.ERROR)
     stderr_handler.setFormatter(
@@ -48,7 +47,7 @@ def configure_logging():
     )
     root_logger.addHandler(stderr_handler)
 
-    # Log-Rotation: Rotating file handler
+    # Log rotation: Rotating file handler
     file_handler = logging.handlers.RotatingFileHandler(
         filename=os.getenv("LOG_FILE", "app.log"),
         maxBytes=int(os.getenv("LOG_MAX_BYTES", "10485760")),  # 10MB default
@@ -67,7 +66,7 @@ def configure_logging():
         uv_logger.setLevel(log_level_value)
         uv_logger.propagate = False
 
-    # Optional Monitoring: HTTP handler für ELK/Logstash
+    # Optional monitoring: HTTP handler for ELK/Logstash
     logstash_url = os.getenv("LOGSTASH_URL")
     if logstash_url:
         http_handler = logging.handlers.HTTPHandler(
@@ -78,31 +77,31 @@ def configure_logging():
         http_handler.setLevel(logging.INFO)
         root_logger.addHandler(http_handler)
 
-    # 2) Structlog konfigurieren
+    # 2) Configure structlog
     structlog.configure(
         processors=[
-            structlog.processors.TimeStamper(fmt="iso"),  # ISO-Zeitstempel
-            structlog.processors.add_log_level,  # Level als Feld
-            structlog.processors.StackInfoRenderer(),  # Stack-Infos bei Bedarf
+            structlog.processors.TimeStamper(fmt="iso"),  # ISO timestamp
+            structlog.processors.add_log_level,  # Level as field
+            structlog.processors.StackInfoRenderer(),  # Stack info when needed
             structlog.processors.format_exc_info,  # exception info
-            structlog.processors.JSONRenderer(),  # Ausgabe als JSON
+            structlog.processors.JSONRenderer(),  # Output as JSON
         ],
         context_class=dict,
-        # Brücke zum stdlib-Logger
+        # Bridge to stdlib logger
         logger_factory=structlog.stdlib.LoggerFactory(),
         wrapper_class=cast(type[BindableLogger], structlog.stdlib.BoundLogger),
         cache_logger_on_first_use=True,
     )
 
 
-# Hinweis: Für FastAPI-Apps sollte zusätzlich die Middleware eingebunden werden
+# Note: For FastAPI apps, the middleware should also be included
 # from shared.logging import add_request_middleware
 
 
 def get_logger(name=None):
     """
-    Liefert einen Structlog-Logger, getagged mit dem Modul-Namen.
-    Verwende in jedem Modul:
+    Returns a structlog logger, tagged with the module name.
+    Use in each module:
       from shared.logging import get_logger
       logger = get_logger(__name__)
     """

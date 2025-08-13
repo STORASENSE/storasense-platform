@@ -1,4 +1,0 @@
-buiid:
-    docker build -t app:latest
-run:
-    docker run --detach app:latest

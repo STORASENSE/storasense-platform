@@ -10,7 +10,7 @@ import sqlalchemy
 from sqlalchemy import text
 from sqlalchemy.orm import sessionmaker
 
-from backend.src.app.src.shared.logging import logging
+from backend.src.app.src.shared.logger import get_logger
 from backend.src.app.src.seed_dev import seed_dev_data
 from backend.src.app.src.seed_prod import seed_prod_data
 from backend.src.app.src.shared.database.base_model import BaseModel
@@ -18,10 +18,9 @@ from backend.src.app.src.shared.database.engine import db_engine
 from backend.src.app.src.shared.database.model_discovery import discover_models
 
 discover_models()
+_logger = get_logger(__name__)
 
 _environment = os.getenv("ENVIRONMENT")  # TEST / DEV / PROD
-
-_logger = logging.getLogger(__name__)
 
 _LocalSessionMaker = sessionmaker(
     bind=db_engine, autoflush=False, autocommit=False
@@ -52,9 +51,9 @@ def generate_hypertables():
                 sql = text(
                     f"""
                         SELECT create_hypertable(
-                            '"{table_name}"',
-                            '{time_column}',
-                            if_not_exists => TRUE
+                        '"{table_name}"',
+                        '{time_column}',
+                        if_not_exists => TRUE
                         );
                     """
                 )

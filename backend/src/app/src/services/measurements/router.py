@@ -4,7 +4,13 @@ from typing import List
 
 from fastapi import Depends, APIRouter, status, HTTPException
 
-from backend.src.app.src.shared.logging import logging
+from backend.src.app.src.services.auth.schemas import TokenData
+from backend.src.app.src.services.auth.service import auth_service
+from backend.src.app.src.services.users.service import (
+    UserService,
+    inject_user_service,
+)
+from backend.src.app.src.shared.logger import get_logger
 from backend.src.app.src.services.measurements.service import (
     MeasurementService,
     inject_measurement_service,
@@ -19,8 +25,7 @@ from backend.src.app.src.services.sensors.errors import SensorDoesNotExistError
 from backend.src.app.src.shared.database.pagination import PageRequest
 
 router = APIRouter()
-
-_logger = logging.getLogger(__name__)
+_logger = get_logger(__name__)
 
 
 @router.get(
@@ -83,18 +88,46 @@ def find_measurements_by_sensor_id_and_max_date(
     return GetMeasurementsResponse(measurements=measurements)
 
 
+# @router.post("/measurements/{sensor_id}", status_code=status.HTTP_201_CREATED)
+# async def create_measurement(
+#     sensor_id: UUID,
+#     request: CreateMeasurementRequest,
+#     measurement_service: MeasurementService = Depends(
+#         inject_measurement_service
+#     ),
+# ):
+#     try:
+#         measurement_service.create_measurement(sensor_id, request)
+#
+#     except Exception as e:
+#         raise HTTPException(
+#             status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+#         )
+
+
 @router.post("/measurements/{sensor_id}", status_code=status.HTTP_201_CREATED)
-def create_measurement(
+async def create_measurement(
     sensor_id: UUID,
     request: CreateMeasurementRequest,
+    token_data: TokenData = Depends(auth_service.get_current_user),
+    user_service: UserService = Depends(inject_user_service),
     measurement_service: MeasurementService = Depends(
         inject_measurement_service
     ),
 ):
-    try:
-        measurement_service.create_measurement(sensor_id, request)
-
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+    # Make sure there is a user in the database for the given Keycloak ID or create one if it doesn't exist yet
+    user = user_service.get_or_create_user_by_keycloak_id(token_data)
+    if user:
+        _logger.info(
+            f"User with Keycloak ID {token_data.id} exists or was created."
         )
+        measurement_service.create_measurement(sensor_id, request)
+    else:
+        _logger.error(
+            f"User with Keycloak ID {token_data.id} could not be created."
+        )
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User could not be created or found.",
+        )
+    return {"status": "success"}
