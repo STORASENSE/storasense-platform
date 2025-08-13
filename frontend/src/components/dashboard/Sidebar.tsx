@@ -1,6 +1,6 @@
 "use client"
 
-import {FC, ReactNode, useMemo} from "react";
+import {FC, ReactNode, useMemo, useEffect, useState} from "react";
 import Link from "next/link";
 import {usePathname} from "next/navigation";
 import {Button} from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { MdSpaceDashboard as DashboardIcon } from "react-icons/md";
 import { FaHouseUser as StorageIcon } from "react-icons/fa";
 import { FaChartBar as AnalyticsIcon } from "react-icons/fa6";
 import useKeycloak from "@/app/(main)/useKeycloak";
+import {useGetHealthQuery} from "@/redux/api/storaSenseApi";
 
 interface SidebarLinkProps {
     href: string;
@@ -45,6 +46,13 @@ const Sidebar: FC = () => {
     const { keycloak, authenticated } = useKeycloak();
     const username = authenticated ? keycloak?.idTokenParsed?.preferred_username || "[User]" : "[User]";
 
+    const { data: healthData, isSuccess } = useGetHealthQuery(undefined, {
+        skip: !authenticated,
+        pollingInterval: 30000, // Poll every 30 seconds
+    });
+
+    const isBackendOnline = isSuccess && healthData?.status;
+
     return (
         <nav className="h-full w-[300px] p-3 border-r-2 border-athens-gray flex flex-col">
             <div
@@ -64,11 +72,26 @@ const Sidebar: FC = () => {
                 </ul>
             </div>
 
-            <div className="mt-auto pt-4 border-t border-athens-gray">
-                <p className="text-base font-medium text-blue-whale text-left">
-                    Welcome {username}
-                </p>
-            </div>
+            {authenticated && (
+                <div className="mt-auto pt-3 border-t border-athens-gray">
+                    <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 rounded-lg p-3 border border-slate-200 shadow-md">
+                        {isBackendOnline && (
+                            <div className="flex items-center space-x-2 mb-2">
+                                <div className="relative">
+                                    <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                                    <div className="absolute inset-0 w-2 h-2 bg-emerald-400 rounded-full animate-ping opacity-75"></div>
+                                </div>
+                                <span className="text-xs font-medium text-emerald-600 uppercase tracking-wide">Online</span>
+                            </div>
+                        )}
+                        <div className="space-y-1">
+                            <p className="text-xs text-slate-500 font-medium">Welcome back</p>
+                            <p className="text-base font-bold text-slate-800 truncate">{username}</p>
+                        </div>
+                        <div className="mt-2 h-0.5 bg-gradient-to-r from-blue-200 via-indigo-300 to-purple-200 rounded-full"></div>
+                    </div>
+                </div>
+            )}
         </nav>
     );
 }

@@ -21,7 +21,6 @@ function getBaseUrl(): string {
     }
 }
 
-
 export const storaSenseApi = createApi({
     reducerPath: 'storaSenseApi',
     baseQuery: fetchBaseQuery({
@@ -55,6 +54,12 @@ export const storaSenseApi = createApi({
             }),
         }),
 
+        getHealth: build.query<{ status: string }, void>({
+            query: () => ({
+                url: '/health'
+            })
+        }),
+
     })
 });
 
@@ -62,4 +67,5 @@ export const {
     useGetStoragesByUserIdQuery,
     useGetSensorsQuery,
     useGetMeasurementsQuery,
+    useGetHealthQuery,
 } = storaSenseApi;
