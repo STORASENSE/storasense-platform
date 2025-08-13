@@ -21,7 +21,7 @@ const storageSlice = createSlice({
     initialState,
     reducers: {
 
-        setActiveStorage: (state: StorageSliceState, action: PayloadAction<StoraSenseStorge>) => {
+        setActiveStorage: (state: StorageSliceState, action: PayloadAction<StoraSenseStorge | undefined>) => {
             return {
                 ...state,
                 activeStorage: action.payload,

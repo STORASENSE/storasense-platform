@@ -52,7 +52,7 @@ const Sidebar: FC = () => {
                 aria-label="external links"
                 className="flex flex-col gap-3 flex-grow mt-6">
                 <ul className="list-none flex flex-col gap-4">
-                    <SidebarLink href="/dashboard/storage" icon={<StorageIcon />}>
+                    <SidebarLink href="/dashboard/storages" icon={<StorageIcon />}>
                         Storages
                     </SidebarLink>
                     <SidebarLink href="/dashboard" icon={<DashboardIcon />}>

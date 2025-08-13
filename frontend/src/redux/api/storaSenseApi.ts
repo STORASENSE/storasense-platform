@@ -1,11 +1,11 @@
-import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
+import {BaseQueryError, BaseQueryMeta, createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
 import {
     GetMeasurementsRequest,
     GetMeasurementsResponse,
     GetSensorsByStorageIdRequest,
     GetSensorsByStorageIdResponse,
     GetStoragesByUserIdRequest,
-    GetStoragesByUserIdResponse
+    GetStoragesByUserIdResponse, StoraSenseUser
 } from "@/redux/api/storaSenseApiSchemas";
 import type { RootState } from '../store';
 
@@ -36,6 +36,10 @@ export const storaSenseApi = createApi({
     }),
     endpoints: (build) => ({
 
+        getMe: build.query<StoraSenseUser | undefined, void>({
+            query: () => '/users/me'
+        }),
+
         getStoragesByUserId: build.query<GetStoragesByUserIdResponse, GetStoragesByUserIdRequest>({
             query: ({ user_id }) => ({
                 url: `/storages/byUserId/${user_id}`
@@ -59,6 +63,7 @@ export const storaSenseApi = createApi({
 });
 
 export const {
+    useGetMeQuery,
     useGetStoragesByUserIdQuery,
     useGetSensorsQuery,
     useGetMeasurementsQuery,
