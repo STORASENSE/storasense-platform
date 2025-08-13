@@ -2,11 +2,12 @@
 set -e
 
 APP_DB_NAME=${POSTGRES_DB:-storasense_app_data}
+DB_USER=${POSTGRES_USER:-user1}
 
 echo "INFO: Resetting application database '$APP_DB_NAME'..."
 
 # Connect to psql and execute the SQL commands
-psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "postgres" <<-EOSQL
+psql -v ON_ERROR_STOP=1 --username "$DB_USER" --dbname "postgres" <<-EOSQL
     -- Terminate all active connections to the app DB, BUT NOT THE OWN CONNECTION
     SELECT pg_terminate_backend(pid)
     FROM pg_stat_activity
@@ -17,7 +18,12 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "postgres" <<-EOSQL
     DROP DATABASE IF EXISTS $APP_DB_NAME;
 
     -- Recreate the database
-    CREATE DATABASE $APP_DB_NAME WITH OWNER = ${POSTGRES_USER};
+    CREATE DATABASE $APP_DB_NAME WITH OWNER = $DB_USER;
+EOSQL
+
+# Connects to newly created application database and activates TimescaleDB extension
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$APP_DB_NAME" <<-EOSQL
+    CREATE EXTENSION IF NOT EXISTS timescaledb;
 EOSQL
 
 echo "SUCCESS: Database '$APP_DB_NAME' has been successfully reset."

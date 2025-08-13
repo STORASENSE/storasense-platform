@@ -51,9 +51,9 @@ def generate_hypertables():
                 sql = text(
                     f"""
                         SELECT create_hypertable(
-                            '"{table_name}"',
-                            '{time_column}',
-                            if_not_exists => TRUE
+                        '"{table_name}"',
+                        '{time_column}',
+                        if_not_exists => TRUE
                         );
                     """
                 )
