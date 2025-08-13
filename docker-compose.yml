@@ -135,14 +135,16 @@ services:
       keycloak:
         condition: service_started
 
-#  mqtt-client:
-#    build:
-#      context: .
-#      dockerfile: ./backend/src/mqtt_client/Dockerfile
-#    env_file: .env
-#    restart: always
-#    networks:
-#      - storasense-network
+  mqtt-client:
+    build:
+      context: .
+      dockerfile: ./backend/src/mqtt_client/Dockerfile
+    env_file: .env
+    restart: always
+    networks:
+      - storasense-network
+    depends_on:
+      - app
 
   frontend:
     build:
@@ -173,3 +175,6 @@ volumes:
 networks:
   storasense-network:
     driver: bridge
+  host:
+    external: true
+    name: host

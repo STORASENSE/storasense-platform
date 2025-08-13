@@ -22,11 +22,11 @@ class UserModel(BaseModel):
         String(255), unique=True, index=True, nullable=False
     )
     email: Mapped[str] = mapped_column(
-        String(255), unique=True, index=True, nullable=False
-    )
+        String(255), unique=True, index=True, nullable=True
+    )  # Allow null for email to support technical users
     name: Mapped[str] = mapped_column(
-        String(255), unique=False, index=False, nullable=False
-    )
+        String(255), unique=False, index=False, nullable=True
+    )  # Allow null for name to support technical users
 
     accessed_storages: Mapped[list["StorageModel"]] = relationship(
         secondary=user_storage_access, back_populates="accessing_users"

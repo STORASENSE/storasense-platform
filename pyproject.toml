@@ -34,6 +34,7 @@ sqlalchemy = "^2.0.41"
 pg8000 = "^1.31.4"
 authlib = "^1.6.1"
 itsdangerous = "^2.2.0"
+urllib3 = "^2.5.0"
 
 [tool.poetry.group.dev.dependencies]
 commitizen = "^4.8.3"

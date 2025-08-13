@@ -1,60 +1,108 @@
 import math
 import os
-from datetime import datetime
-
+import time
 import requests
+import urllib3
+
+from datetime import datetime
+from urllib3.exceptions import InsecureRequestWarning
 from database import get_db_connection
-from backend.src.app.src.shared.logging import logging
 
-_logger = logging.getLogger(__name__)
+from logger import get_logger
 
-KEYCLOAK_URL = os.environ.get("KEYCLOAK_URL")
-REALM_NAME = os.environ.get("KEYCLOAK_REALM")
-CLIENT_ID = os.environ.get("MQTT_KEYCLOAK_CLIENT_ID")
-CLIENT_SECRET = os.environ.get("MQTT_KEYCLOAK_CLIENT_SECRET")
+urllib3.disable_warnings(InsecureRequestWarning)
 
-if not all([KEYCLOAK_URL, REALM_NAME, CLIENT_ID, CLIENT_SECRET]):
-    raise RuntimeError(
-        "Keycloak is not configured correctly. Please check environment variables."
-    )
+_logger = get_logger(__name__)
+
+_access_token = None
+_token_expires_at = 0
 
 
-# Client credentials grant flow
+def get_keycloak_config():
+    keycloak_url = os.getenv("MQTT_KEYCLOAK_URL")
+    realm_name = os.getenv("KEYCLOAK_REALM")
+    client_id = os.getenv("MQTT_KEYCLOAK_CLIENT_ID")
+    client_secret = os.getenv("MQTT_KEYCLOAK_CLIENT_SECRET")
+
+    if not all([keycloak_url, realm_name, client_id, client_secret]):
+        _logger.error(
+            f"Missing environment variables: KEYCLOAK_URL={keycloak_url}, REALM={realm_name}, CLIENT_ID={client_id}, CLIENT_SECRET=***"
+        )
+        raise RuntimeError(
+            "Keycloak is not configured correctly. Please check environment variables."
+        )
+
+    return keycloak_url, realm_name, client_id, client_secret
+
+
 def get_access_token():
     """
     Gets an access token from Keycloak using the client credentials grant flow.
     """
+    global _access_token, _token_expires_at
+
+    keycloak_url, realm_name, client_id, client_secret = get_keycloak_config()
+
     token_url = (
-        f"{KEYCLOAK_URL}/realms/{REALM_NAME}/protocol/openid-connect/token"
+        f"{keycloak_url}/realms/{realm_name}/protocol/openid-connect/token"
     )
 
     payload = {
         "grant_type": "client_credentials",
-        "client_id": CLIENT_ID,
-        "client_secret": CLIENT_SECRET,
+        "client_id": client_id,
+        "client_secret": client_secret,
     }
 
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
 
     try:
-        response = requests.post(token_url, headers=headers, data=payload)
+        response = requests.post(
+            token_url, headers=headers, data=payload, verify=False
+        )
         response.raise_for_status()
 
         token_data = response.json()
         _logger.debug("Token data received successfully.")
-        return token_data.get("access_token")
+
+        # Store the access token and its expiration time
+        _access_token = token_data.get("access_token")
+        expires_in = token_data.get("expires_in", 3600)
+        _token_expires_at = time.time() + expires_in - 60  # 60 seconds buffer
+
+        return _access_token
 
     except requests.exceptions.RequestException as e:
-        _logger.debug(f"Error while getting token: {e}")
+        _logger.error(f"Error while getting token: {e}")
         return None
 
 
-def send_one_value(token):
+def get_valid_token():
+    """
+    Returns a valid access token, refreshing it if necessary.
+    """
+    global _access_token, _token_expires_at
+
+    # check if the token is already set and valid
+    if not _access_token or time.time() >= _token_expires_at:
+        _logger.info("Token expired or missing, requesting new token...")
+        _access_token = get_access_token()
+
+    return _access_token
+
+
+def send_one_value():
+    token = get_valid_token()
+    if not token:
+        _logger.warning(
+            "Token was not received. Returning without sending data."
+        )
+        return
+
     connection = get_db_connection()
     with connection:
         row = connection.execute(
-            """select message_id, timestamp,sensor_id,
-              value, unit from sensor_data limit 1"""
+            """select message_id, timestamp, sensor_id, value, unit
+               from sensor_data limit 1"""
         ).fetchone()
         if row:
             row_id = row[0]
@@ -63,17 +111,18 @@ def send_one_value(token):
             value = row[3]
             unit = row[4]
             try:
-                if not token:
-                    _logger.warning(
-                        "Token was not received. Returning without sending data."
-                    )
-                    return
                 headers = {
                     "Authorization": f"Bearer {token}",
                     "Content-Type": "application/json",
                 }
+                backend_url = os.getenv("MQTT_BACKEND_URL")
+                if not backend_url:
+                    _logger.error(
+                        "MQTT_BACKEND_URL environment variable not set"
+                    )
+                    return
                 response_code = requests.post(
-                    f"{os.getenv('MQTT_BACKEND_URL')}/{sensor_id}",
+                    f"{backend_url}/{sensor_id}",
                     headers=headers,
                     json={
                         "value": math.floor(value),
@@ -84,20 +133,18 @@ def send_one_value(token):
             except requests.exceptions.RequestException:
                 response_code = 400
 
-            if response_code == int(os.getenv("MQTT_HTTP_RESPONSE_OK")):
+            expected_code = os.getenv("MQTT_HTTP_RESPONSE_OK", "200")
+            if response_code == int(expected_code):
                 connection = get_db_connection()
                 with connection:
                     connection.execute(
                         "DELETE FROM sensor_data WHERE message_id = ?",
                         (row_id,),
                     )
-                _logger.info("sent {value}")
+                _logger.info(f"Successfully sent {value}")
 
 
 def start_rest_client(stop_event):
-    access_token = get_access_token()
-    if not access_token:
-        _logger.error("Failed to obtain access token. Exiting.")
-        return
     while not stop_event.is_set():
-        send_one_value(access_token)
+        send_one_value()
+        time.sleep(5)  # Wait for 5 seconds before retrying

@@ -4,9 +4,9 @@ import os
 import paho.mqtt.client as mqtt
 from database import get_db_connection
 
-from backend.src.app.src.shared.logging import logging
+from logger import get_logger
 
-_logger = logging.getLogger(__name__)
+_logger = get_logger(__name__)
 
 
 def get_topics():

@@ -6,9 +6,9 @@ from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2AuthorizationCodeBearer
 
 from backend.src.app.src.services.auth.schemas import TokenData
-from backend.src.app.src.shared.logging import logging
+from backend.src.app.src.shared.logger import get_logger
 
-_logger = logging.getLogger(__name__)
+_logger = get_logger(__name__)
 
 KEYCLOAK_URL = os.environ.get("KEYCLOAK_URL")
 REALM_NAME = os.environ.get("KEYCLOAK_REALM")
@@ -38,20 +38,6 @@ class AuthService:
     def __init__(self):
         # PyJWKClient automatically fetches and caches the JWKS (JSON Web Key Set)
         self.jwks_client = PyJWKClient(JWKS_URL)
-
-    def warmup(self):
-        """
-        Forces the JWKS client to fetch the keys from Keycloak immediately
-        to ensure the service is ready on startup.
-        """
-        try:
-            _logger.info("AuthService: Warming up by fetching JWKS...")
-            self.jwks_client.get_jwk_set()
-            _logger.debug("AuthService: Warmup successful. Keys are cached.")
-        except Exception as e:
-            _logger.debug(
-                f"FATAL: Could not warm up auth service. Token validation might fail. Error: {e}"
-            )
 
     async def validate_token(self, token: str) -> TokenData:
         """Validates the JWT token and extracts user information."""
