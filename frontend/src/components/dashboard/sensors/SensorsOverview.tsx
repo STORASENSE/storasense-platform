@@ -5,21 +5,8 @@ import {Button} from "@/components/ui/button";
 import {Plus} from "lucide-react";
 import SensorCard from "./SensorCard";
 import AddSensorModal from "./AddSensorModal";
-import {useGetSensorsQuery, useDeleteSensorMutation, useGetSensorStatusQuery} from "@/redux/api/storaSenseApi";
-
-interface Sensor {
-    id: string;
-    name: string;
-    type: "ULTRASONIC" | "TEMPERATURE_INSIDE" | "TEMPERATURE_OUTSIDE" | "HUMIDITY" | "GAS";
-    storage_id: string;
-    allowed_min: number;
-    allowed_max: number;
-    status?: "online" | "offline" | "warning";
-    value?: string;
-    unit?: string;
-    location?: string;
-    lastUpdate?: string;
-}
+import {useGetSensorsQuery, useDeleteSensorMutation, useGetSensorStatusQuery, useAddSensorMutation} from "@/redux/api/storaSenseApi";
+import {Sensor} from "@/redux/api/storaSenseApiSchemas";
 
 interface SensorsOverviewProps {
     storageId: string;
@@ -52,7 +39,8 @@ const SensorsOverview: FC<SensorsOverviewProps> = ({ storageId, userId }) => {
         { storage_id: storageId },
         { skip: viewMode !== "storage" }
     );
-
+    // Add mutation
+    const [addSensor] = useAddSensorMutation();
     // Delete mutation
     const [deleteSensor] = useDeleteSensorMutation();
 
@@ -61,8 +49,13 @@ const SensorsOverview: FC<SensorsOverviewProps> = ({ storageId, userId }) => {
         ? (storageSensorsData || [])
         : [];
 
-    const handleAddSensor = (newSensor: Sensor) => {
-        refetchStorage();
+    const handleAddSensor = async (newSensor: Sensor) => {
+        try {
+            await addSensor({ sensor: newSensor }).unwrap();
+            refetchStorage();
+        } catch {
+            console.error('Failed to add sensor:');
+        }
     };
 
     const handleDeleteSensor = async (sensorId: string) => {
@@ -149,7 +142,7 @@ const SensorsOverview: FC<SensorsOverviewProps> = ({ storageId, userId }) => {
             <AddSensorModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                onAdd={handleAddSensor}
+                onAdd={() => handleAddSensor()}
             />
         </div>
     );

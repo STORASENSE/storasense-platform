@@ -52,8 +52,8 @@ export const storaSenseApi = createApi({
         }),
 
         addSensor: build.mutation<AddSensorResponse, AddSensorRequest>({
-            query: ({sensor_id}) => ({
-                url: `/sensors/${sensor_id}`,
+            query: ({sensor}) => ({
+                url: `/sensors/${sensor.id}`,
                 method: 'POST'
             })
         }),

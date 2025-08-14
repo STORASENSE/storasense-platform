@@ -43,7 +43,6 @@ export interface Sensor {
     storage_id: string;
     allowed_min: number;
     allowed_max: number;
-    location?: string;
 }
 
 export interface Measurement {
@@ -74,12 +73,7 @@ export type GetSensorsByStorageIdResponse = Sensor[];
 /////////////////////////////////////////////////////////////////////////
 
 export interface AddSensorRequest {
-    sensor_id: string;
-    name: string;
-    type: SensorType;
-    storage_id: string;
-    allowed_min: number;
-    allowed_max: number;
+    sensor: Sensor;
 }
 
 export interface AddSensorResponse {
