@@ -19,12 +19,14 @@ from backend.src.app.src.db_init import initialize_database
 # ... Router imports ...
 from .services.users.router import router as users_router
 
-# from .services.storages.router import router as storages_router
 from backend.src.app.src.services.measurements.router import (
     router as measurements_router,
 )
 from backend.src.app.src.services.sensors.router import (
     router as sensors_router,
+)
+from backend.src.app.src.services.storages.router import (
+    router as storages_router,
 )
 
 discover_models()
@@ -64,9 +66,9 @@ app = FastAPI(
 add_request_middleware(app)
 
 app.include_router(users_router)
-# app.include_router(storages_router)
 app.include_router(measurements_router)
 app.include_router(sensors_router)
+app.include_router(storages_router)
 
 # configure CORS-middleware
 origins = [
