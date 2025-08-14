@@ -1,6 +1,6 @@
 'use client';
 
-import { FC, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ProtectedPage from "@/components/ProtectedPage";
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Legend,
@@ -14,30 +14,41 @@ type SummaryItem = { type: string; sensor_id: string; avg_value: number; min_val
 type DoorOpenItem = { day: string; sensor_id: string; open_seconds: number; };
 
 const COLORS = {
-  min: "#a5b4fc", max: "#6366f1", ultrasonic: "#22c55e", fallback: "#64748b",
+  min: "#a5b4fc",
+  max: "#6366f1",
+  ultrasonic: "#22c55e",
+  fallback: "#64748b",
   byType: {
-    TEMPERATURE_INSIDE: "#0ea5e9", TEMPERATURE_OUTSIDE: "#3b82f6",
-    HUMIDITY: "#10b981", GAS: "#f59e0b", ULTRASONIC: "#ef4444",
+    TEMPERATURE_INSIDE: "#0ea5e9",
+    TEMPERATURE_OUTSIDE: "#3b82f6",
+    HUMIDITY: "#10b981",
+    GAS: "#f59e0b",
+    ULTRASONIC: "#ef4444",
   } as Record<string, string>,
 };
 
-const Card: FC<React.PropsWithChildren<{ title?: string; subtitle?: string; className?: string }>> = ({ title, subtitle, className, children }) => (
-  <div className={`bg-white rounded-2xl border shadow-sm p-5 ${className ?? ""}`}>
-    {title && <div className="font-semibold">{title}</div>}
-    {subtitle && <div className="text-xs text-gray-500 mt-0.5">{subtitle}</div>}
-    {children}
-  </div>
-);
+function Card(props: React.PropsWithChildren<{ title?: string; subtitle?: string; className?: string }>) {
+  const { title, subtitle, className, children } = props;
+  return (
+    <div className={`bg-white rounded-2xl border shadow-sm p-5 ${className ?? ""}`}>
+      {title && <div className="font-semibold">{title}</div>}
+      {subtitle && <div className="text-xs text-gray-500 mt-0.5">{subtitle}</div>}
+      {children}
+    </div>
+  );
+}
 
-const StatCard: FC<{ label: string; value: string | number; foot?: string }> = ({ label, value, foot }) => (
-  <div className="rounded-2xl border bg-white p-4 shadow-sm">
-    <div className="text-xs text-gray-500">{label}</div>
-    <div className="mt-1 text-2xl font-semibold">{value}</div>
-    {foot && <div className="mt-1 text-xs text-gray-400">{foot}</div>}
-  </div>
-);
+function StatCard({ label, value, foot }: { label: string; value: string | number; foot?: string }) {
+  return (
+    <div className="rounded-2xl border bg-white p-4 shadow-sm">
+      <div className="text-xs text-gray-500">{label}</div>
+      <div className="mt-1 text-2xl font-semibold">{value}</div>
+      {foot && <div className="mt-1 text-xs text-gray-400">{foot}</div>}
+    </div>
+  );
+}
 
-const Page: FC = () => {
+export default function Page() {
   const [win, setWin] = useState<Window>("7d");
   const [summary, setSummary] = useState<SummaryItem[]>([]);
   const [door, setDoor] = useState<DoorOpenItem[]>([]);
@@ -45,7 +56,7 @@ const Page: FC = () => {
   const [errMsg, setErrMsg] = useState<string | null>(null);
   const token = useSelector((s: RootState) => s.auth.token);
 
-  // zuerst /api (Proxy), dann ENV oder Domain
+  // 1) zuerst /api (Proxy), dann ENV oder Domain
   const BASES = useMemo(
     () => ["/api", process.env.NEXT_PUBLIC_API_BASE ?? "https://api.storasense.de"],
     []
@@ -79,7 +90,7 @@ const Page: FC = () => {
           try {
             const { sArr, dArr } = await load(base);
             setSummary(sArr); setDoor(dArr); ok = true; break;
-          } catch { /* next base */ }
+          } catch { /* nächster Kandidat */ }
         }
         if (!ok) { setSummary([]); setDoor([]); setErrMsg("Konnte keine Analytics-Daten laden."); }
       } catch (e) {
@@ -89,6 +100,7 @@ const Page: FC = () => {
     })();
   }, [win, token, BASES]);
 
+  // Aggregationen
   const kpisByType = useMemo(() => {
     const map = new Map<string, { count: number; sumAvg: number; min: number; max: number }>();
     summary.forEach(r => {
@@ -140,6 +152,7 @@ const Page: FC = () => {
       </header>
 
       <section className="space-y-6">
+        {/* Window Switcher */}
         <div className="rounded-xl border bg-white/60 p-2 w-fit">
           {(["7d", "30d", "365d"] as Window[]).map(w => (
             <button
@@ -152,6 +165,7 @@ const Page: FC = () => {
           ))}
         </div>
 
+        {/* Top stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <StatCard label="Total sensors" value={topStats.totalSensors} />
           <StatCard label="Sensor types" value={topStats.totalTypes} />
@@ -161,32 +175,32 @@ const Page: FC = () => {
         {/* KPI Cards by type */}
         <Card title="KPIs by type" subtitle={`Aggregated over ${humanWindow[win]}`}>
           <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-4">
-            {kpisByType.map(k => {
-              const items: { label: "Avg" | "Min" | "Max"; value: number }[] = [
-                { label: "Avg", value: k.avg },
-                { label: "Min", value: k.min },
-                { label: "Max", value: k.max },
-              ];
-              return (
-                <div key={k.type} className="rounded-xl border p-4">
-                  <div className="text-sm text-gray-500">{k.type}</div>
-                  <div className="mt-2 grid grid-cols-3 gap-2 text-center">
-                    {items.map(({ label, value }) => (
-                      <div key={label}>
-                        <div className="text-xs text-gray-500">{label}</div>
-                        <div className="text-lg font-semibold">{value.toFixed(2)}</div>
-                      </div>
-                    ))}
+            {kpisByType.map(k => (
+              <div key={k.type} className="rounded-xl border p-4">
+                <div className="text-sm text-gray-500">{k.type}</div>
+                <div className="mt-2 grid grid-cols-3 gap-2 text-center">
+                  <div>
+                    <div className="text-xs text-gray-500">Avg</div>
+                    <div className="text-lg font-semibold">{k.avg.toFixed(2)}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-500">Min</div>
+                    <div className="text-lg font-semibold">{k.min.toFixed(2)}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-500">Max</div>
+                    <div className="text-lg font-semibold">{k.max.toFixed(2)}</div>
                   </div>
                 </div>
-              );
-            })}
+              </div>
+            ))}
             {!loading && kpisByType.length === 0 && (
               <div className="text-sm text-gray-500">No data in the last {humanWindow[win]}.</div>
             )}
           </div>
         </Card>
 
+        {/* Min/Max per sensor */}
         <Card title="Min/Max per sensor" subtitle="Each bar group shows min and max per sensor">
           <div className="w-full h-64 mt-3">
             <ResponsiveContainer>
@@ -206,6 +220,7 @@ const Page: FC = () => {
           </div>
         </Card>
 
+        {/* Door-open area */}
         <Card title="Door open per day (hours)" subtitle={`Sum of open time per day • ${humanWindow[win]}`}>
           <div className="w-full h-64 mt-3">
             <ResponsiveContainer>
@@ -229,6 +244,7 @@ const Page: FC = () => {
           </div>
         </Card>
 
+        {/* Averages by sensor type */}
         <Card title="Averages by sensor type" subtitle="Horizontal bars by type">
           <div className="w-full h-64 mt-3">
             <ResponsiveContainer>
@@ -255,6 +271,4 @@ const Page: FC = () => {
       </section>
     </ProtectedPage>
   );
-};
-
-export default Page;
+}
