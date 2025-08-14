@@ -22,7 +22,7 @@ function HomePageComponent() {
                 <div className="text-center -mt-16">
                     <button
                         onClick={() => keycloak?.login()}
-                        className="px-4 py-2 bg-blue-500 text-white rounded"
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded"
                     >
                         Login
                     </button>

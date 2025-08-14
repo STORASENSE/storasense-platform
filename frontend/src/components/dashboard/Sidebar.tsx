@@ -5,8 +5,9 @@ import Link from "next/link";
 import {usePathname} from "next/navigation";
 import {Button} from "@/components/ui/button";
 import { MdSpaceDashboard as DashboardIcon } from "react-icons/md";
-import { FaHouseUser as StorageIcon } from "react-icons/fa";
-import { FaChartBar as AnalyticsIcon } from "react-icons/fa6";
+import { MdOutlineWarehouse as StorageIcon } from "react-icons/md";
+import { MdOutlineQueryStats as AnalyticsIcon } from "react-icons/md";
+import { MdOutlineDeviceThermostat as SensorsIcon } from "react-icons/md";
 import useKeycloak from "@/app/(main)/useKeycloak";
 import {useGetHealthQuery} from "@/redux/api/storaSenseApi";
 
@@ -28,9 +29,9 @@ const SidebarLink: FC<SidebarLinkProps> = (props) => {
             <Button asChild className={`
                 ${isActive ? 'bg-black-haze font-semibold' : 'bg-white'}
                 hover:bg-black-haze text-blue-whale justify-start
-                w-full shadow-none text-base px-4 py-3`}>
+                w-full shadow-none text-base px-1 py-2`}>
                 <Link href={props.href}>
-                    <span aria-hidden className="text-xl mr-2">
+                    <span aria-hidden className="text-3xl mr-2">
                         {props.icon}
                     </span>
                     <span>
@@ -68,6 +69,9 @@ const Sidebar: FC = () => {
                     </SidebarLink>
                     <SidebarLink href="/dashboard/analytics" icon={<AnalyticsIcon />}>
                         Analytics
+                    </SidebarLink>
+                    <SidebarLink href="/dashboard/sensors" icon={<SensorsIcon />}>
+                        Sensors
                     </SidebarLink>
                 </ul>
             </div>
