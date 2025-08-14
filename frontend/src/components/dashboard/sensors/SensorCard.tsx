@@ -108,7 +108,7 @@ const SensorCard: FC<SensorCardProps> = ({ sensor }) => {
                     <div className="flex items-center justify-between text-xs text-gray-500">
                         <div className="flex items-center gap-1">
                             <Clock className="w-3 h-3" />
-                            <span>{sensor.lastUpdate || "Unbekannt"}</span>
+                            <span>{sensor.lastUpdate || "Unknown"}</span>
                         </div>
                     </div>
                 </div>

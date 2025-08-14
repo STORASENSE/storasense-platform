@@ -89,7 +89,7 @@ const AddSensorModal: FC<AddSensorModalProps> = ({ isOpen, onClose, onAdd }) => 
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-lg font-semibold text-gray-900">
-                        Neuen Sensor hinzufügen
+                        Add New Sensor
                     </h2>
                     <button
                         onClick={onClose}
@@ -129,7 +129,7 @@ const AddSensorModal: FC<AddSensorModalProps> = ({ isOpen, onClose, onAdd }) => 
 
                     <div className="space-y-2">
                         <label htmlFor="type" className="block text-sm font-medium text-gray-700">
-                            Sensor Typ
+                            Sensor Type
                         </label>
                         <select
                             id="type"
@@ -163,7 +163,7 @@ const AddSensorModal: FC<AddSensorModalProps> = ({ isOpen, onClose, onAdd }) => 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <label htmlFor="min" className="block text-sm font-medium text-gray-700">
-                                Min. Wert
+                                Min. Value
                             </label>
                             <Input
                                 id="min"
@@ -176,7 +176,7 @@ const AddSensorModal: FC<AddSensorModalProps> = ({ isOpen, onClose, onAdd }) => 
                         </div>
                         <div className="space-y-2">
                             <label htmlFor="max" className="block text-sm font-medium text-gray-700">
-                                Max. Wert
+                                Max. Value
                             </label>
                             <Input
                                 id="max"
@@ -191,13 +191,13 @@ const AddSensorModal: FC<AddSensorModalProps> = ({ isOpen, onClose, onAdd }) => 
 
                     <div className="space-y-2">
                         <label htmlFor="location" className="block text-sm font-medium text-gray-700">
-                            Standort (optional)
+                            Location Name (optional)
                         </label>
                         <Input
                             id="location"
                             value={formData.location}
                             onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                            placeholder="z.B. Lager A - Regal 1"
+                            placeholder="e.g. Storage A - Shelf 1"
                         />
                     </div>
 
@@ -208,7 +208,7 @@ const AddSensorModal: FC<AddSensorModalProps> = ({ isOpen, onClose, onAdd }) => 
                             onClick={onClose}
                             className="flex-1"
                         >
-                            Abbrechen
+                            Cancel
                         </Button>
                         <Button
                             type="submit"

@@ -22,43 +22,43 @@ interface Sensor {
 
 const mockSensors: Sensor[] = [
     {
-        id: "ad5b8443-aef7-39a8-a530-75282ecb075f",
-        name: "Ultrasonic Sensor A",
+        id: "1",
+        name: "Ultrasonic Sensor 1",
         type: "ULTRASONIC",
         storage_id: "storage-1",
-        allowed_min: 50.0,
-        allowed_max: 200.0,
+        allowed_min: 0,
+        allowed_max: 100,
         status: "online",
-        value: "120",
+        value: "50",
         unit: "cm",
-        location: "Lager A - Regal 1",
-        lastUpdate: "vor 2 Minuten",
+        location: "Warehouse A",
+        lastUpdate: "2023-10-01T12:00:00Z"
     },
     {
-        id: "bd5b8443-aef7-39a8-a530-75282ecb075f",
-        name: "Temperature Sensor B",
+        id: "2",
+        name: "Temperature Sensor Inside",
         type: "TEMPERATURE",
         storage_id: "storage-2",
-        allowed_min: 18.0,
-        allowed_max: 25.0,
-        status: "online",
-        value: "22.5",
+        allowed_min: -20,
+        allowed_max: 50,
+        status: "warning",
+        value: "25",
         unit: "°C",
-        location: "Lager B - Zone 2",
-        lastUpdate: "vor 5 Minuten",
+        location: "Office Room 1",
+        lastUpdate: "2023-10-01T12:05:00Z"
     },
     {
-        id: "cd5b8443-aef7-39a8-a530-75282ecb075f",
-        name: "Motion Sensor Entrance",
-        type: "MOTION",
+        id: "3",
+        name: "Humidity Sensor Outside",
+        type: "HUMIDITY",
         storage_id: "storage-3",
-        allowed_min: 0.0,
-        allowed_max: 1.0,
-        status: "warning",
-        value: "1",
-        unit: "",
-        location: "Haupteingang",
-        lastUpdate: "vor 1 Minute",
+        allowed_min: 0,
+        allowed_max: 100,
+        status: "offline",
+        value: "2",
+        unit: "%",
+        location: "Garden Area",
+        lastUpdate: "2"
     }
 ];
 
@@ -80,7 +80,7 @@ const SensorsOverview: FC = () => {
             <div className="flex justify-between items-center">
                 <div className="flex items-center gap-4">
                     <div className="text-sm text-gray-600">
-                        {sensors.length} Sensoren aktiv
+                        {sensors.length} Sensors active
                     </div>
                     <div className="flex gap-2">
                         <div className="flex items-center gap-1">
