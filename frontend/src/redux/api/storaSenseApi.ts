@@ -5,7 +5,11 @@ import {
     GetSensorsByStorageIdRequest,
     GetSensorsByStorageIdResponse,
     GetStoragesByUserIdRequest,
-    GetStoragesByUserIdResponse
+    GetStoragesByUserIdResponse,
+    AddSensorRequest,
+    AddSensorResponse,
+    DeleteSensorRequest,
+    SensorStatusResponse,
 } from "@/redux/api/storaSenseApiSchemas";
 import type { RootState } from '../store';
 
@@ -47,6 +51,27 @@ export const storaSenseApi = createApi({
             })
         }),
 
+        addSensor: build.mutation<AddSensorResponse, AddSensorRequest>({
+            query: ({sensor_id}) => ({
+                url: `/sensors/${sensor_id}`,
+                method: 'POST'
+            })
+        }),
+
+        getSensorStatus: build.query<SensorStatusResponse, { sensor_id: string }>({
+            query: ({ sensor_id }) => ({
+                url: `/sensors/status/${sensor_id}`,
+                method: 'GET',
+            }),
+        }),
+
+        deleteSensor: build.mutation<void, DeleteSensorRequest>({
+            query: ({ sensor_id }) => ({
+                url: `/sensors/${sensor_id}`,
+                method: 'DELETE'
+            })
+        }),
+
         getMeasurements: build.query<GetMeasurementsResponse, GetMeasurementsRequest>({
             query: ({ sensor_id, max_date }) => ({
                 url: `/measurements/${sensor_id}/filter`,
@@ -68,4 +93,7 @@ export const {
     useGetSensorsQuery,
     useGetMeasurementsQuery,
     useGetHealthQuery,
+    useAddSensorMutation,
+    useDeleteSensorMutation,
+    useGetSensorStatusQuery
 } = storaSenseApi;

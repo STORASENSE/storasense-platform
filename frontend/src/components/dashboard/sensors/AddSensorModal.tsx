@@ -1,6 +1,6 @@
 "use client"
 
-import {FC, useState} from "react";
+import React, {FC, useState} from "react";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {X} from "lucide-react";
@@ -11,11 +11,12 @@ interface AddSensorModalProps {
     onAdd: (sensor: {
         id: string;
         name: string;
-        type: "ULTRASONIC" | "TEMPERATURE-INSIDE" | "TEMPERATURE-OUTSIDE" | "HUMIDITY" | "GAS";
+        type: "ULTRASONIC" | "TEMPERATURE_INSIDE" | "TEMPERATURE_OUTSIDE" | "HUMIDITY" | "GAS";
         storage_id: string;
         allowed_min: number;
         allowed_max: number;
         status?: "online" | "offline" | "warning";
+        value?: string;
         unit?: string;
         location?: string;
         lastUpdate?: string;
@@ -40,7 +41,7 @@ const AddSensorModal: FC<AddSensorModalProps> = ({ isOpen, onClose, onAdd }) => 
         const newSensor = {
             id: formData.id,
             name: formData.name,
-            type: formData.type as "ULTRASONIC" | "TEMPERATURE-INSIDE" | "TEMPERATURE-OUTSIDE" | "HUMIDITY" | "GAS",
+            type: formData.type as "ULTRASONIC" | "TEMPERATURE_INSIDE" | "TEMPERATURE_OUTSIDE" | "HUMIDITY" | "GAS",
             storage_id: formData.storage_id,
             allowed_min: formData.allowed_min,
             allowed_max: formData.allowed_max,
@@ -66,8 +67,8 @@ const AddSensorModal: FC<AddSensorModalProps> = ({ isOpen, onClose, onAdd }) => 
     const getUnitForType = (type: string) => {
         switch (type) {
             case "ULTRASONIC": return "cm";
-            case "TEMPERATURE-INSIDE": return "°C";
-            case "TEMPERATURE-OUTSIDE": return "°C";
+            case "TEMPERATURE_INSIDE": return "°C";
+            case "TEMPERATURE_OUTSIDE": return "°C";
             case "HUMIDITY": return "%";
             case "GAS": return "ppm";
             default: return "";
@@ -109,7 +110,7 @@ const AddSensorModal: FC<AddSensorModalProps> = ({ isOpen, onClose, onAdd }) => 
                             id="id"
                             value={formData.id}
                             onChange={(e) => setFormData(prev => ({ ...prev, id: e.target.value }))}
-                            placeholder="z.B. ad5b8443-aef7-39a8-a530-75282ecb075f"
+                            placeholder="e.g. ad5b8443-aef7-39a8-a530-75282ecb075f"
                             required
                         />
                     </div>
@@ -122,7 +123,7 @@ const AddSensorModal: FC<AddSensorModalProps> = ({ isOpen, onClose, onAdd }) => 
                             id="name"
                             value={formData.name}
                             onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                            placeholder="z.B. Ultrasonic Sensor A"
+                            placeholder="e.g. Ultrasonic Sensor A"
                             required
                         />
                     </div>
@@ -134,7 +135,7 @@ const AddSensorModal: FC<AddSensorModalProps> = ({ isOpen, onClose, onAdd }) => 
                         <select
                             id="type"
                             value={formData.type}
-                            onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value as any }))}
+                            onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value as never }))}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             required
                         >
@@ -155,7 +156,7 @@ const AddSensorModal: FC<AddSensorModalProps> = ({ isOpen, onClose, onAdd }) => 
                             id="storage_id"
                             value={formData.storage_id}
                             onChange={(e) => setFormData(prev => ({ ...prev, storage_id: e.target.value }))}
-                            placeholder="e.g. storage-1"
+                            placeholder="e.g. ad5b8443-aef7-39a8-a530-75282ecb075f"
                             required
                         />
                     </div>

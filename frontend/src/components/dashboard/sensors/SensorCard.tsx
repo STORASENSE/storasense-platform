@@ -1,6 +1,7 @@
 import {FC} from "react";
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
-import {Waves, Thermometer, Droplets, Eye, Sun, MapPin, Clock, Settings} from "lucide-react";
+import {Button} from "@/components/ui/button";
+import {Waves, Thermometer, Droplets, Eye, MapPin, Clock, Settings, Trash2} from "lucide-react";
 
 interface Sensor {
     id: string;
@@ -18,9 +19,10 @@ interface Sensor {
 
 interface SensorCardProps {
     sensor: Sensor;
+    onDelete?: (sensorId: string) => void;
 }
 
-const SensorCard: FC<SensorCardProps> = ({ sensor }) => {
+const SensorCard: FC<SensorCardProps> = ({ sensor, onDelete }) => {
     const getIcon = () => {
         switch (sensor.type) {
             case "ULTRASONIC": return <Waves className="w-5 h-5" />;
@@ -52,6 +54,12 @@ const SensorCard: FC<SensorCardProps> = ({ sensor }) => {
         }
     };
 
+    const handleDelete = () => {
+        if (onDelete && window.confirm(`Are you sure to delete sensor "${sensor.name}"?`)) {
+            onDelete(sensor.id);
+        }
+    };
+
     return (
         <Card className="hover:shadow-lg transition-shadow duration-200 border-l-4 border-l-blue-500">
             <CardHeader className="pb-3">
@@ -75,14 +83,26 @@ const SensorCard: FC<SensorCardProps> = ({ sensor }) => {
                             </div>
                         </div>
                     </div>
-                    <div className={`text-xs px-2 py-1 rounded-full ${getStatusColor()}`}>
-                        {sensor.status || "unknown"}
+                    <div className="flex items-center gap-2">
+                        <div className={`text-xs px-2 py-1 rounded-full ${getStatusColor()}`}>
+                            {sensor.status || "unknown"}
+                        </div>
+                        {onDelete && (
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={handleDelete}
+                                className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 h-auto"
+                            >
+                                <Trash2 className="w-4 h-4" />
+                            </Button>
+                        )}
                     </div>
                 </div>
             </CardHeader>
             <CardContent className="pt-0">
                 <div className="space-y-3">
-                    {/* Messwert */}
+                    {/* Measurement */}
                     <div className="bg-gray-50 rounded-lg p-3">
                         <div className="text-2xl font-bold text-gray-900">
                             {sensor.value || "N/A"}{sensor.unit || ""}
@@ -92,7 +112,7 @@ const SensorCard: FC<SensorCardProps> = ({ sensor }) => {
                         </div>
                     </div>
 
-                    {/* Grenzwerte */}
+                    {/* Limits */}
                     <div className="bg-blue-50 rounded-lg p-3">
                         <div className="flex justify-between text-sm">
                             <span className="text-gray-600">Min:</span>
@@ -104,7 +124,7 @@ const SensorCard: FC<SensorCardProps> = ({ sensor }) => {
                         </div>
                     </div>
 
-                    {/* Zusatzinfo */}
+                    {/* Info */}
                     <div className="flex items-center justify-between text-xs text-gray-500">
                         <div className="flex items-center gap-1">
                             <Clock className="w-3 h-3" />

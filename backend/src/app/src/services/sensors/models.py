@@ -24,5 +24,6 @@ class SensorModel(BaseModel):
     allowed_min: Mapped[float] = mapped_column(nullable=True)
     allowed_max: Mapped[float] = mapped_column(nullable=True)
     measurements: Mapped[list["MeasurementModel"]] = relationship(
-        back_populates="sensor"
+        back_populates="sensor",
+        cascade="all, delete-orphan",  # Cascade: delete measurements when sensor is deleted
     )

@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 from uuid import UUID
 from pydantic import BaseModel, ConfigDict
@@ -30,3 +31,9 @@ class SensorResponse(BaseModel):
     name: str | None
     type: SensorType
     storage_id: UUID
+
+
+class SensorStatusResponse(BaseModel):
+    sensor_id: str
+    is_online: bool
+    last_measurement: Optional[datetime] = None
