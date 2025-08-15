@@ -69,7 +69,6 @@ nav:
   - Architecture:
       - Architecture Overview: arc.md
       - Data Domain: data_eva.md
-      - Alarming: alarm.md
   - Components:
       - Storasense-Sensoric (Arduino): arduino.md
       - Backend: backend.md
