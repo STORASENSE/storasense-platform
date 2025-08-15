@@ -16,8 +16,6 @@ class StorageModel(BaseModel):
     __tablename__ = "Storage"
 
     name: Mapped[str] = mapped_column(unique=True)
-    password_hash: Mapped[str] = mapped_column()
-    password_salt: Mapped[str] = mapped_column()
     description: Mapped[Optional[str]] = mapped_column()
     accessing_users: Mapped[list["UserModel"]] = relationship(
         secondary=user_storage_access, back_populates="accessed_storages"

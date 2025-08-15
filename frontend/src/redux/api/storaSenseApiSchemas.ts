@@ -87,3 +87,9 @@ export interface GetMeasurementsRequest {
 export interface GetMeasurementsResponse {
     measurements: Measurement[];
 }
+
+/////////////////////////////////////////////////////////////////////////
+
+export interface CreateStorageRequest {
+    name: string;
+}

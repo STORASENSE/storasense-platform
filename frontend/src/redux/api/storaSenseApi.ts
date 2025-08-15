@@ -1,5 +1,6 @@
 import {BaseQueryError, BaseQueryMeta, createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
 import {
+    CreateStorageRequest,
     GetMeasurementsRequest,
     GetMeasurementsResponse,
     GetSensorsByStorageIdRequest,
@@ -46,6 +47,14 @@ export const storaSenseApi = createApi({
             })
         }),
 
+        createStorage: build.mutation<void, CreateStorageRequest>({
+            query: (request) => ({
+                url: '/storages',
+                body: request,
+                method: 'POST'
+            })
+        }),
+
         getSensors: build.query<GetSensorsByStorageIdResponse, GetSensorsByStorageIdRequest>({
             query: ({ storage_id }) => ({
                 url: `/sensors/byStorageId/${storage_id}`
@@ -65,6 +74,7 @@ export const storaSenseApi = createApi({
 export const {
     useGetMeQuery,
     useGetStoragesByUserIdQuery,
+    useCreateStorageMutation,
     useGetSensorsQuery,
     useGetMeasurementsQuery,
 } = storaSenseApi;

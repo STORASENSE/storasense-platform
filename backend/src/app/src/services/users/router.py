@@ -1,4 +1,10 @@
+from uuid import UUID
 from fastapi import APIRouter, Depends, status, HTTPException
+
+from backend.src.app.src.services.auth.errors import (
+    AuthorizationError,
+    UnknownAuthPrincipalError,
+)
 from ..auth.service import auth_service, TokenData
 from ..users.service import UserService, inject_user_service
 from .models import UserModel
@@ -30,3 +36,28 @@ async def read_users_me(
     )
 
     return user_response
+
+
+@router.get("/byStorageId/{storage_id}")
+def find_users_by_storage_id(
+    storage_id: UUID,
+    token_data: TokenData = Depends(auth_service.get_current_user),
+    user_service: UserService = Depends(inject_user_service),
+) -> list[UserResponse]:
+    try:
+        users = user_service.find_all_by_storage_id(storage_id, token_data)
+    except (UnknownAuthPrincipalError, AuthorizationError):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication principal is not authorized to access the requested resource.",
+        )
+    return [
+        UserResponse(
+            id=user.id,
+            keycloak_id=user.keycloak_id,
+            username=user.username,
+            email=user.email,
+            name=user.name,
+        )
+        for user in users
+    ]

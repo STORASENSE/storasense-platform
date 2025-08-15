@@ -1,0 +1,2 @@
+class StorageAlreadyExistsError(Exception):
+    pass

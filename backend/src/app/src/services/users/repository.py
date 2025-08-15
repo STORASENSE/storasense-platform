@@ -16,15 +16,23 @@ class UserRepository(BaseRepository[UserModel, UUID]):
     def __init__(self, session: Session):
         super().__init__(session)
 
-    def find_by_id(self, user_id: UUID) -> Optional[UserModel]:
+    def find_by_id(self, object_id: UUID) -> Optional[UserModel]:
         """Finds a user by their ID."""
-        query = select(UserModel).where(UserModel.id == user_id)
+        query = select(UserModel).where(UserModel.id == object_id)
         return self.session.scalars(query).one_or_none()
 
     def find_by_keycloak_id(self, keycloak_id: str) -> Optional[UserModel]:
         """Finds a user by their ID ('sub'-Claim of JWT)."""
         query = select(UserModel).where(UserModel.keycloak_id == keycloak_id)
         return self.session.scalars(query).one_or_none()
+
+    def find_all_by_storage_id(self, storage_id: UUID) -> list[UserModel]:
+        return (
+            self.session.query(UserModel)
+            .join(UserModel.accessed_storages)
+            .filter_by(id=storage_id)
+            .all()
+        )
 
     def create_user(self, user_data: dict) -> UserModel:
         """

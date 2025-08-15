@@ -7,6 +7,7 @@ import {Button} from "@/components/ui/button";
 import { MdSpaceDashboard as DashboardIcon } from "react-icons/md";
 import { FaHouseUser as StorageIcon } from "react-icons/fa";
 import { FaChartBar as AnalyticsIcon } from "react-icons/fa6";
+import { FaUsers as UsersIcon } from "react-icons/fa";
 import useKeycloak from "@/app/(main)/useKeycloak";
 
 interface SidebarLinkProps {
@@ -54,6 +55,9 @@ const Sidebar: FC = () => {
                 <ul className="list-none flex flex-col gap-4">
                     <SidebarLink href="/dashboard/storages" icon={<StorageIcon />}>
                         Storages
+                    </SidebarLink>
+                    <SidebarLink href="/dashboard/users" icon={<UsersIcon />}>
+                        Users
                     </SidebarLink>
                     <SidebarLink href="/dashboard" icon={<DashboardIcon />}>
                         Overview

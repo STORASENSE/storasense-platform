@@ -10,3 +10,7 @@ class StorageResponse(BaseModel):
     name: Optional[str]
 
     model_config = ConfigDict()
+
+
+class CreateStorageRequest(BaseModel):
+    name: str
