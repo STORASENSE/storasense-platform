@@ -89,7 +89,7 @@ const AddSensorModal: FC<AddSensorModalProps> = ({ isOpen, onClose }) => {
               : JSON.stringify(error.data.detail)
           );
         } else {
-          setErrorMessage("An error occurred when trying adding the new sensor.");
+          setErrorMessage("An error occurred when trying to add the new sensor.");
         }
       });
   };
@@ -132,9 +132,6 @@ const AddSensorModal: FC<AddSensorModalProps> = ({ isOpen, onClose }) => {
               {errorMessage}
             </div>
           )}
-            <div className="p-3 text-sm text-red-700 bg-gray-50 rounded-md">
-                Please notice: All fields are required.
-            </div>
 
           <div className="space-y-2">
             <label htmlFor="id" className="block text-sm font-medium text-gray-700">

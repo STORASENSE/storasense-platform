@@ -140,7 +140,7 @@ services:
       context: .
       dockerfile: ./backend/src/mqtt_client/Dockerfile
     env_file: .env
-    restart: always
+    restart: on-failure
     networks:
       - storasense-network
     depends_on:
