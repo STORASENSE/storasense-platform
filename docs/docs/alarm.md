@@ -3,30 +3,29 @@
 ## Zielbild
 - **Alarm**, wenn Sensorwert **außerhalb** `[min_value, max_value]` liegt **und** dies **≥ dwell_time** (vom User konfigurierbar) anhält.
 - **Kein Flapping**: Hysterese + Cooldown, **eine aktive Alarm-Instanz** pro *(user, storage, sensor, rule)*.
-- **Skalierbar** auf ~500 Nutzer (≈ bis ~10k Sensoren realistisch), **zustandsbasiert** und **streaming-nah** (Prüfung **beim Ingest** statt teurer DB-Scans).
+- **Skalierbar** auf ~50 Nutzer (≈ bis ~500 Sensoren realistisch), **zustandsbasiert** und **streaming-nah** (Prüfung **beim Ingest** statt teurer DB-Scans).
 - **Push** zu FE + Integrationen via **WebSocket/SSE** und **MQTT**.
 
 ---
 
 ## 1) Nicht-funktionale Anforderungen
-- **Skalierung / Parallelität**: Ziel bis **10k Sensoren** (Annahme: Ø 20 Sensoren/User). Ø 1 Messung/Sensor/s ⇒ bis **10k msg/s** Spitze.
+- **Skalierung / Parallelität**: Ziel bis **100 Sensoren** (Annahme: Ø 20 Sensoren/User). Ø 1 Messung/Sensor/s ⇒ bis **100 msg/s** Spitze.
 - **Latenz**: Alarm-Erkennung < **2 s** nach Erreichen der *dwell_time* (bei kontinuierlichem Ingest).
 - **Verfügbarkeit & Robustheit**: Alarm-State wird **in DB persistiert**, aber **im Speicher** (Redis/in-proc) gespiegelt; Crash-sicher dank Perioden-Flush.
 - **Kosten / Effizienz**: **Kein Polling** großer Zeiträume; **In-Memory-State** + **Event-getriebene** Updates (Ingest-Pfad, **LISTEN/NOTIFY** bei Regeländerung).
 
 ### Parallel-Alarm-Policy (pro Nutzer)
-- **Soft-Limit:** **50** gleichzeitige aktive Sensor-Alarme pro User. Ab Erreichen → **Konsolidierung** zu Storage-„Storm“-Alarmen (Zähler + Top-Sensoren) und visuelle Warnung im UI.
-- **Hard-Limit:** **200**. Darüber hinaus **keine** neuen Einzel-Alarm-Instanzen; bestehende „Storm“-Alarme werden **aktualisiert**.
+- **Soft-Limit:** **20** gleichzeitige aktive Sensor-Alarme pro User. Ab Erreichen → **Konsolidierung** zu Storage-„Storm“-Alarmen (Zähler + Top-Sensoren) und visuelle Warnung im UI.
+- **Hard-Limit:** **50**. Darüber hinaus **keine** neuen Einzel-Alarm-Instanzen; bestehende „Storm“-Alarme werden **aktualisiert**.
 - **Ziel:** Alert Fatigue vermeiden, UI & Benachrichtigungen stabil halten, trotzdem Impact sichtbar machen.
 
 ---
 
 ## 2) Datenmodell
 
-| Tabelle          | Wichtigste Felder (nur was fürs MVP nötig ist)                                      | Zweck / Beschreibung                     |
-|------------------|--------------------------------------------------------------------------------------|------------------------------------------|
-| `Sensor`         | min_value, max_value, **dwell_seconds**, **enabled**                                 | Schwellwerte & Mindestdauer je Sensor    |
-| `Measurements`   | sensor_id, timestamp, value                                                          | Zeitreihe der Messwerte                  |
+| Tabelle          | Wichtigste Felder                                      | Zweck / Beschreibung                     |
+|------------------|-------------------------------------------------------------------------------------|------------------------------------------|
+| `Sensor`         | min_value, max_value, **dwell_seconds**, **enabled**                                | Schwellwerte & Mindestdauer je Sensor    |
 | `Alarm`          | user_id, storage_id, sensor_id, **status**(PENDING/FIRING/RESOLVED), **pending_since**, **fired_at**, **resolved_at**, **last_value**, **last_ts** | Aktueller/letzter Alarmzustand je Sensor |
 | `AlarmEvent` *(neu)* | alarm_id (FK → Alarm.id), ts, state_change(PENDING/FIRING/RESOLVED/ACKED), value, meta(JSONB) | Verlauf/Audit der Zustandswechsel        |
 
@@ -69,7 +68,7 @@
 
 ## 5) Caching & Verteilung
 - **Single-Instance**: in-proc LRU/TTL Cache (z. B. `cachetools`).
-- **Multi-Instance**: **Redis** für State+Rules **oder** Postgres‑gestütztes `alarm_state` + `SELECT … FOR UPDATE SKIP LOCKED` bei Workern.
+- **Multi-Instance**: **Postgres**‑gestütztes `alarm_state` + `SELECT … FOR UPDATE SKIP LOCKED` bei Workern.
 - **Invalidation**: Postgres **LISTEN/NOTIFY** (`rule_changes`).
 
 ---
