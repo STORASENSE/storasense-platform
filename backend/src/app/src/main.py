@@ -26,6 +26,9 @@ from backend.src.app.src.services.measurements.router import (
 from backend.src.app.src.services.sensors.router import (
     router as sensors_router,
 )
+from backend.src.app.src.services.analytics.router import (
+    router as analytics_router,
+)
 
 discover_models()
 load_dotenv()
@@ -67,6 +70,7 @@ app.include_router(users_router)
 # app.include_router(storages_router)
 app.include_router(measurements_router)
 app.include_router(sensors_router)
+app.include_router(analytics_router)
 
 # configure CORS-middleware
 origins = [
