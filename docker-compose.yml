@@ -100,7 +100,7 @@ services:
     networks:
       - storasense-network
     environment:
-      - "BACKUP_CRON_EXPRESSION=35 10 * * *" # Every day at 3 AM
+      - "BACKUP_CRON_EXPRESSION=0 3 * * *" # Every day at 3 AM
       - "BACKUP_SOURCES=/volume/storasense_data_volume" # Source to back-up
       - "BACKUP_FILENAME=storasense_db_backup-%Y-%m-%d_%H-%M-%S.tar.gz"
       - "BACKUP_PRUNE_AFTER_DAYS=7" # Delete backups older than 7 days
@@ -127,11 +127,6 @@ services:
       - "traefik.http.routers.app-https.tls=true"
       - "traefik.http.services.app.loadbalancer.server.port=8000"
 
-#      # Load Balancing-Healthcheck
-#      - "traefik.http.services.app.loadbalancer.healthcheck.path=/health"
-#      - "traefik.http.services.app.loadbalancer.healthcheck.interval=10s"
-#      - "traefik.http.services.app.loadbalancer.healthcheck.timeout=3s"
-#      - "traefik.http.services.app.loadbalancer.healthcheck.retries=3"
     depends_on:
       timescaledb:
         condition: service_healthy
