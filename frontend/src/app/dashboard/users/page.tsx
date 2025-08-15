@@ -6,12 +6,9 @@ const Page: FC = () => {
     return (
         <ProtectedPage>
             <header className="mb-5">
-                <h1 className="text-3xl font-semibold text-blue-whale">
+                <h1 className="text-3xl font-semibold text-blue-whale mb-4">
                     Users
                 </h1>
-                <p>
-                    Below is al list of all users that have access to the active storage.
-                </p>
             </header>
             <section>
 

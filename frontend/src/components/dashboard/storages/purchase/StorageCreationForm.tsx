@@ -2,86 +2,136 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label"
+import { Label } from "@/components/ui/label";
 import { useCreateStorageMutation } from "@/redux/api/storaSenseApi";
 import { CreateStorageRequest } from "@/redux/api/storaSenseApiSchemas";
 import { Formik, FormikConfig, FormikErrors } from "formik";
-import { useRouter } from "next/navigation";
 import { FC } from "react";
-
+import { AlertCircle } from "lucide-react";
 
 interface FormState {
     storageName: string;
 }
 
+interface StorageCreationFormProps {
+    onSuccess?: () => void;
+    onClose?: () => void;
+}
 
-const StorageCreationForm: FC = () => {
-    const router = useRouter();
+const StorageCreationForm: FC<StorageCreationFormProps> = ({ onSuccess, onClose }) => {
     const [createStorage] = useCreateStorageMutation();
+
+    const handleCancel = () => {
+        if (onClose) {
+            onClose();
+        } else if (onSuccess) {
+            onSuccess();
+        }
+    };
 
     const formConfig: FormikConfig<FormState> = {
         initialValues: {
             storageName: ''
         },
         validate: (values) => {
-            console.log('hello')
             const errors: FormikErrors<FormState> = {};
-            const storageNameRegex = /^[a-zA-Z]+[a-zA-Z0-9]*/;
+            const storageNameRegex = /^[a-zA-Z][a-zA-Z0-9]*$/;
 
-            if (!values.storageName) {
+            if (!values.storageName.trim()) {
                 errors.storageName = "This field is required";
-            } else if (values.storageName.length < 5) {
-                errors.storageName = "Name must be at least 5 characters long";
-            } else if (!storageNameRegex.test(values.storageName)) {
-                errors.storageName = ""
+            } else if (values.storageName.trim().length < 3) {
+                errors.storageName = "Name must be at least 3 characters long";
+            } else if (values.storageName.trim().length > 50) {
+                errors.storageName = "Name must not exceed 50 characters";
+            } else if (!storageNameRegex.test(values.storageName.trim())) {
+                errors.storageName = "Name must start with a letter and can only contain letters and numbers";
             }
             return errors;
         },
-        onSubmit: (values, { setSubmitting }) => {
-            console.log('world')
-            const request: CreateStorageRequest = {
-                name: values.storageName
+        onSubmit: async (values, { setSubmitting, resetForm, setStatus }) => {
+            try {
+                setStatus(null);
+                const request: CreateStorageRequest = {
+                    name: values.storageName.trim()
+                };
+
+                await createStorage(request).unwrap();
+
+                resetForm();
+                if (onSuccess) {
+                    onSuccess();
+                }
+            } catch (error) {
+                console.error('Failed to create storage:', error);
+                setStatus('Failed to create storage. Please try again.');
+            } finally {
+                setSubmitting(false);
             }
-            createStorage(request)
-                .unwrap()
-                .then(() => {
-                    setSubmitting(false);
-                    router.push('/dashboard/storages');
-                })
-                .catch(reason => {
-                    setSubmitting(false);
-                    console.error(reason);
-                })
         }
-    }
+    };
 
     return (
-        <Formik {...formConfig}>
-            {(props) => (
-                <form className="w-full max-w-[600px] flex flex-col gap-3" onSubmit={props.handleSubmit}>
-                    <div>
-                        <Label htmlFor="storageName" className="mb-1">
-                            Storage Name
-                        </Label>
-                        <Input
-                            id="storageName"
-                            name="storageName"
-                            value={props.values.storageName}
-                            onChange={props.handleChange}
-                            onBlur={props.handleBlur}
-                            aria-invalid={(props.errors.storageName && props.touched.storageName) ? true : false}
-                        />
-                        <div className="text-sm text-destructive">
-                            {props.errors.storageName && props.touched.storageName && props.errors.storageName}
+        <div className="space-y-6">
+            <Formik {...formConfig}>
+                {(formik) => (
+                    <form className="space-y-6" onSubmit={formik.handleSubmit}>
+                        {formik.status && (
+                            <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 p-3 rounded-md">
+                                <AlertCircle className="w-4 h-4" />
+                                {formik.status}
+                            </div>
+                        )}
+
+                        <div className="space-y-2">
+                            <Label htmlFor="storageName" className="text-sm font-medium">
+                                Storage Name
+                            </Label>
+                            <Input
+                                id="storageName"
+                                name="storageName"
+                                placeholder="Enter storage name"
+                                value={formik.values.storageName}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                className={`transition-colors ${
+                                    formik.errors.storageName && formik.touched.storageName
+                                        ? 'border-destructive focus-visible:ring-destructive'
+                                        : ''
+                                }`}
+                                aria-invalid={!!(formik.errors.storageName && formik.touched.storageName)}
+                                disabled={formik.isSubmitting}
+                            />
+                            {formik.errors.storageName && formik.touched.storageName && (
+                                <div className="flex items-center gap-2 text-sm text-destructive">
+                                    <AlertCircle className="w-4 h-4" />
+                                    {formik.errors.storageName}
+                                </div>
+                            )}
                         </div>
-                    </div>
-                    <Button type="submit">
-                        Submit Purchase Request
-                    </Button>
-                </form>
-            )}
-        </Formik>
+
+                        <div className="flex gap-3 pt-4">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                className="flex-1"
+                                onClick={handleCancel}
+                                disabled={formik.isSubmitting}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                type="submit"
+                                className="flex-1 bg-blue-whale hover:bg-blue-whale/90"
+                                disabled={formik.isSubmitting || !formik.isValid || !formik.dirty}
+                            >
+                                {formik.isSubmitting ? 'Creating...' : 'Add Storage'}
+                            </Button>
+                        </div>
+                    </form>
+                )}
+            </Formik>
+        </div>
     );
-}
+};
 
 export default StorageCreationForm;
