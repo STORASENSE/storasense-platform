@@ -88,23 +88,6 @@ def find_measurements_by_sensor_id_and_max_date(
     return GetMeasurementsResponse(measurements=measurements)
 
 
-# @router.post("/measurements/{sensor_id}", status_code=status.HTTP_201_CREATED)
-# async def create_measurement(
-#     sensor_id: UUID,
-#     request: CreateMeasurementRequest,
-#     measurement_service: MeasurementService = Depends(
-#         inject_measurement_service
-#     ),
-# ):
-#     try:
-#         measurement_service.create_measurement(sensor_id, request)
-#
-#     except Exception as e:
-#         raise HTTPException(
-#             status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
-#         )
-
-
 @router.post("/measurements/{sensor_id}", status_code=status.HTTP_201_CREATED)
 async def create_measurement(
     sensor_id: UUID,

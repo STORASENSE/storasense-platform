@@ -48,6 +48,7 @@ export interface Sensor {
     id: string;
     name: string;
     type: SensorType;
+    storage_id: string;
     allowed_min: number;
     allowed_max: number;
 }
@@ -76,6 +77,39 @@ export interface GetSensorsByStorageIdRequest {
 }
 
 export type GetSensorsByStorageIdResponse = Sensor[];
+
+/////////////////////////////////////////////////////////////////////////
+
+export interface AddSensorRequest {
+    sensor_id: string;
+    sensor: {
+        name: string;
+        type: SensorType;
+        storage_id: string;
+        allowed_min: number;
+        allowed_max: number;
+    };
+}
+
+export interface AddSensorResponse {
+    sensor_id: string;
+    name: string;
+    type: SensorType;
+    storage_id: string;
+    allowed_min: number;
+    allowed_max: number;
+    location?: string;
+}
+
+export interface DeleteSensorRequest {
+    sensor_id: string;
+}
+
+export interface SensorStatusResponse {
+  sensor_id: string;
+  is_online: boolean;
+  last_measurement: string | null;
+}
 
 /////////////////////////////////////////////////////////////////////////
 

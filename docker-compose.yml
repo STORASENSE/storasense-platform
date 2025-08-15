@@ -10,19 +10,18 @@ services:
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
-      - "--entrypoints.dashboard.address=:8080"
     ports:
       - "80:80"
       - "443:443"
-      - "8080:8080" # Traefik Dashboard
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     networks:
       - storasense-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.dashboard.entrypoints=dashboard"
-      - "traefik.http.routers.dashboard.rule=Host(`localhost`)"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.storasense.de`)"
+      - "traefik.http.routers.dashboard.tls=true"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.middlewares=dashboard-auth"
       - "traefik.http.middlewares.dashboard-auth.basicauth.users=${TRAEFIK_HASHED}"
@@ -46,8 +45,6 @@ services:
       - KC_PROXY_HEADERS=xforwarded
       - KC_CACHE=local
     command: start
-    ports:
-      - "8088:8080"
     networks:
       storasense-network:
         aliases:
@@ -58,7 +55,7 @@ services:
       - "traefik.http.routers.keycloak-http.entrypoints=web"
       - "traefik.http.routers.keycloak-http.middlewares=https-redirect@docker"
 
-      - "traefik.http.routers.keycloak-https.rule=Host(`auth.storasense.de`) && !PathPrefix(`/admin`)"
+      - "traefik.http.routers.keycloak-https.rule=Host(`auth.storasense.de`)"
       - "traefik.http.routers.keycloak-https.entrypoints=websecure"
       - "traefik.http.routers.keycloak-https.tls=true"
       - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
@@ -129,6 +126,7 @@ services:
       - "traefik.http.routers.app-https.entrypoints=websecure"
       - "traefik.http.routers.app-https.tls=true"
       - "traefik.http.services.app.loadbalancer.server.port=8000"
+
     depends_on:
       timescaledb:
         condition: service_healthy
@@ -140,7 +138,7 @@ services:
       context: .
       dockerfile: ./backend/src/mqtt_client/Dockerfile
     env_file: .env
-    restart: always
+    restart: on-failure
     networks:
       - storasense-network
     depends_on:
