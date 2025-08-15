@@ -1,0 +1,61 @@
+@startuml
+skinparam sequenceMessageAlign center
+
+actor "IoT-Mikrocontroller \n (Arduino)" as Sensor
+participant "MQTT Broker" as Broker
+participant "MQTT Client (Skript)" as MqttClient
+box "FastAPI Backend" #LightBlue
+    participant "Ingestion Endpoint" as APIEndpoint
+    participant "Alarm Service" as AlarmService
+    participant "Persistence Service" as PersistenceService
+end box
+database "TimescaleDB" as DB
+
+== Daten-Ingestion & Alarmierung ==
+
+Sensor -> Broker : 1. Messwert senden (MQTT Publish)\n(z.B. Temperatur)
+activate Broker
+
+Broker -> MqttClient : 2. Messwert empfangen (MQTT Subscribe)
+deactivate Broker
+activate MqttClient
+
+MqttClient -> APIEndpoint : 3. Messwert weiterleiten (HTTP POST)\n(JSON-Payload)
+deactivate MqttClient
+activate APIEndpoint
+
+APIEndpoint -> AlarmService : 4. Messwert zur Prüfung weiterleiten
+activate AlarmService
+
+AlarmService -> DB : 4.1. Alarmregeln laden / Schwellwerte prüfen
+activate DB
+DB --> AlarmService : 4.2. Regeln bereitstellen
+deactivate DB
+
+alt Grenzwertverletzung erkannt (z.B. > 30s)
+    AlarmService -> Broker : 5.1. Alarm senden (MQTT Publish)\n(Alarm-Topic)
+    activate Broker
+    Broker --> AlarmService : (Bestätigung)
+    deactivate Broker
+else Keine Grenzwertverletzung
+    AlarmService --> APIEndpoint : 5.2. Prüfung OK
+end
+
+deactivate AlarmService
+
+APIEndpoint -> PersistenceService : 6. Messwert zur Speicherung weiterleiten
+activate PersistenceService
+
+PersistenceService -> DB : 7. Messwert speichern
+activate DB
+DB --> PersistenceService : 8. Speicherung bestätigt
+deactivate DB
+
+PersistenceService --> APIEndpoint : 9. Speicherung OK
+deactivate PersistenceService
+
+APIEndpoint --> MqttClient : 10. HTTP 200 OK (Bestätigung der Verarbeitung)
+deactivate APIEndpoint
+
+
+@enduml
