@@ -5,6 +5,7 @@ from fastapi import Depends, APIRouter, status, HTTPException
 from backend.src.app.src.services.sensors.schemas import (
     CreateSensorRequest,
     SensorMetadata,
+    SensorStatusResponse,
 )
 from backend.src.app.src.services.sensors.service import (
     SensorService,
@@ -62,6 +63,40 @@ def create_sensor(
     try:
         sensor_service.create_sensor(sensor_id, request)
 
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+        )
+
+
+@router.delete("/sensors/{sensor_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_sensor(
+    sensor_id: UUID,
+    sensor_service: SensorService = Depends(inject_sensor_service),
+):
+    try:
+        sensor_service.delete_sensor(sensor_id)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+        )
+
+
+@router.get("/sensors/status/{sensor_id}", status_code=status.HTTP_200_OK)
+def check_sensor_status(
+    sensor_id: UUID,
+    max_age_minutes: int = 1,  # Last minute is interesting for this check
+    sensor_service: SensorService = Depends(inject_sensor_service),
+):
+    try:
+        status_info = sensor_service.check_sensor_status(
+            sensor_id, max_age_minutes
+        )
+        return SensorStatusResponse(**status_info)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=str(e)
+        )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)

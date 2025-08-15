@@ -5,7 +5,11 @@ import {
     GetSensorsByStorageIdRequest,
     GetSensorsByStorageIdResponse,
     GetStoragesByUserIdRequest,
-    GetStoragesByUserIdResponse
+    GetStoragesByUserIdResponse,
+    AddSensorRequest,
+    AddSensorResponse,
+    DeleteSensorRequest,
+    SensorStatusResponse,
 } from "@/redux/api/storaSenseApiSchemas";
 import type { RootState } from '../store';
 
@@ -20,7 +24,6 @@ function getBaseUrl(): string {
             throw new Error("Environment variable NODE_ENV was not set by node environment!");
     }
 }
-
 
 export const storaSenseApi = createApi({
     reducerPath: 'storaSenseApi',
@@ -44,7 +47,33 @@ export const storaSenseApi = createApi({
 
         getSensors: build.query<GetSensorsByStorageIdResponse, GetSensorsByStorageIdRequest>({
             query: ({ storage_id }) => ({
-                url: `/sensors/byStorageId/${storage_id}`
+                url: `/sensors/byStorageId/${storage_id}`,
+                method: 'GET',
+            })
+        }),
+
+        addSensor: build.mutation<AddSensorResponse, AddSensorRequest>({
+            query: ({sensor_id, sensor}) => ({
+                url: `/sensors/${sensor_id}`,
+                method: 'POST',
+                body: sensor,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+        }),
+
+        getSensorStatus: build.query<SensorStatusResponse, { sensor_id: string }>({
+            query: ({ sensor_id }) => ({
+                url: `/sensors/status/${sensor_id}`,
+                method: 'GET',
+            }),
+        }),
+
+        deleteSensor: build.mutation<void, DeleteSensorRequest>({
+            query: ({ sensor_id }) => ({
+                url: `/sensors/${sensor_id}`,
+                method: 'DELETE'
             })
         }),
 
@@ -55,6 +84,12 @@ export const storaSenseApi = createApi({
             }),
         }),
 
+        getHealth: build.query<{ status: string }, void>({
+            query: () => ({
+                url: '/health'
+            })
+        }),
+
     })
 });
 
@@ -62,4 +97,8 @@ export const {
     useGetStoragesByUserIdQuery,
     useGetSensorsQuery,
     useGetMeasurementsQuery,
+    useGetHealthQuery,
+    useAddSensorMutation,
+    useDeleteSensorMutation,
+    useGetSensorStatusQuery
 } = storaSenseApi;

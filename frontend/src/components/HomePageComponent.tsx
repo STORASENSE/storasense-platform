@@ -17,21 +17,21 @@ function HomePageComponent() {
 
     if (!authenticated || !keycloak) {
         return(
-            <>
+            <div className="space-y-6">
                 <AuthenticationMessage/>
-                <div className="text-center">
+                <div className="text-center -mt-16">
                     <button
                         onClick={() => keycloak?.login()}
-                        className="px-4 py-2 bg-blue-500 text-white rounded"
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded"
                     >
                         Login
                     </button>
                 </div>
-            </>
+            </div>
         );
     }
 
-    // Fallback if useEffect hasnt been triggered yet
+    // Fallback if useEffect hasn't been triggered yet
     return null;
 }
 

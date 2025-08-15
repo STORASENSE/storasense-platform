@@ -66,7 +66,7 @@ const StorageMonitoring: FC<StorageMonitoringProps> = ({ storageId }) => {
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-const DashboardOverview: FC = () => {
+const SensorsOverview: FC = () => {
     const activeStorage = useSelector((state: RootState) => state.storage.activeStorage);
 
     if (!activeStorage) {
@@ -78,4 +78,4 @@ const DashboardOverview: FC = () => {
     );
 }
 
-export default DashboardOverview;
+export default SensorsOverview;

@@ -12,6 +12,9 @@ from backend.src.app.src.services.storages.repository import (
     StorageRepository,
     inject_storage_repository,
 )
+from backend.src.app.src.services.measurements.service import (
+    inject_measurement_service,
+)
 from backend.src.app.src.shared.database.engine import open_session
 
 
@@ -22,9 +25,41 @@ class SensorService:
         sensor_repository: SensorRepository,
         storage_repository: StorageRepository,
     ):
+        self._measurement_service = inject_measurement_service(
+            session, sensor_repository=sensor_repository
+        )
         self._session = session
         self._sensor_repository = sensor_repository
         self._storage_repository = storage_repository
+
+    def check_sensor_status(
+        self, sensor_id: UUID, max_age_minutes: int = 1
+    ) -> dict:
+        """
+        Checks if a sensor is online based on the last measurement.
+
+        :param sensor_id: The ID of the sensor to check.
+        :param max_age_minutes: Maximum age in minutes for a measurement to be considered "online".
+        :return: Dictionary with sensor status information.
+        """
+        sensor = self._sensor_repository.find_by_id(sensor_id)
+        if not sensor:
+            raise ValueError(f"Sensor with ID {sensor_id} does not exist.")
+
+        # Get last measurement for additional info
+        last_measurement = self._measurement_service.find_latest_by_sensor_id(
+            sensor_id, max_age_minutes
+        )
+
+        is_online = last_measurement is not None
+
+        return {
+            "sensor_id": str(sensor_id),
+            "is_online": is_online,
+            "last_measurement": (
+                last_measurement.created_at if last_measurement else None
+            ),
+        }
 
     def find_sensor_by_id(self, sensor_id: UUID) -> SensorModel:
         """Finds a sensor by its ID."""
@@ -59,12 +94,25 @@ class SensorService:
         sensor.id = sensor_id
         sensor.type = request.type
         sensor.storage_id = request.storage_id
-        sensor.storage = request.storage
         sensor.name = request.name
         sensor.allowed_min = request.allowed_min
         sensor.allowed_max = request.allowed_max
 
         self._sensor_repository.create(sensor)
+        self._session.commit()
+
+    def delete_sensor(self, sensor_id: UUID):
+        """
+        Deletes a sensor by its ID.
+        Condition: The sensor with the given ID must exist.
+
+        :param sensor_id: The ID of the sensor to be deleted.
+        """
+        sensor = self._sensor_repository.find_by_id(sensor_id)
+        if not sensor:
+            raise ValueError(f"Sensor with ID {sensor_id} does not exist.")
+
+        self._sensor_repository.delete(sensor)
         self._session.commit()
 
 

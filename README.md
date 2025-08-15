@@ -114,7 +114,7 @@ or
 
 ## Deployment Workflow:
 ### 1.  DNS Configuration
-- Create a DNS record for `storasense.de` in your OS pointing to the server's IP address (loopback-adress): `127.0.0.1 storasense.de api.storasense.de auth.storasense.de`
+- Create a DNS record for `storasense.de` in your OS pointing to the server's IP address (loopback-adress): `127.0.0.1 storasense.de api.storasense.de auth.storasense.de traefik.storasense.de`
 ### 2. .env Configuration
 - Verify `.env` configuration (root directory) - checkout `.env.example` for reference.
 ### 3. Docker Configuration
@@ -163,8 +163,9 @@ chmod +x ./db-init/db-init.sh
   * Remove the temporary admin user from the `docker-compose.yml` file after the initial setup is completed.
 ---
 ## URLs:
-| URL Type                                   | URL                                                                                                                     |
-|--------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
-| Frontend                                   | [https://storasense.de](http://storasense.de)
-| Backend-API Documentation <br> (SwaggerUI) | [https://api.storasense.de/docs](http://api.storasense.de/docs)                                                         |
-| Keycloak-Configuration / Admin-Console     | [http://localhost:8088/admin](http://localhost:8088/admin) <br> [https://auth.storasense.de](http://auth.storasense.de) |
+| URL Type                                   | URL                                                                                                                             |
+|--------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|
+| Frontend                                   | [https://storasense.de](https://storasense.de)
+| Backend-API Documentation <br> (SwaggerUI) | [https://api.storasense.de/docs](https://api.storasense.de/docs)                                                                |
+| Keycloak-Configuration / Admin-Console     | [https://auth.storasense.de](https://auth.storasense.de) / [https://auth.storasense.de/admin](https://auth.storasense.de/admin) |
+| Traefik Dashboard                           | [https://traefik.storasense.de](https://traefik.storasense.de)                                                                  |
