@@ -6,8 +6,8 @@ import {
     GetSensorsByStorageIdRequest,
     GetSensorsByStorageIdResponse,
     GetStoragesByUserIdRequest,
-    GetStoragesByUserIdResponse, StoraSenseUser
     GetStoragesByUserIdResponse,
+    StoraSenseUser,
     AddSensorRequest,
     AddSensorResponse,
     DeleteSensorRequest,
