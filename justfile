@@ -8,6 +8,10 @@ start:
     echo "Starting the application..."
     docker-compose up -d
 
+start-scaled:
+    echo "Starting the application with scaling..."
+    docker-compose up -d --scale app=3
+
 stop:
     echo "Stopping the application..."
     docker-compose down
