@@ -24,7 +24,7 @@ const TopBar: FC = () => {
                 ) : (
                     <button
                         onClick={() => keycloak?.login()}
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded"
+                        className="px-4 py-2 bg-blue-whale text-white border-blue-whale"
                     >
                         Login
                     </button>

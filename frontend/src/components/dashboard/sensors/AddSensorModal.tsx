@@ -227,7 +227,7 @@ const AddSensorModal: FC<AddSensorModalProps> = ({ isOpen, onClose }) => {
             </Button>
             <Button
               type="submit"
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+              className="flex 1 bg-blue-whale text-white border-blue-whale"
               disabled={!isFormValid(formData)}
             >
               Add Sensor

@@ -73,7 +73,7 @@ const SensorsOverview: FC<SensorsOverviewProps> = ({ storageId, userId }) => {
 
                 <Button
                     onClick={() => setIsModalOpen(true)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    className="bg-blue-whale text-white border-blue-whale"
                 >
                     <Plus className="w-4 h-4 mr-2" />
                     Add Sensor
@@ -95,13 +95,6 @@ const SensorsOverview: FC<SensorsOverviewProps> = ({ storageId, userId }) => {
                     <p className="text-gray-500 mb-4">
                         No sensors found for this storage.
                     </p>
-                    <Button
-                        onClick={() => setIsModalOpen(true)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
-                    >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add first Sensor
-                    </Button>
                 </section>
             )}
 
