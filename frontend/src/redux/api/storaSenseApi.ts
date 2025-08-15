@@ -47,14 +47,19 @@ export const storaSenseApi = createApi({
 
         getSensors: build.query<GetSensorsByStorageIdResponse, GetSensorsByStorageIdRequest>({
             query: ({ storage_id }) => ({
-                url: `/sensors/byStorageId/${storage_id}`
+                url: `/sensors/byStorageId/${storage_id}`,
+                method: 'GET',
             })
         }),
 
         addSensor: build.mutation<AddSensorResponse, AddSensorRequest>({
-            query: ({sensor}) => ({
-                url: `/sensors/${sensor.id}`,
-                method: 'POST'
+            query: ({sensor_id, sensor}) => ({
+                url: `/sensors/${sensor_id}`,
+                method: 'POST',
+                body: sensor,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             })
         }),
 

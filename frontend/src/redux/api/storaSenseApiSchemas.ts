@@ -73,7 +73,14 @@ export type GetSensorsByStorageIdResponse = Sensor[];
 /////////////////////////////////////////////////////////////////////////
 
 export interface AddSensorRequest {
-    sensor: Sensor;
+    sensor_id: string;
+    sensor: {
+        name: string;
+        type: SensorType;
+        storage_id: string;
+        allowed_min: number;
+        allowed_max: number;
+    };
 }
 
 export interface AddSensorResponse {

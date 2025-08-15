@@ -94,7 +94,6 @@ class SensorService:
         sensor.id = sensor_id
         sensor.type = request.type
         sensor.storage_id = request.storage_id
-        sensor.storage = request.storage
         sensor.name = request.name
         sensor.allowed_min = request.allowed_min
         sensor.allowed_max = request.allowed_max
