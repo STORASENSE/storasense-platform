@@ -17,7 +17,7 @@ def main():
 
     if os.getenv("ENVIRONMENT", "").upper() != "PROD":
         _logger.info("Skipping execution - not in PROD environment")
-        sys.exit(0)
+        sys.exit(0)  # Exit if not in PROD environment
 
     init_db()
     stop_event = threading.Event()
