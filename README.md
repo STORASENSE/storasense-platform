@@ -162,7 +162,7 @@ chmod +x ./db-init/db-init.sh
   * Make sure that the **User profile attributes** (go to `Realm settings` -> `User profile`) match with our database schema (except the intern managed attributes - such as the ids).
   * Remove the temporary admin user from the `docker-compose.yml` file after the initial setup is completed.
 ---
-## URLs:
+## Accessing the System:
 | URL Type                                   | URL                                                                                                                             |
 |--------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|
 | Frontend                                   | [https://storasense.de](https://storasense.de)
