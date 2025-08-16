@@ -129,8 +129,8 @@ chmod +x ./db-init/db-init.sh
 - Follow the following steps:
   * Create an initial **temporary admin user** - add to the `docker-compose.yml` configuration: `keycloak: environment:`:
   ```yaml
-    - KEYCLOAK_ADMIN=admin # or use a .env variable
-    - KEYCLOAK_ADMIN_PASSWORD=admin # or use a .env variable
+    - KC_BOOTSTRAP_ADMIN_USERNAME=admin # or use a .env variable
+    - KC_BOOTSTRAP_ADMIN_PASSWORD=test # or use a .env variable
   ```
   * Open the Keycloak Admin Console in your browser at `https://auth.storasense.de/admin`.
   * Login with the temporary admin user credentials you set in the first step.
