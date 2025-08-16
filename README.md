@@ -132,7 +132,7 @@ chmod +x ./db-init/db-init.sh
     - KEYCLOAK_ADMIN=admin # or use a .env variable
     - KEYCLOAK_ADMIN_PASSWORD=admin # or use a .env variable
   ```
-  * Open the Keycloak Admin Console in your browser at `http://localhost:8088/admin`.
+  * Open the Keycloak Admin Console in your browser at `https://auth.storasense.de/admin`.
   * Login with the temporary admin user credentials you set in the first step.
   * Create a new realm named `storasense-realm`.
   * Create three new clients - for the **backend**, **frontend** and **mqtt-client** - with the following settings:
