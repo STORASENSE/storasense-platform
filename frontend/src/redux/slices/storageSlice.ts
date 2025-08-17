@@ -4,19 +4,15 @@ import {StoraSenseStorge} from "@/redux/api/storaSenseApiSchemas";
 
 interface StorageSliceState {
     activeStorage?: StoraSenseStorge;
+    availableStorages: StoraSenseStorge[];
 }
 
 const initialState: StorageSliceState = {
-    activeStorage: undefined
-}
-
-if (typeof window !== 'undefined' && localStorage.getItem('activeStorage')) {
-    try {
-        const storage = JSON.parse(localStorage.getItem('activeStorage')!);
-        initialState.activeStorage = storage;
-    } catch {
-        localStorage.removeItem('activeStorage');
-    }
+    activeStorage: {
+        id: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+        name: "MyStorage"
+    },
+    availableStorages: [],
 }
 
 
@@ -26,11 +22,6 @@ const storageSlice = createSlice({
     reducers: {
 
         setActiveStorage: (state: StorageSliceState, action: PayloadAction<StoraSenseStorge | undefined>) => {
-            if (action.payload) {
-                localStorage.setItem('activeStorage', JSON.stringify(action.payload));
-            } else {
-                localStorage.removeItem('activeStorage');
-            }
             return {
                 ...state,
                 activeStorage: action.payload,

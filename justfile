@@ -32,7 +32,3 @@ reset-db:
 logs:
     echo "Displaying logs..."
     docker-compose logs -f
-
-backend:
-    echo "Building Traefik, Keycloak, TimescaleDB, and Backend..."
-    docker compose up --build traefik keycloak timescaledb app

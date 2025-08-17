@@ -12,7 +12,6 @@ import {
     AddSensorResponse,
     DeleteSensorRequest,
     SensorStatusResponse,
-    StoraSenseStorge,
 } from "@/redux/api/storaSenseApiSchemas";
 import type { RootState } from '../store';
 
@@ -44,10 +43,6 @@ export const storaSenseApi = createApi({
 
         getMe: build.query<StoraSenseUser | undefined, void>({
             query: () => '/users/me'
-        }),
-
-        getMyStorages: build.query<StoraSenseStorge[], void>({
-            query: () => '/storages/myStorages'
         }),
 
         getStoragesByUserId: build.query<GetStoragesByUserIdResponse, GetStoragesByUserIdRequest>({
@@ -114,7 +109,6 @@ export const storaSenseApi = createApi({
 
 export const {
     useGetMeQuery,
-    useGetMyStoragesQuery,
     useGetStoragesByUserIdQuery,
     useCreateStorageMutation,
     useGetSensorsQuery,

@@ -12,6 +12,9 @@ interface ProtectedPageProps {
 
 const ProtectedPage: FC<ProtectedPageProps> = ({ children }) => {
     const { keycloak, authenticated } = useKeycloak();
+    if (process.env.NODE_ENV === 'development') {
+        return children
+    }
     if (!authenticated || !keycloak) {
         return (
             <>
@@ -19,6 +22,7 @@ const ProtectedPage: FC<ProtectedPageProps> = ({ children }) => {
             </>
         );
     }
+
     return <>{children}</>;
 };
 

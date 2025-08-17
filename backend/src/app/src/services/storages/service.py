@@ -33,14 +33,6 @@ class StorageService:
 
     def find_storages_by_user_id(self, user_id: UUID) -> list[StorageModel]:
         return self.storage_repository.find_all_by_user_id(user_id)
-    
-    def find_my_storages(self, token_data: TokenData) -> list[StorageModel]:
-        user = self.user_repository.find_by_keycloak_id(token_data.id)
-        if user is None:
-            raise UnknownAuthPrincipalError(
-                "Requesting authentication principal does not exist"
-            )
-        return self.storage_repository.find_all_by_user_id(user.id)
 
     def create_storage(self, storage: StorageModel, token_data: TokenData):
         user = self.user_repository.find_by_keycloak_id(token_data.id)
