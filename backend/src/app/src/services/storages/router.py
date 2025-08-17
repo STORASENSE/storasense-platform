@@ -21,6 +21,27 @@ from backend.src.app.src.services.storages.service import (
 router = APIRouter(prefix="/storages", tags=["Storages"])
 
 
+@router.get("/myStorages")
+def get_my_storages(
+    token_data: TokenData = Depends(auth_service.get_current_user),
+    storage_service: StorageService = Depends(inject_storage_service)
+) -> list[StorageResponse]:
+    try:
+        storages = storage_service.find_my_storages(token_data)
+    except UnknownAuthPrincipalError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication principal is unauthorized to access the requested resource",
+        )
+    return [
+        StorageResponse(
+            id=storage.id,
+            name=storage.name
+        )
+        for storage in storages
+    ]
+
+
 @router.get("/byUserId/{user_id}")
 def storages_by_user_id(
     user_id: UUID,
@@ -33,7 +54,7 @@ def storages_by_user_id(
     ]
 
 
-@router.post("/")
+@router.post("")
 def create_storage(
     request: CreateStorageRequest,
     token_data: TokenData = Depends(auth_service.get_current_user),

@@ -30,7 +30,10 @@ const StorageCard: FC<StorageCardProps> = ({ storage }) => {
     }
 
     return (
-        <Card onClick={toggleActive} className={'cursor-pointer ' + isActive? 'border-blue-whale' : ''}>
+        <Card
+            data-active={isActive || undefined}
+            onClick={toggleActive}
+            className="cursor-pointer data-active:bg-blue-whale data-active:text-white duration-300">
             <CardHeader>
                 <CardTitle>
                     {storage.name || '[Unnamed Storage]'}
