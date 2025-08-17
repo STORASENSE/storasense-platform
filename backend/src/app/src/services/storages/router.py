@@ -24,7 +24,7 @@ router = APIRouter(prefix="/storages", tags=["Storages"])
 @router.get("/myStorages")
 def get_my_storages(
     token_data: TokenData = Depends(auth_service.get_current_user),
-    storage_service: StorageService = Depends(inject_storage_service)
+    storage_service: StorageService = Depends(inject_storage_service),
 ) -> list[StorageResponse]:
     try:
         storages = storage_service.find_my_storages(token_data)
@@ -34,10 +34,7 @@ def get_my_storages(
             detail="Authentication principal is unauthorized to access the requested resource",
         )
     return [
-        StorageResponse(
-            id=storage.id,
-            name=storage.name
-        )
+        StorageResponse(id=storage.id, name=storage.name)
         for storage in storages
     ]
 
