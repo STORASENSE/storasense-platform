@@ -3,6 +3,7 @@
 import {FC} from "react";
 import {Input} from "@/components/ui/input";
 import useKeycloak from '../../app/(main)/useKeycloak';
+import ActiveStorageSelection from "./ActiveStorageSelection";
 
 const TopBar: FC = () => {
     const { keycloak, authenticated } = useKeycloak();
@@ -10,7 +11,7 @@ const TopBar: FC = () => {
     return (
         <div className="py-2 px-5 grow flex justify-between items-end">
             <div role="navigation" aria-label="search tools">
-                <Input placeholder="Search..."/>
+                <ActiveStorageSelection />
             </div>
 
             <div className="user-actions">
