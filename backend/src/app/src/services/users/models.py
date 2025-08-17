@@ -5,7 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.src.app.src.shared.database.base_model import BaseModel
 from backend.src.app.src.shared.database.join_tables.user_storage import (
-    user_storage_access,
+    UserStorageAccess,
 )
 
 if TYPE_CHECKING:
@@ -28,6 +28,9 @@ class UserModel(BaseModel):
         String(255), unique=False, index=False, nullable=True
     )  # Allow null for name to support technical users
 
+    storage_associations: Mapped[list[UserStorageAccess]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
     accessed_storages: Mapped[list["StorageModel"]] = relationship(
-        secondary=user_storage_access, back_populates="accessing_users"
+        secondary=UserStorageAccess.__table__, back_populates="accessing_users"
     )

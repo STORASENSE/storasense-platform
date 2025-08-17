@@ -3,7 +3,7 @@
 import {FC, JSX, useState, Fragment} from "react";
 import {useGetMyStoragesQuery} from "@/redux/api/storaSenseApi";
 import StorageCard from "@/components/dashboard/storages/StorageCard";
-import StorageCreationForm from "@/components/dashboard/storages/purchase/StorageCreationForm";
+import StorageCreationForm from "@/components/dashboard/storages/StorageCreationForm";
 import {Skeleton} from "@/components/ui/skeleton";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 import {AlertCircleIcon, Plus} from "lucide-react";
@@ -13,11 +13,10 @@ import {Dialog, Transition} from '@headlessui/react';
 const StorageOverview: FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const {data: storages, isLoading, isError, error, refetch} = useGetMyStoragesQuery();
+    const {data: storages, isLoading, isError, error} = useGetMyStoragesQuery();
 
     const handleModalClose = () => {
         setIsModalOpen(false);
-        refetch();
     };
 
     if (isLoading) {

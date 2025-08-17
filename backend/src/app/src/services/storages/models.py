@@ -4,7 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.src.app.src.shared.database.base_model import BaseModel
 from backend.src.app.src.shared.database.join_tables.user_storage import (
-    user_storage_access,
+    UserStorageAccess,
 )
 
 if TYPE_CHECKING:
@@ -17,9 +17,15 @@ class StorageModel(BaseModel):
 
     name: Mapped[str] = mapped_column(unique=True)
     description: Mapped[Optional[str]] = mapped_column()
-    accessing_users: Mapped[list["UserModel"]] = relationship(
-        secondary=user_storage_access, back_populates="accessed_storages"
+
+    user_associations: Mapped[list[UserStorageAccess]] = relationship(
+        back_populates="storage", cascade="all, delete-orphan"
     )
+    accessing_users: Mapped[list["UserModel"]] = relationship(
+        secondary=UserStorageAccess.__table__,
+        back_populates="accessed_storages",
+    )
+
     sensors: Mapped[list["SensorModel"]] = relationship(
         back_populates="storage"
     )

@@ -3,10 +3,14 @@ from uuid import UUID
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
-from backend.src.app.src.services.auth.errors import UnknownAuthPrincipalError
+from backend.src.app.src.services.auth.errors import (
+    AuthorizationError,
+    UnknownAuthPrincipalError,
+)
 from backend.src.app.src.services.auth.schemas import TokenData
 from backend.src.app.src.services.storages.errors import (
     StorageAlreadyExistsError,
+    StorageNotFoundError,
 )
 from backend.src.app.src.services.storages.models import StorageModel
 from backend.src.app.src.services.storages.repository import (
@@ -18,6 +22,10 @@ from backend.src.app.src.services.users.repository import (
     inject_user_repository,
 )
 from backend.src.app.src.shared.database.engine import open_session
+from backend.src.app.src.shared.database.enums import UserRole
+from backend.src.app.src.shared.database.join_tables.user_storage import (
+    UserStorageAccess,
+)
 
 
 class StorageService:
@@ -62,8 +70,29 @@ class StorageService:
             raise StorageAlreadyExistsError(
                 "Could not create storage because a storage with the given name already exists"
             )
-        storage.accessing_users.append(user)
+        storage.user_associations.append(
+            UserStorageAccess(user=user, role=UserRole.ADMIN)
+        )
         self.storage_repository.create(storage)
+        self.session.commit()
+
+    def delete_storage(self, storage_id: UUID, token_data: TokenData):
+        user = self.user_repository.find_by_keycloak_id(token_data.id)
+        if user is None:
+            raise UnknownAuthPrincipalError(
+                "Requesting authentication principal does not exist"
+            )
+        storage = self.storage_repository.find_by_id(storage_id)
+        if storage is None:
+            raise StorageNotFoundError(
+                "Could not delete storage because it does not exist"
+            )
+        role = self.user_repository.find_user_role(user.id, storage.id)
+        if role != UserRole.ADMIN:
+            raise AuthorizationError(
+                "Could not delete storage because requesting user does not have admin rights"
+            )
+        self.storage_repository.delete(storage)
         self.session.commit()
 
 

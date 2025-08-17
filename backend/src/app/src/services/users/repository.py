@@ -7,6 +7,10 @@ from sqlalchemy.orm import Session
 
 from backend.src.app.src.services.users.models import UserModel
 from backend.src.app.src.shared.database.engine import open_session
+from backend.src.app.src.shared.database.enums import UserRole
+from backend.src.app.src.shared.database.join_tables.user_storage import (
+    UserStorageAccess,
+)
 from backend.src.app.src.shared.repositories.base_repository import (
     BaseRepository,
 )
@@ -33,6 +37,19 @@ class UserRepository(BaseRepository[UserModel, UUID]):
             .filter_by(id=storage_id)
             .all()
         )
+
+    def find_user_role(
+        self, user_id: UUID, storage_id: UUID
+    ) -> Optional[UserRole]:
+        association = (
+            self.session.query(UserStorageAccess)
+            .where(UserStorageAccess.user_id == user_id)
+            .where(UserStorageAccess.storage_id == storage_id)
+            .one_or_none()
+        )
+        if association is None:
+            return None
+        return association.role
 
     def create_user(self, user_data: dict) -> UserModel:
         """

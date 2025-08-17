@@ -40,6 +40,7 @@ export const storaSenseApi = createApi({
             return headers;
         }
     }),
+    tagTypes: ['MyStorages'],
     endpoints: (build) => ({
 
         getMe: build.query<StoraSenseUser | undefined, void>({
@@ -47,7 +48,8 @@ export const storaSenseApi = createApi({
         }),
 
         getMyStorages: build.query<StoraSenseStorge[], void>({
-            query: () => '/storages/myStorages'
+            query: () => '/storages/myStorages',
+            providesTags: ['MyStorages']
         }),
 
         getStoragesByUserId: build.query<GetStoragesByUserIdResponse, GetStoragesByUserIdRequest>({
@@ -61,7 +63,16 @@ export const storaSenseApi = createApi({
                 url: '/storages',
                 body: request,
                 method: 'POST'
-            })
+            }),
+            invalidatesTags: ['MyStorages']
+        }),
+
+        deleteStorage: build.mutation<void, string>({
+            query: (storageId) => ({
+                url: `/storages/${storageId}`,
+                method: 'DELETE'
+            }),
+            invalidatesTags: ['MyStorages']
         }),
 
         getSensors: build.query<GetSensorsByStorageIdResponse, GetSensorsByStorageIdRequest>({
@@ -117,6 +128,7 @@ export const {
     useGetMyStoragesQuery,
     useGetStoragesByUserIdQuery,
     useCreateStorageMutation,
+    useDeleteStorageMutation,
     useGetSensorsQuery,
     useGetMeasurementsQuery,
     useGetHealthQuery,
