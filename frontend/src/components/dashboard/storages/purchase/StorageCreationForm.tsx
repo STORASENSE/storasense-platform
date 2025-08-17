@@ -8,6 +8,7 @@ import { CreateStorageRequest } from "@/redux/api/storaSenseApiSchemas";
 import { Formik, FormikConfig, FormikErrors } from "formik";
 import { FC } from "react";
 import { AlertCircle } from "lucide-react";
+import { FastApiError } from "@/redux/api/storaSenseApiErrors";
 
 interface FormState {
     storageName: string;
@@ -61,9 +62,25 @@ const StorageCreationForm: FC<StorageCreationFormProps> = ({ onSuccess, onClose 
                 if (onSuccess) {
                     onSuccess();
                 }
-            } catch (error) {
+            } catch (error: any) {
                 console.error('Failed to create storage:', error);
-                setStatus('Failed to create storage. Please try again.');
+                if ('status' in error) {
+                    setStatus('Failed to create storage. Please try again.');
+                }
+                switch ((error as FastApiError).status) {
+                    case 400:
+                        setStatus("The data you entered was empty or malformed.");
+                        break;
+                    case 401:
+                        setStatus("You aren't authorized to access this resource.");
+                        break;
+                    case 409:
+                        setStatus("A storage with this name already exists.");
+                        break;
+                    default:
+                        setStatus("An unknown error occurred. Please try again later.");
+                        break;
+                }
             } finally {
                 setSubmitting(false);
             }

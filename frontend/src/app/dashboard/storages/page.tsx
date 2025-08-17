@@ -1,9 +1,6 @@
 import {FC} from "react";
 import ProtectedPage from "@/components/ProtectedPage";
 import StorageOverview from "@/components/dashboard/storages/StorageOverview";
-// import Link from "next/link";
-// import { FaCartShopping as ShoppingIcon } from "react-icons/fa6";
-// import StorageCreationForm from "@/components/dashboard/storages/purchase/StorageCreationForm";
 
 
 const Page: FC = () => {
@@ -22,16 +19,6 @@ const Page: FC = () => {
             <section>
                 <StorageOverview />
             </section>
-            {/*<section className="mt-[100px] flex flex-col items-center">*/}
-            {/*    /!*<h2 className="mb-3 flex gap-2 items-center text-xl font-semibold text-blue-whale">*!/*/}
-            {/*    /!*    <ShoppingIcon aria-hidden />*!/*/}
-            {/*    /!*    Purchase New Storage*!/*/}
-            {/*    /!*</h2>*!/*/}
-            {/*    /!*<p className="max-w-[600px] text-center">*!/*/}
-            {/*    /!*    You may contact us to purchase a new monitoring device, which will be mailed to you in due time.*!/*/}
-            {/*    /!*    You can find the form <Link className="underline" href="/dashboard/storages/purchase">here</Link>.*!/*/}
-            {/*    /!*</p>*!/*/}
-            {/*</section>*/}
         </ProtectedPage>
     );
 }
