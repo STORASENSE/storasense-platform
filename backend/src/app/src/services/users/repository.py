@@ -28,7 +28,9 @@ class UserRepository(BaseRepository[UserModel, UUID]):
     def find_by_keycloak_id(self, keycloak_id: str) -> Optional[UserModel]:
         """Finds a user by their ID ('sub'-Claim of JWT)."""
         query = select(UserModel).where(UserModel.keycloak_id == keycloak_id)
-        return self.session.scalars(query).one_or_none()
+        return self.session.scalars(
+            query
+        ).one_or_none()  # returns a single UserModel or None
 
     def find_all_by_storage_id(self, storage_id: UUID) -> list[UserModel]:
         return (
