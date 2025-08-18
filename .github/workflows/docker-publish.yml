@@ -1,0 +1,46 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches: [ feat/docker-publish ]
+    paths:
+      - 'Dockerfile'
+      - '**/Dockerfile'
+      - '.github/workflows/docker-publish.yml'
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push frontend image
+        run: |
+          IMAGE_NAME=ghcr.io/${{ github.repository }}/frontend:latest
+          docker build -t $IMAGE_NAME ./frontend
+          docker push $IMAGE_NAME
+
+      - name: Build and push backend-app image
+        run: |
+          IMAGE_NAME=ghcr.io/${{ github.repository }}/backend-app:latest
+          docker build -t $IMAGE_NAME ./backend/src/app
+          docker push $IMAGE_NAME
+
+      - name: Build and push backend-mqtt-client image
+        run: |
+          IMAGE_NAME=ghcr.io/${{ github.repository }}/backend-mqtt-client:latest
+          docker build -t $IMAGE_NAME ./backend/src/mqtt-client
+          docker push $IMAGE_NAME
