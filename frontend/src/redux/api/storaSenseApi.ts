@@ -40,11 +40,20 @@ export const storaSenseApi = createApi({
             return headers;
         }
     }),
-    tagTypes: ['MyStorages'],
+
+    tagTypes: ['Me', 'MyStorages'],
+
     endpoints: (build) => ({
 
         getMe: build.query<StoraSenseUser | undefined, void>({
-            query: () => '/users/me'
+            query: () => '/users/me',
+            providesTags: ['Me']
+        }),
+
+        // same as getMe, but used for signing up ad-hoc
+        createMe: build.mutation<StoraSenseUser | undefined, void>({
+            query: () => '/users/me',
+            invalidatesTags: ['Me', 'MyStorages']
         }),
 
         getMyStorages: build.query<StoraSenseStorge[], void>({
@@ -125,6 +134,7 @@ export const storaSenseApi = createApi({
 
 export const {
     useGetMeQuery,
+    useCreateMeMutation,
     useGetMyStoragesQuery,
     useGetStoragesByUserIdQuery,
     useCreateStorageMutation,

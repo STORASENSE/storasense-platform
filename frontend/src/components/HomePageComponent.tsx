@@ -1,18 +1,25 @@
 'use client';
 
+import { useKeycloak } from "@/auth/keycloakConfigurer";
 import AuthenticationMessage from "@/components/AuthenticationMessage";
-import { useAuthenticatedUser } from '@/app/(main)/useAuthenticatedUser';
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
 
 function HomePageComponent() {
-    const {
-        keycloak,
-        authenticated,
-        keycloakReady,
-        isLoading
-    } = useAuthenticatedUser();
+    const router = useRouter();
+    const {keycloak, isLoading, isError} = useKeycloak();
 
-    // Wait for Keycloak to be ready
-    if (!keycloakReady) {
+    useEffect(() => {
+        if (isLoading || isError) {
+            return;
+        }
+        if (keycloak?.authenticated) {
+            router.replace("/dashboard");
+        }
+    }, [keycloak, isLoading, isError]);
+
+    if (isLoading) {
         return (
             <div className="flex justify-center items-center h-64">
                 <div className="text-center">
@@ -23,8 +30,12 @@ function HomePageComponent() {
         );
     }
 
+    if (isError) {
+        return <></>;
+    }
+
     // Show login page if not authenticated
-    if (!authenticated || !keycloak) {
+    if (!keycloak?.authenticated) {
         return(
             <div className="space-y-6">
                 <AuthenticationMessage/>
@@ -35,18 +46,6 @@ function HomePageComponent() {
                     >
                         Login
                     </button>
-                </div>
-            </div>
-        );
-    }
-
-    // Show loading state if user is authenticated but still loading
-    if (isLoading) {
-        return (
-            <div className="flex justify-center items-center h-64">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-whale mx-auto mb-4"></div>
-                    <p>Loading User...</p>
                 </div>
             </div>
         );
