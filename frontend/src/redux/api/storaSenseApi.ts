@@ -43,7 +43,7 @@ export const storaSenseApi = createApi({
     tagTypes: ['MyStorages'],
     endpoints: (build) => ({
 
-        getMe: build.query<StoraSenseUser | undefined, void>({
+        getMe: build.query<StoraSenseUser, void>({
             query: () => '/users/me'
         }),
 
