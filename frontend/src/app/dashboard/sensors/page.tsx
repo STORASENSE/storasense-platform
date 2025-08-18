@@ -11,7 +11,7 @@ const Page: FC = () => {
                 </h1>
             </header>
             <section>
-                <SensorsOverview storageId={""} userId={""} />
+                <SensorsOverview />
             </section>
         </ProtectedPage>
     );

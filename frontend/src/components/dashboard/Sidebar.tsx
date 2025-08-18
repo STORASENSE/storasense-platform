@@ -1,6 +1,6 @@
 "use client"
 
-import {FC, ReactNode, useMemo, useEffect, useState} from "react";
+import {FC, ReactNode, useMemo} from "react";
 import Link from "next/link";
 import {usePathname} from "next/navigation";
 import {Button} from "@/components/ui/button";

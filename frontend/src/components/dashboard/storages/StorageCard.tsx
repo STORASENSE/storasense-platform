@@ -2,7 +2,7 @@
 
 import {FC, useMemo} from "react";
 import {StoraSenseStorge} from "@/redux/api/storaSenseApiSchemas";
-import {Card, CardAction, CardHeader, CardTitle} from "@/components/ui/card";
+import {Card} from "@/components/ui/card";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "@/redux/store";
 import {setActiveStorage} from "@/redux/slices/storageSlice";
