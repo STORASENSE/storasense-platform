@@ -4,14 +4,14 @@ FROM node:18-alpine AS base
 FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /frontend
-COPY /frontend/package.json /frontend/package-lock.json* ./
+COPY package.json package-lock.json* ./
 RUN npm ci
 
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /frontend
 COPY --from=deps /frontend/node_modules ./node_modules
-COPY /frontend ./
+COPY . ./
 RUN npm run build
 
 FROM base AS runner
