@@ -29,18 +29,21 @@ jobs:
 
       - name: Build and push frontend image
         run: |
-          IMAGE_NAME=ghcr.io/${{ github.repository }}/frontend:latest
+          REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE_NAME=ghcr.io/$REPO_NAME/storasense-frontend:latest
           docker build -t $IMAGE_NAME ./frontend
           docker push $IMAGE_NAME
 
       - name: Build and push backend-app image
         run: |
-          IMAGE_NAME=ghcr.io/${{ github.repository }}/backend-app:latest
+          REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE_NAME=ghcr.io/$REPO_NAME/storasense-backend-app:latest
           docker build -t $IMAGE_NAME ./backend/src/app
           docker push $IMAGE_NAME
 
       - name: Build and push backend-mqtt-client image
         run: |
-          IMAGE_NAME=ghcr.io/${{ github.repository }}/backend-mqtt-client:latest
+          REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE_NAME=ghcr.io/$REPO_NAME/storasense-backend-mqtt-client:latest
           docker build -t $IMAGE_NAME ./backend/src/mqtt-client
           docker push $IMAGE_NAME
