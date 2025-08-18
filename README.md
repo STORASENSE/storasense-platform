@@ -121,7 +121,7 @@ or
 - Ensure Docker is installed and running on your system.
 - Make the db-init script executable:
 ```bash
-chmod +x ./db-init/db-init.sh
+chmod +x ./db-scripts/db-scripts.sh
 ```
 - Build the Docker-Compose Setup: `docker-compose up -d --build`
 ### 4. Optional: Keycloak Configuration
