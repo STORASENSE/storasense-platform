@@ -17,5 +17,11 @@ RUN poetry config virtualenvs.create false \
 
 COPY . /app
 
+# Create non-root user
+RUN addgroup --system --gid 1001 appuser
+RUN adduser --system --uid 1001 appuser
+
+USER appuser
+
 # Run the application server
 CMD ["uvicorn", "backend.src.app.src.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

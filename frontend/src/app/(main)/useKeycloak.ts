@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { KeycloakContext } from '@/components/KeycloakProvider';
+import { KeycloakContext } from '@/auth/KeycloakProvider';
 
 const useKeycloak = () => {
   const context = useContext(KeycloakContext);

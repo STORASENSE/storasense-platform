@@ -21,5 +21,11 @@ RUN poetry config virtualenvs.create false \
 
 COPY ./backend/src/mqtt_client .
 
+# Create non-root user
+RUN addgroup --system --gid 1001 mqttclientuser
+RUN adduser --system --uid 1001 mqttclientuser
+
+USER mqttclientuser
+
 # Run the application
 CMD ["python", "src/main.py"]
