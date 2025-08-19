@@ -27,6 +27,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # Note: Build context is always the root of the repository
       - name: Build and push frontend image
         run: |
           REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
@@ -38,12 +39,12 @@ jobs:
         run: |
           REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           IMAGE_NAME=ghcr.io/$REPO_NAME/storasense-backend-app:latest
-          docker build -t $IMAGE_NAME ./backend/src/app
+          docker build -f backend/src/app/Dockerfile -t $IMAGE_NAME .
           docker push $IMAGE_NAME
 
       - name: Build and push backend-mqtt-client image
         run: |
           REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           IMAGE_NAME=ghcr.io/$REPO_NAME/storasense-backend-mqtt-client:latest
-          docker build -t $IMAGE_NAME ./backend/src/mqtt-client
+          docker build -f backend/src/mqtt-client/Dockerfile -t $IMAGE_NAME .
           docker push $IMAGE_NAME
