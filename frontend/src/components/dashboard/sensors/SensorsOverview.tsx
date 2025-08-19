@@ -2,7 +2,7 @@
 
 import { FC, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { InfoIcon, Plus } from "lucide-react";
 import SensorCard from "./SensorCard";
 import AddSensorModal from "./AddSensorModal";
 import {
@@ -11,11 +11,9 @@ import {
     useGetSensorStatusQuery
 } from "@/redux/api/storaSenseApi";
 import { Sensor } from "@/redux/api/storaSenseApiSchemas";
-
-interface SensorsOverviewProps {
-    storageId: string;
-    userId: string;
-}
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface EnrichedSensor extends Sensor {
     status: "online" | "offline" | "warning";
@@ -39,12 +37,16 @@ const useSensorWithStatus = (sensor: Sensor): EnrichedSensor => {
     }), [sensor, statusData]);
 };
 
-const SensorsOverview: FC<SensorsOverviewProps> = ({ storageId, userId }) => {
+const SensorsOverview: FC = () => {
+    const activeStorage = useSelector((state: RootState) => state.storage.activeStorage);
+
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     // Query for Storage-Sensors
     const { data: sensorsData, refetch } = useGetSensorsQuery({
-        storage_id: storageId
+        storage_id: activeStorage?.id || ''
+    }, {
+        skip: activeStorage === undefined
     });
 
     // Delete mutation
@@ -66,6 +68,20 @@ const SensorsOverview: FC<SensorsOverviewProps> = ({ storageId, userId }) => {
         }
     };
 
+    if (!activeStorage) {
+        return (
+            <Alert className="mt-2 p-2">
+                <InfoIcon />
+                <AlertTitle>
+                    You cannot view this content.
+                </AlertTitle>
+                <AlertDescription>
+                    No storage is currently selected!
+                </AlertDescription>
+            </Alert>
+        );
+    }
+
     return (
         <div className="space-y-6">
             <header className="flex justify-between items-center">
@@ -73,7 +89,7 @@ const SensorsOverview: FC<SensorsOverviewProps> = ({ storageId, userId }) => {
 
                 <Button
                     onClick={() => setIsModalOpen(true)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    className="bg-blue-whale text-white border-blue-whale"
                 >
                     <Plus className="w-4 h-4 mr-2" />
                     Add Sensor
@@ -95,13 +111,6 @@ const SensorsOverview: FC<SensorsOverviewProps> = ({ storageId, userId }) => {
                     <p className="text-gray-500 mb-4">
                         No sensors found for this storage.
                     </p>
-                    <Button
-                        onClick={() => setIsModalOpen(true)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
-                    >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add first Sensor
-                    </Button>
                 </section>
             )}
 

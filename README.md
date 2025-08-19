@@ -129,10 +129,10 @@ chmod +x ./db-init/db-init.sh
 - Follow the following steps:
   * Create an initial **temporary admin user** - add to the `docker-compose.yml` configuration: `keycloak: environment:`:
   ```yaml
-    - KEYCLOAK_ADMIN=admin # or use a .env variable
-    - KEYCLOAK_ADMIN_PASSWORD=admin # or use a .env variable
+    - KC_BOOTSTRAP_ADMIN_USERNAME=admin # or use a .env variable
+    - KC_BOOTSTRAP_ADMIN_PASSWORD=test # or use a .env variable
   ```
-  * Open the Keycloak Admin Console in your browser at `http://localhost:8088/admin`.
+  * Open the Keycloak Admin Console in your browser at `https://auth.storasense.de/admin`.
   * Login with the temporary admin user credentials you set in the first step.
   * Create a new realm named `storasense-realm`.
   * Create three new clients - for the **backend**, **frontend** and **mqtt-client** - with the following settings:
@@ -162,7 +162,7 @@ chmod +x ./db-init/db-init.sh
   * Make sure that the **User profile attributes** (go to `Realm settings` -> `User profile`) match with our database schema (except the intern managed attributes - such as the ids).
   * Remove the temporary admin user from the `docker-compose.yml` file after the initial setup is completed.
 ---
-## URLs:
+## Accessing the system:
 | URL Type                                   | URL                                                                                                                             |
 |--------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|
 | Frontend                                   | [https://storasense.de](https://storasense.de)
