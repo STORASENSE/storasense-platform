@@ -46,5 +46,5 @@ jobs:
         run: |
           REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           IMAGE_NAME=ghcr.io/$REPO_NAME/storasense-backend-mqtt-client:latest
-          docker build -f backend/src/mqtt-client/Dockerfile -t $IMAGE_NAME .
+          docker build -f backend/src/mqtt_client/Dockerfile -t $IMAGE_NAME .
           docker push $IMAGE_NAME
