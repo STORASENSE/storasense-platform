@@ -2,7 +2,7 @@ name: Build and Push Docker Images
 
 on:
   push:
-    branches: [ feat/docker-publish ] # TODO change to dev branch
+    branches: [ dev ]
     paths:
       - 'Dockerfile'
       - '**/Dockerfile'
