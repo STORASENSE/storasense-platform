@@ -31,7 +31,7 @@ jobs:
         run: |
           REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           IMAGE_NAME=ghcr.io/$REPO_NAME/storasense-frontend:latest
-          docker build -t $IMAGE_NAME ./frontend
+          docker build -f frontend/Dockerfile -t $IMAGE_NAME .
           docker push $IMAGE_NAME
 
       - name: Build and push backend-app image
