@@ -11,16 +11,16 @@ RUN npm ci
 FROM base AS builder
 WORKDIR /frontend
 COPY --from=deps /frontend/node_modules ./node_modules
-COPY /frontend ./
+COPY ./frontend ./
 RUN npm run build
 
 FROM base AS runner
 WORKDIR /frontend
 
 ENV NODE_ENV=production
-COPY --from=builder /frontend/public ./public
-COPY --from=builder /frontend/.next/standalone ./
-COPY --from=builder /frontend/.next/static ./.next/static
+COPY --from=builder ./frontend/public ./public
+COPY --from=builder ./frontend/.next/standalone ./
+COPY --from=builder ./frontend/.next/static ./.next/static
 
 EXPOSE 3000
 ENV PORT=3000
