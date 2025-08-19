@@ -31,6 +31,14 @@ export enum SensorType {
 /// Model Types
 /////////////////////////////////////////////////////////////////////////
 
+export interface StoraSenseUser {
+    id: string;
+    keycloak_id: string;
+    username: string;
+    email?: string;
+    name?: string;
+}
+
 export interface StoraSenseStorge {
     id: string;
     name: string;
@@ -112,4 +120,10 @@ export interface GetMeasurementsRequest {
 
 export interface GetMeasurementsResponse {
     measurements: Measurement[];
+}
+
+/////////////////////////////////////////////////////////////////////////
+
+export interface CreateStorageRequest {
+    name: string;
 }

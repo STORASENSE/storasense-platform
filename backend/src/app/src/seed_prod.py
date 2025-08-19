@@ -16,9 +16,7 @@ def seed_storage(session: Session):
     _logger.info("Seeding storage...")
     initial_storage = StorageModel(
         id=_known_storage_id,
-        name="Main Storage",
-        password_hash="1234",
-        password_salt="1234",
+        name="MainStorage",
     )
     session.add(initial_storage)
     session.flush()

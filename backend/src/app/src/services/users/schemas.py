@@ -15,3 +15,11 @@ class UserResponse(BaseModel):
     )
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class UserPublicResponse(BaseModel):
+    """Public User Response Schema"""
+
+    username: str
+    email: str
+    name: str

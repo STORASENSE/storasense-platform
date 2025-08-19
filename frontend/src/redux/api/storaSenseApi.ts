@@ -1,15 +1,18 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
 import {
+    CreateStorageRequest,
     GetMeasurementsRequest,
     GetMeasurementsResponse,
     GetSensorsByStorageIdRequest,
     GetSensorsByStorageIdResponse,
     GetStoragesByUserIdRequest,
     GetStoragesByUserIdResponse,
+    StoraSenseUser,
     AddSensorRequest,
     AddSensorResponse,
     DeleteSensorRequest,
     SensorStatusResponse,
+    StoraSenseStorge,
 } from "@/redux/api/storaSenseApiSchemas";
 import type { RootState } from '../store';
 
@@ -37,12 +40,48 @@ export const storaSenseApi = createApi({
             return headers;
         }
     }),
+
+    tagTypes: ['Me', 'MyStorages'],
+
     endpoints: (build) => ({
+
+        getMe: build.query<StoraSenseUser | undefined, void>({
+            query: () => '/users/me',
+            providesTags: ['Me']
+        }),
+
+        // same as getMe, but used for signing up ad-hoc
+        createMe: build.mutation<StoraSenseUser | undefined, void>({
+            query: () => '/users/me',
+            invalidatesTags: ['Me', 'MyStorages']
+        }),
+
+        getMyStorages: build.query<StoraSenseStorge[], void>({
+            query: () => '/storages/myStorages',
+            providesTags: ['MyStorages']
+        }),
 
         getStoragesByUserId: build.query<GetStoragesByUserIdResponse, GetStoragesByUserIdRequest>({
             query: ({ user_id }) => ({
                 url: `/storages/byUserId/${user_id}`
             })
+        }),
+
+        createStorage: build.mutation<void, CreateStorageRequest>({
+            query: (request) => ({
+                url: '/storages',
+                body: request,
+                method: 'POST'
+            }),
+            invalidatesTags: ['MyStorages']
+        }),
+
+        deleteStorage: build.mutation<void, string>({
+            query: (storageId) => ({
+                url: `/storages/${storageId}`,
+                method: 'DELETE'
+            }),
+            invalidatesTags: ['MyStorages']
         }),
 
         getSensors: build.query<GetSensorsByStorageIdResponse, GetSensorsByStorageIdRequest>({
@@ -94,7 +133,12 @@ export const storaSenseApi = createApi({
 });
 
 export const {
+    useGetMeQuery,
+    useCreateMeMutation,
+    useGetMyStoragesQuery,
     useGetStoragesByUserIdQuery,
+    useCreateStorageMutation,
+    useDeleteStorageMutation,
     useGetSensorsQuery,
     useGetMeasurementsQuery,
     useGetHealthQuery,

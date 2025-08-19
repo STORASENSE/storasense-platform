@@ -26,8 +26,6 @@ def seed_storages(session: Session):
         StorageModel(
             id=UUID("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
             name="MyStorage",
-            password_hash="1234",
-            password_salt="1234",
         )
     ]
     session.add_all(storages)

@@ -27,15 +27,11 @@ _LocalSessionMaker = sessionmaker(
 )
 
 
-def is_prod_initialized() -> bool:
+def is_db_initialized() -> bool:
     """
     This function is used to check if the production database has already been
     initialized. If the environment is not PROD, raises an error.
     """
-    if _environment != "PROD":
-        raise EnvironmentError(
-            f"PROD environment expected, but was '{_environment}'!"
-        )
     return sqlalchemy.inspect(db_engine).has_table("Storage")
 
 
@@ -71,9 +67,9 @@ def initialize_database():
     2. Converts marked tables into Hypertables (only when not in test mode).
     """
     session = _LocalSessionMaker()
-    if _environment == "PROD" and is_prod_initialized():
+    if _environment != "TEST" and is_db_initialized():
         _logger.info(
-            "Production database already initialized. Skipping further initialization."
+            "Database already initialized. Skipping further initialization."
         )
         return
 
