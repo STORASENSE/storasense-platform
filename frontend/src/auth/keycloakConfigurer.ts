@@ -1,4 +1,4 @@
-import Keycloak, { KeycloakConfig } from "keycloak-js";
+import Keycloak, { KeycloakConfig, KeycloakInitOptions } from "keycloak-js";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 
 
@@ -29,13 +29,7 @@ export const KeycloakContext = createContext<KeycloakContextState>({
 
 ///////////////////////////////////////////////////////////////////////////////////
 
-export function useKeycloak(): KeycloakContextState {
-    return useContext(KeycloakContext);
-}
-
-///////////////////////////////////////////////////////////////////////////////////
-
-export function useKeycloakBuilder(): KeycloakContextState {
+export function useKeycloakBuilder(initOptions?: KeycloakInitOptions): KeycloakContextState {
     const isRun = useRef<boolean>(false);
 
     const [keycloak, setKeycloak] = useState<Keycloak | undefined>(undefined);
@@ -55,9 +49,7 @@ export function useKeycloakBuilder(): KeycloakContextState {
         setKeycloak(keycloak);
 
         keycloakInstance
-            .init({
-                onLoad: 'check-sso',
-            })
+            .init(initOptions)
             .then(() => {
                 setIsError(false);
                 setError(false);

@@ -13,7 +13,10 @@ interface KeycloakProviderProps {
 }
 
 export const KeycloakProvider: React.FC<KeycloakProviderProps> = ({ children }) => {
-    const { keycloak, isLoading, isError, error } = useKeycloakBuilder();
+    const { keycloak, isLoading, isError, error } = useKeycloakBuilder({
+        onLoad: 'check-sso',
+        checkLoginIframe: false
+    });
     const [createMe] = useCreateMeMutation();
     const dispatch = useDispatch();
 

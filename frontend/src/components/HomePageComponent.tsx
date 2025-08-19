@@ -1,6 +1,6 @@
 'use client';
 
-import { useKeycloak } from "@/auth/keycloakConfigurer";
+import useKeycloak from "@/auth/useKeycloak";
 import AuthenticationMessage from "@/components/AuthenticationMessage";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
