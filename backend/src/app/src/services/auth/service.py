@@ -13,18 +13,25 @@ _logger = get_logger(__name__)
 KEYCLOAK_URL = os.environ.get("KEYCLOAK_URL")
 REALM_NAME = os.environ.get("KEYCLOAK_REALM")
 CLIENT_ID = os.environ.get("KEYCLOAK_CLIENT_ID")
-
+MQTT_CLIENT_ID = os.environ.get("MQTT_CLIENT_ID")
+ALLOWED_AUDIENCES = set(
+    filter(
+        None,
+        [
+            CLIENT_ID,
+            MQTT_CLIENT_ID,
+        ],
+    )
+)
 if not all([KEYCLOAK_URL, REALM_NAME, CLIENT_ID]):
     raise RuntimeError(
         "Keycloak is not configured correctly. Please check environment variables."
     )
 
-# URLs for browser flow
 AUTHORIZATION_URL = (
     f"{KEYCLOAK_URL}/realms/{REALM_NAME}/protocol/openid-connect/auth"
 )
 TOKEN_URL = f"{KEYCLOAK_URL}/realms/{REALM_NAME}/protocol/openid-connect/token"
-# URL for internal service communication
 JWKS_URL = f"http://auth.storasense.de:8080/realms/{REALM_NAME}/protocol/openid-connect/certs"
 
 oauth2_scheme = OAuth2AuthorizationCodeBearer(
@@ -36,11 +43,9 @@ oauth2_scheme = OAuth2AuthorizationCodeBearer(
 
 class AuthService:
     def __init__(self):
-        # PyJWKClient automatically fetches and caches the JWKS (JSON Web Key Set)
         self.jwks_client = PyJWKClient(JWKS_URL)
 
     async def validate_token(self, token: str) -> TokenData:
-        """Validates the JWT token and extracts user information."""
         if not token:
             raise HTTPException(
                 status_code=401,
@@ -48,20 +53,24 @@ class AuthService:
             )
 
         try:
-            # Client gets the signing key from token
             signing_key = self.jwks_client.get_signing_key_from_jwt(token)
-            _logger.info(f"Expected vClient ID (Audience): {CLIENT_ID}")
 
-            # Decrypt payload using the signing key
             payload = jwt.decode(
                 token,
                 signing_key.key,
                 algorithms=["RS256"],
-                # Checking "Audience": Value of CLIENT_ID must match the "aud" claim in the token.
-                audience=CLIENT_ID,
+                audience=None,
             )
 
-            # Extract information for backend
+            aud = payload.get("aud")
+            if isinstance(aud, list):
+                if not any(a in ALLOWED_AUDIENCES for a in aud):
+                    raise HTTPException(
+                        status_code=401, detail="Invalid audience"
+                    )
+            elif aud not in ALLOWED_AUDIENCES:
+                raise HTTPException(status_code=401, detail="Invalid audience")
+
             user_id = payload.get("sub")
             username = payload.get("preferred_username")
             roles = payload.get("realm_access", {}).get("roles", [])
@@ -88,12 +97,9 @@ class AuthService:
     async def get_current_user(
         self, token: str = Depends(oauth2_scheme)
     ) -> TokenData:
-        """Dependency to get and validate the current user."""
         return await self.validate_token(token)
 
     def has_role(self, required_role: str):
-        """Dependency to check if the user has a specific role."""
-
         async def role_checker(
             token_data: TokenData = Depends(self.get_current_user),
         ):
@@ -107,5 +113,4 @@ class AuthService:
         return role_checker
 
 
-# Global instance of AuthService
 auth_service = AuthService()

@@ -147,4 +147,4 @@ def send_one_value():
 def start_rest_client(stop_event):
     while not stop_event.is_set():
         send_one_value()
-        time.sleep(5)  # Wait for 5 seconds before retrying
+        # time.sleep(5)  # Wait for 5 seconds before retrying
