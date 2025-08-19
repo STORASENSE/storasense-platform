@@ -74,9 +74,6 @@ const Sidebar: FC = () => {
                     <SidebarLink href="/dashboard/storages" icon={<StorageIcon />}>
                         Storages
                     </SidebarLink>
-                    <SidebarLink href="/dashboard/users" icon={<UsersIcon />}>
-                        Users
-                    </SidebarLink>
                     <SidebarLink href="/dashboard" icon={<DashboardIcon />}>
                         Overview
                     </SidebarLink>
@@ -85,6 +82,9 @@ const Sidebar: FC = () => {
                     </SidebarLink>
                     <SidebarLink href="/dashboard/sensors" icon={<SensorsIcon />}>
                         Sensors
+                    </SidebarLink>
+                    <SidebarLink href="/dashboard/users" icon={<UsersIcon />}>
+                        Users
                     </SidebarLink>
                 </ul>
             </div>
