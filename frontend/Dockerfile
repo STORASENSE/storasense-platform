@@ -10,7 +10,7 @@ RUN npm ci
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /frontend
-COPY --from=deps /frontend/node_modules ./node_modules
+COPY --from=deps ./frontend/node_modules ./node_modules
 COPY ./frontend ./
 RUN npm run build
 
