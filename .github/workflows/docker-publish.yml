@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - dev
+      - fix/ci-fix
     paths:
       - 'Dockerfile'
       - '**/Dockerfile'
