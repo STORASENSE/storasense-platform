@@ -164,8 +164,8 @@ services:
   # Kafka setup:
   # Apache Kafka in KRAFT mode (without zookeper)
   kafka:
-    image: bitnami/kafka:3.6
-    container_name: kafka
+    image: bitnami/kafka:latest
+    container_name: storasense-kafka
     restart: unless-stopped
     environment:
       - KAFKA_CFG_NODE_ID=1
@@ -185,7 +185,7 @@ services:
   # Kafka UI (Redpanda Console)
   kafka-ui:
     image: redpandadata/console:latest
-    container_name: kafka-ui
+    container_name: storasense-kafka-ui
     restart: unless-stopped
     environment:
       - KAFKA_BROKERS=kafka:9092
@@ -197,8 +197,8 @@ services:
 
   # Kafka Connect, loading MQTT-Connectoren from ./connect-plugins
   kafka-connect:
-    image: confluentinc/cp-kafka-connect:7.5.0
-    container_name: kafka-connect
+    image: confluentinc/cp-kafka-connect:latest
+    container_name: storasense-kafka-connect
     restart: unless-stopped
     environment:
       - CONNECT_BOOTSTRAP_SERVERS=kafka:9092
@@ -225,35 +225,35 @@ services:
 
   # Topic-Creation for Kafka
   kafka-init:
-    image: bitnami/kafka:3.6
-    container_name: kafka-init
+    image: bitnami/kafka:latest
+    container_name: storasense-kafka-init
     depends_on:
       - kafka
     command:
       - bash
       - -c
       - |
-        /opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic iot-sensordata --partitions 6 --replication-factor 1;
-        /opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic alarme --partitions 3 --replication-factor 1;
+        /opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic iot-sensordata --partitions 5 --replication-factor 1;
+        /opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic alarms --partitions 5 --replication-factor 1;
     networks:
       - storasense-network
     restart: "no"
 
-  # Alarmservice
-  alarmservice:
-    image: ghcr.io/storasense/storasense-platform/storasense-alarmservice:latest
-    container_name: alarmservice
-    restart: unless-stopped
-    environment:
-      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-      - INPUT_TOPIC=iot-sensordata
-      - OUTPUT_TOPIC=alarme
-      - WINDOW_SECONDS=30
-      - THRESHOLD_VALUE=40.0
-    depends_on:
-      - kafka
-    networks:
-      - storasense-network
+#  # Alarmservice
+#  alarmservice:
+#    image: ghcr.io/storasense/storasense-platform/storasense-alarmservice:latest
+#    container_name: alarmservice
+#    restart: unless-stopped
+#    environment:
+#      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+#      - INPUT_TOPIC=iot-sensordata
+#      - OUTPUT_TOPIC=alarme
+#      - WINDOW_SECONDS=30
+#      - THRESHOLD_VALUE=40.0
+#    depends_on:
+#      - kafka
+#    networks:
+#      - storasense-network
 
 volumes:
   storasense_data_volume:
