@@ -130,6 +130,7 @@ def send_one_value():
                         "unit": unit,
                     },
                 ).status_code
+
             except requests.exceptions.RequestException:
                 response_code = 400
 

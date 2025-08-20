@@ -80,7 +80,7 @@ services:
       - POSTGRES_KC_DB_PASSWORD=${POSTGRES_KC_DB_PASSWORD}
     volumes:
       - storasense_data_volume:/var/lib/postgresql/data
-      - ./db-scripts:/docker-entrypoint-initdb.d
+      - ./db-init:/docker-entrypoint-initdb.d
     networks:
       - storasense-network
     healthcheck:
@@ -94,19 +94,19 @@ services:
     container_name: storasense-backup
     restart: always
     volumes:
-      - storasense_data_volume:/backup/storasense_data_volume:ro # Mount the data volume to back-up
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./storasense_data_volume_backup:/archive # Location to store backups (here: local directory)
+      - storasense_data_volume:/volume/storasense_data_volume:ro
+      - ./storasense_data_volume_backup:/backup
     networks:
       - storasense-network
     environment:
-      - "BACKUP_CRON_EXPRESSION=* 3 * * *" # ATTENTION: You have to calculate the time difference to your local time: -2hours for UTC+2 (Germany)
-      - "BACKUP_SOURCES=/backup/storasense_data_volume" # Source to back-up
+      - "BACKUP_CRON_EXPRESSION=0 3 * * *"
+      - "BACKUP_SOURCES=/volume/storasense_data_volume"
       - "BACKUP_FILENAME=storasense_db_backup-%Y-%m-%d_%H-%M-%S.tar.gz"
-      - "BACKUP_PRUNE_AFTER_DAYS=7" # Delete backups older than 7 days
-      - "BACKUP_TARGET=/archive" # Backup destination (here: local directory)
+      - "BACKUP_PRUNE_AFTER_DAYS=7"
+      - "BACKUP_TARGET=file:///backup"
     depends_on:
-      - frontend # Start after the whole system is up
+      - frontend
 
   app:
     image: ghcr.io/storasense/storasense-platform/storasense-backend-app:latest
@@ -160,6 +160,100 @@ services:
         condition: service_started
       app:
         condition: service_started
+
+#  # Kafka setup:
+#  # Apache Kafka in KRAFT mode (without zookeper)
+#  kafka:
+#    image: bitnami/kafka:3.6
+#    container_name: kafka
+#    restart: unless-stopped
+#    environment:
+#      - KAFKA_CFG_NODE_ID=1
+#      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+#      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+#      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+#      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+#      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+#      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+#      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=false
+#      - KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+#      - KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+#      - KAFKA_CFG_TRANSACTION_STATE_LOG_MIN_ISR=1
+#    networks:
+#      - storasense-network
+#
+#  # Kafka UI (Redpanda Console)
+#  kafka-ui:
+#    image: redpandadata/console:latest
+#    container_name: kafka-ui
+#    restart: unless-stopped
+#    environment:
+#      - KAFKA_BROKERS=kafka:9092
+#    depends_on:
+#      - kafka
+#    networks:
+#      - storasense-network
+#    # Add labels for Traefik routing
+#
+#  # Kafka Connect, loading MQTT-Connectoren from ./connect-plugins
+#  kafka-connect:
+#    image: confluentinc/cp-kafka-connect:7.5.0
+#    container_name: kafka-connect
+#    restart: unless-stopped
+#    environment:
+#      - CONNECT_BOOTSTRAP_SERVERS=kafka:9092
+#      - CONNECT_REST_PORT=8083
+#      - CONNECT_GROUP_ID=connect-cluster
+#      - CONNECT_CONFIG_STORAGE_TOPIC=_connect-configs
+#      - CONNECT_OFFSET_STORAGE_TOPIC=_connect-offsets
+#      - CONNECT_STATUS_STORAGE_TOPIC=_connect-status
+#      - CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR=1
+#      - CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR=1
+#      - CONNECT_STATUS_STORAGE_REPLICATION_FACTOR=1
+#      - CONNECT_KEY_CONVERTER=org.apache.kafka.connect.storage.StringConverter
+#      - CONNECT_VALUE_CONVERTER=org.apache.kafka.connect.json.JsonConverter
+#      - CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE=false
+#      - CONNECT_PLUGIN_PATH=/usr/share/confluent-hub-components,/connect-plugins
+#    volumes:
+#      - ./connect-plugins:/connect-plugins
+#      - ./connect-secrets:/opt/connect-secrets:ro
+#      - ./connectors:/opt/connectors:ro
+#    depends_on:
+#      - kafka
+#    networks:
+#      - storasense-network
+#
+#  # Topic-Creation for Kafka
+#  kafka-init:
+#    image: bitnami/kafka:3.6
+#    container_name: kafka-init
+#    depends_on:
+#      - kafka
+#    command:
+#      - bash
+#      - -c
+#      - |
+#        /opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic iot-sensordata --partitions 6 --replication-factor 1;
+#        /opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic alarme --partitions 3 --replication-factor 1;
+#    networks:
+#      - storasense-network
+#    restart: "no"
+#
+#  # Alarmservice
+#  alarmservice:
+#    image: ghcr.io/storasense/storasense-platform/storasense-alarmservice:latest
+#    container_name: alarmservice
+#    restart: unless-stopped
+#    environment:
+#      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+#      - INPUT_TOPIC=iot-sensordata
+#      - OUTPUT_TOPIC=alarme
+#      - WINDOW_SECONDS=30
+#      - THRESHOLD_VALUE=40.0
+#    depends_on:
+#      - kafka
+#    networks:
+#      - storasense-network
 
 volumes:
   storasense_data_volume:
