@@ -94,19 +94,19 @@ services:
     container_name: storasense-backup
     restart: always
     volumes:
+      - storasense_data_volume:/backup/storasense_data_volume:ro # Mount the data volume to back-up
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - storasense_data_volume:/volume/storasense_data_volume:ro
-      - ./storasense_data_volume_backup:/backup
+      - ./storasense_data_volume_backup:/archive # Location to store backups (here: local directory)
     networks:
       - storasense-network
     environment:
-      - "BACKUP_CRON_EXPRESSION=0 3 * * *"
-      - "BACKUP_SOURCES=/volume/storasense_data_volume"
+      - "BACKUP_CRON_EXPRESSION=* 3 * * *" # ATTENTION: You have to calculate the time difference to your local time: -2hours for UTC+2 (Germany)
+      - "BACKUP_SOURCES=/backup/storasense_data_volume" # Source to back-up
       - "BACKUP_FILENAME=storasense_db_backup-%Y-%m-%d_%H-%M-%S.tar.gz"
-      - "BACKUP_PRUNE_AFTER_DAYS=7"
-      - "BACKUP_TARGET=file:///backup"
+      - "BACKUP_PRUNE_AFTER_DAYS=7" # Delete backups older than 7 days
+      - "BACKUP_TARGET=/archive" # Backup destination (here: local directory)
     depends_on:
-      - frontend
+      - frontend # Start after the whole system is up
 
   app:
     image: ghcr.io/storasense/storasense-platform/storasense-backend-app:latest
