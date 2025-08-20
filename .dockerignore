@@ -26,8 +26,8 @@ backend/*.pyc
 backend/*.pyo
 backend/.pytest_cache/
 backend/.mypy_cache/
-backend/venv/
-backend/env/
+venv/
+env/
 backend/.coverage
 backend/coverage.xml
 

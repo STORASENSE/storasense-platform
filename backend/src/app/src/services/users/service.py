@@ -1,5 +1,11 @@
+from uuid import UUID
 from fastapi import Depends
 from sqlalchemy.orm import Session
+
+from backend.src.app.src.services.auth.errors import (
+    AuthorizationError,
+    UnknownAuthPrincipalError,
+)
 
 from ..auth.schemas import TokenData
 from .models import UserModel
@@ -43,6 +49,21 @@ class UserService:
             user = self._user_repository.create_user(new_user_data_filtered)
             self._session.commit()
             return user
+
+    def find_all_by_storage_id(
+        self, storage_id: UUID, token_data: TokenData
+    ) -> list[UserModel]:
+        user = self._user_repository.find_by_keycloak_id(token_data.id)
+        if user is None:
+            raise UnknownAuthPrincipalError(
+                "Could not fetch all users in storage because authentication token is invalid"
+            )
+        users = self._user_repository.find_all_by_storage_id(storage_id)
+        if user not in users:
+            raise AuthorizationError(
+                "Could not fetch all users in storage because requesting client is unauthorized"
+            )
+        return users
 
 
 def inject_user_service(

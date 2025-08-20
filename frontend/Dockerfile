@@ -1,4 +1,4 @@
-FROM node:18-alpine AS base
+FROM node:current-alpine3.22 AS base
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -17,10 +17,16 @@ RUN npm run build
 FROM base AS runner
 WORKDIR /frontend
 
+# Create non-root user
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
 ENV NODE_ENV=production
 COPY --from=builder ./frontend/public ./public
 COPY --from=builder ./frontend/.next/standalone ./
 COPY --from=builder ./frontend/.next/static ./.next/static
+
+USER nextjs
 
 EXPOSE 3000
 ENV PORT=3000
