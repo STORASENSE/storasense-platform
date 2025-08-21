@@ -3,10 +3,12 @@ from contextlib import asynccontextmanager
 
 import uvicorn
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 
 from fastapi.middleware.cors import CORSMiddleware
 
+from backend.src.app.src.services.auth.schemas import TokenData
+from backend.src.app.src.services.auth.service import auth_service
 from backend.src.app.src.shared.logger import (
     get_logger,
     add_request_middleware,
@@ -19,7 +21,6 @@ from backend.src.app.src.db_init import initialize_database
 # ... Router imports ...
 from .services.users.router import router as users_router
 
-# from .services.storages.router import router as storages_router
 from backend.src.app.src.services.measurements.router import (
     router as measurements_router,
 )
@@ -28,6 +29,9 @@ from backend.src.app.src.services.sensors.router import (
 )
 from backend.src.app.src.services.analytics.router import (
     router as analytics_router,
+)
+from backend.src.app.src.services.storages.router import (
+    router as storages_router,
 )
 
 discover_models()
@@ -71,6 +75,7 @@ app.include_router(users_router)
 app.include_router(measurements_router)
 app.include_router(sensors_router)
 app.include_router(analytics_router)
+app.include_router(storages_router)
 
 # configure CORS-middleware
 origins = [
@@ -87,10 +92,9 @@ app.add_middleware(
 
 
 @app.get("/health", tags=["Root"])
-def read_root():
-    """
-    # checks if the API is running
-    """
+async def read_root(
+    current_user: TokenData = Depends(auth_service.get_current_user),
+):
     return {
         "status": "ok",
         "message": "welcome to STORASENSE-Platform-Backend API!",

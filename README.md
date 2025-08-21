@@ -114,7 +114,7 @@ or
 
 ## Deployment Workflow:
 ### 1.  DNS Configuration
-- Create a DNS record for `storasense.de` in your OS pointing to the server's IP address (loopback-adress): `127.0.0.1 storasense.de api.storasense.de auth.storasense.de`
+- Create a DNS record for `storasense.de` in your OS pointing to the server's IP address (loopback-adress): `127.0.0.1 storasense.de api.storasense.de auth.storasense.de traefik.storasense.de`
 ### 2. .env Configuration
 - Verify `.env` configuration (root directory) - checkout `.env.example` for reference.
 ### 3. Docker Configuration
@@ -129,10 +129,10 @@ chmod +x ./db-init/db-init.sh
 - Follow the following steps:
   * Create an initial **temporary admin user** - add to the `docker-compose.yml` configuration: `keycloak: environment:`:
   ```yaml
-    - KEYCLOAK_ADMIN=admin # or use a .env variable
-    - KEYCLOAK_ADMIN_PASSWORD=admin # or use a .env variable
+    - KC_BOOTSTRAP_ADMIN_USERNAME=admin # or use a .env variable
+    - KC_BOOTSTRAP_ADMIN_PASSWORD=test # or use a .env variable
   ```
-  * Open the Keycloak Admin Console in your browser at `http://localhost:8088/admin`.
+  * Open the Keycloak Admin Console in your browser at `https://auth.storasense.de/admin`.
   * Login with the temporary admin user credentials you set in the first step.
   * Create a new realm named `storasense-realm`.
   * Create three new clients - for the **backend**, **frontend** and **mqtt-client** - with the following settings:
@@ -162,9 +162,10 @@ chmod +x ./db-init/db-init.sh
   * Make sure that the **User profile attributes** (go to `Realm settings` -> `User profile`) match with our database schema (except the intern managed attributes - such as the ids).
   * Remove the temporary admin user from the `docker-compose.yml` file after the initial setup is completed.
 ---
-## URLs:
-| URL Type                                   | URL                                                                                                                     |
-|--------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
-| Frontend                                   | [https://storasense.de](http://storasense.de)
-| Backend-API Documentation <br> (SwaggerUI) | [https://api.storasense.de/docs](http://api.storasense.de/docs)                                                         |
-| Keycloak-Configuration / Admin-Console     | [http://localhost:8088/admin](http://localhost:8088/admin) <br> [https://auth.storasense.de](http://auth.storasense.de) |
+## Accessing the system:
+| URL Type                                   | URL                                                                                                                             |
+|--------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|
+| Frontend                                   | [https://storasense.de](https://storasense.de)
+| Backend-API Documentation <br> (SwaggerUI) | [https://api.storasense.de/docs](https://api.storasense.de/docs)                                                                |
+| Keycloak-Configuration / Admin-Console     | [https://auth.storasense.de](https://auth.storasense.de) / [https://auth.storasense.de/admin](https://auth.storasense.de/admin) |
+| Traefik Dashboard                           | [https://traefik.storasense.de](https://traefik.storasense.de)                                                                  |

@@ -59,6 +59,22 @@ class MeasurementRepository(BaseRepository[MeasurementModel, UUID]):
         )
         return query.all()
 
+    def find_latest_by_sensor_id(
+        self, sensor_id: UUID
+    ) -> MeasurementModel | None:
+        """
+        Finds the latest measurement for a given sensor.
+
+        :param sensor_id: The ID of the sensor.
+        :return: The latest measurement or None if no measurements exist.
+        """
+        return (
+            self.session.query(MeasurementModel)
+            .filter(MeasurementModel.sensor_id == sensor_id)
+            .order_by(MeasurementModel.created_at.desc())
+            .first()
+        )
+
 
 def inject_measurement_repository(session: Session = Depends(open_session)):
     return MeasurementRepository(session)

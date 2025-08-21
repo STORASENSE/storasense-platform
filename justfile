@@ -8,6 +8,10 @@ start:
     echo "Starting the application..."
     docker-compose up -d
 
+start-scaled:
+    echo "Starting the application with scaling..."
+    docker-compose up -d --scale app=3
+
 stop:
     echo "Stopping the application..."
     docker-compose down
@@ -28,3 +32,7 @@ reset-db:
 logs:
     echo "Displaying logs..."
     docker-compose logs -f
+
+backend:
+    echo "Building Traefik, Keycloak, TimescaleDB, and Backend..."
+    docker compose up --build traefik keycloak timescaledb app

@@ -10,7 +10,7 @@ class SensorType(Enum):
     TEMPERATURE_INSIDE = "TEMPERATURE_INSIDE"
     TEMPERATURE_OUTSIDE = "TEMPERATURE_OUTSIDE"
     HUMIDITY = "HUMIDITY"
-    GAS = "GAS"
+    GAS = "CO2"
     ULTRASONIC = "ULTRASONIC"
 
 
@@ -18,6 +18,8 @@ class MeasurementUnit(Enum):
     CELSIUS = "CELSIUS"
     FAHRENHEIT = "FAHRENHEIT"
     PERCENT = "PERCENT"
+    CENTIMETER = "CENTIMETER"
+    PPM = "PPM"
 
 
 class AlarmSeverity(Enum):

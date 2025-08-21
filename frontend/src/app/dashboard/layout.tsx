@@ -12,7 +12,7 @@ const Layout: FC<{ children: ReactNode }> = ({ children }) => (
                     alt="StoraSense Logo"
                     width={95}
                     height={60}
-                    className="object-contain -mt-2"
+                    className="object-contain -mt-2 -ml-2"
                 />
             </div>
             <TopBar />
