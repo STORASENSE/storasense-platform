@@ -1,6 +1,7 @@
 import {FC} from "react";
 import SensorsOverview from "@/components/dashboard/sensors/SensorsOverview";
 import ProtectedPage from "@/components/ProtectedPage";
+import ActiveStorageRequired from "@/components/context/ActiveStorageRequired";
 
 const Page: FC = () => {
     return (
@@ -11,7 +12,9 @@ const Page: FC = () => {
                 </h1>
             </header>
             <section>
-                <SensorsOverview />
+                <ActiveStorageRequired>
+                    <SensorsOverview />
+                </ActiveStorageRequired>
             </section>
         </ProtectedPage>
     );
