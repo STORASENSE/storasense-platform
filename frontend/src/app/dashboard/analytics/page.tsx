@@ -1,17 +1,14 @@
 'use client';
 
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import ProtectedPage from "@/components/ProtectedPage";
 import {
-  ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Legend,
-  AreaChart, Area, Cell
-} from "recharts";
+  ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Legend, Cell } from "recharts";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 
 type Window = "7d" | "30d" | "365d";
 type SummaryItem = { type: string; sensor_id: string; avg_value: number; min_value: number; max_value: number; };
-type DoorOpenItem = { day: string; sensor_id: string; open_seconds: number; };
 
 const COLORS = {
   min: "#a5b4fc",
@@ -51,7 +48,6 @@ function StatCard({ label, value, foot }: { label: string; value: string | numbe
 export default function Page() {
   const [win, setWin] = useState<Window>("7d");
   const [summary, setSummary] = useState<SummaryItem[]>([]);
-  const [door, setDoor] = useState<DoorOpenItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [errMsg, setErrMsg] = useState<string | null>(null);
   const token = useSelector((s: RootState) => s.auth.token);
@@ -65,22 +61,19 @@ export default function Page() {
   useEffect(() => {
     (async () => {
       setErrMsg(null);
-      if (!token) { setSummary([]); setDoor([]); setLoading(false); return; }
+      if (!token) { setSummary([]); setLoading(false); return; }
 
       setLoading(true);
       const headers: HeadersInit = { Authorization: `Bearer ${token}` };
 
       const load = async (base: string) => {
-        const [sRes, dRes] = await Promise.all([
+        const [sRes] = await Promise.all([
           fetch(`${base}/analytics/summary?window=${win}`, { credentials: "include", headers }),
-          fetch(`${base}/analytics/door-open-duration?window=${win}`, { credentials: "include", headers }),
         ]);
-        if (!sRes.ok || !dRes.ok) throw new Error(`HTTP ${sRes.status}/${dRes.status} @ ${base}`);
+        if (!sRes.ok) throw new Error(`HTTP ${sRes.status} @ ${base}`);
         const sJson: unknown = await sRes.json();
-        const dJson: unknown = await dRes.json();
         return {
           sArr: Array.isArray(sJson) ? (sJson as SummaryItem[]) : [],
-          dArr: Array.isArray(dJson) ? (dJson as DoorOpenItem[]) : [],
         };
       };
 
@@ -88,14 +81,14 @@ export default function Page() {
         let ok = false;
         for (const base of BASES) {
           try {
-            const { sArr, dArr } = await load(base);
-            setSummary(sArr); setDoor(dArr); ok = true; break;
+            const { sArr } = await load(base);
+            setSummary(sArr); ok = true; break;
           } catch { /* nächster Kandidat */ }
         }
-        if (!ok) { setSummary([]); setDoor([]); setErrMsg("Konnte keine Analytics-Daten laden."); }
+        if (!ok) { setSummary([]); setErrMsg("Konnte keine Analytics-Daten laden."); }
       } catch (e) {
         setErrMsg(e instanceof Error ? e.message : "Unbekannter Fehler");
-        setSummary([]); setDoor([]);
+        setSummary([]);
       } finally { setLoading(false); }
     })();
   }, [win, token, BASES]);
@@ -134,11 +127,6 @@ export default function Page() {
   const barData = useMemo(
     () => summary.map(r => ({ name: `${r.type}-${r.sensor_id}`, min: r.min_value, max: r.max_value })),
     [summary]
-  );
-
-  const doorData = useMemo(
-    () => door.map(r => ({ day: r.day, hours: Math.round((r.open_seconds / 3600) * 100) / 100 })),
-    [door]
   );
 
   const humanWindow: Record<Window, string> = { "7d": "7 days", "30d": "30 days", "365d": "365 days" };
@@ -216,30 +204,6 @@ export default function Page() {
                 <Bar dataKey="min" name="Min" barSize={14} fill={COLORS.min} radius={[6, 6, 0, 0]} />
                 <Bar dataKey="max" name="Max" barSize={14} fill={COLORS.max} radius={[6, 6, 0, 0]} />
               </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </Card>
-
-        {/* Door-open area */}
-        <Card title="Door open per day (hours)" subtitle={`Sum of open time per day • ${humanWindow[win]}`}>
-          <div className="w-full h-64 mt-3">
-            <ResponsiveContainer>
-              <AreaChart data={doorData}>
-                <defs>
-                  <linearGradient id="doorArea" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={COLORS.ultrasonic} stopOpacity={0.35}/>
-                    <stop offset="100%" stopColor={COLORS.ultrasonic} stopOpacity={0.06}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="day" />
-                <YAxis />
-                <Tooltip
-                  formatter={(value: number | string): [string, string] => [`${toNum(value).toFixed(2)} h`, "Hours"]}
-                  contentStyle={{ borderRadius: 12 }}
-                />
-                <Area type="monotone" dataKey="hours" name="Hours" stroke={COLORS.ultrasonic} fill="url(#doorArea)" strokeWidth={2} animationDuration={600} />
-              </AreaChart>
             </ResponsiveContainer>
           </div>
         </Card>
