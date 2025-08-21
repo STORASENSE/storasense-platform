@@ -1,11 +1,11 @@
 import {FC} from "react";
 import DashboardOverview from "@/components/dashboard/DashboardOverview";
-import ProtectedPage from "@/components/ProtectedPage";
+import AuthenticationRequired from "@/components/context/AuthenticationRequired";
 import ActiveStorageRequired from "@/components/context/ActiveStorageRequired";
 
 const Page: FC = () => {
     return (
-        <ProtectedPage>
+        <AuthenticationRequired>
             <header className="mb-5">
                 <h1 className="text-3xl font-semibold text-blue-whale">
                     Dashboard
@@ -16,7 +16,7 @@ const Page: FC = () => {
                     <DashboardOverview />
                 </ActiveStorageRequired>
             </section>
-        </ProtectedPage>
+        </AuthenticationRequired>
     );
 }
 
