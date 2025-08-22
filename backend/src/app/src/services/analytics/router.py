@@ -16,18 +16,6 @@ class DoorOpenItem(BaseModel):
     open_seconds: int
 
 
-@router.get(
-    "/analytics/door-open-duration",
-    response_model=List[DoorOpenItem],
-    status_code=status.HTTP_200_OK,
-)
-def door_open_duration(
-    window: Window = Query("7d"),
-    svc: AnalyticsService = Depends(inject_analytics_service),
-):
-    return svc.door_open_duration(window)
-
-
 class SummaryItem(BaseModel):
     type: str
     sensor_id: str

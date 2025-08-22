@@ -71,10 +71,11 @@ app = FastAPI(
 add_request_middleware(app)
 
 app.include_router(users_router)
+# app.include_router(storages_router)
 app.include_router(measurements_router)
 app.include_router(sensors_router)
-app.include_router(storages_router)
 app.include_router(analytics_router)
+app.include_router(storages_router)
 
 # configure CORS-middleware
 origins = [

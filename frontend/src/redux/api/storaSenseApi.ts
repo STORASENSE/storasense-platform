@@ -12,7 +12,7 @@ import {
     AddSensorResponse,
     DeleteSensorRequest,
     SensorStatusResponse,
-    StoraSenseStorge,
+    StoraSenseStorge, AnalyticsSummaryResponse, AnalyticsSummaryRequest,
 } from "@/redux/api/storaSenseApiSchemas";
 import type { RootState } from '../store';
 
@@ -123,6 +123,15 @@ export const storaSenseApi = createApi({
             }),
         }),
 
+        getAnalyticsSummary: build.query<AnalyticsSummaryResponse, AnalyticsSummaryRequest>({
+            query: (args) => ({
+                url: '/analytics/summary',
+                params: {
+                    window: args.window
+                }
+            })
+        }),
+
         getHealth: build.query<{ status: string }, void>({
             query: () => ({
                 url: '/health'
@@ -144,5 +153,6 @@ export const {
     useGetHealthQuery,
     useAddSensorMutation,
     useDeleteSensorMutation,
-    useGetSensorStatusQuery
+    useGetSensorStatusQuery,
+    useGetAnalyticsSummaryQuery,
 } = storaSenseApi;
