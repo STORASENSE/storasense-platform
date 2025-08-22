@@ -48,8 +48,10 @@ const StorageCard: FC<StorageCardProps> = ({ storage }) => {
                 switch(error.status) {
                     case 404:
                         message = 'Error: storage does not exist';
+                        break;
                     case 409:
                         message = 'Error: only admins can delete storages';
+                        break;
                 }
             }
             console.error(message, error);
@@ -75,7 +77,7 @@ const StorageCard: FC<StorageCardProps> = ({ storage }) => {
                     variant="ghost"
                     size="sm"
                     onClick={handleDelete}
-                    className="text-red-500 hover:text-red-700 hover:bg-red-50">
+                    className="text-cerise-red hover:text-cerise-red-700 hover:bg-cerise-red/5">
                     <TrashIcon />
                 </Button>
             </div>

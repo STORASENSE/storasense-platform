@@ -1,11 +1,11 @@
 import {FC} from "react";
-import ProtectedPage from "@/components/ProtectedPage";
+import AuthenticationRequired from "@/components/context/AuthenticationRequired";
 import StorageOverview from "@/components/dashboard/storages/StorageOverview";
 
 
 const Page: FC = () => {
     return (
-        <ProtectedPage>
+        <AuthenticationRequired>
             <header className="mb-5">
                 <h1 className="text-3xl font-semibold text-blue-whale mb-4">
                     Storages
@@ -19,7 +19,7 @@ const Page: FC = () => {
             <section>
                 <StorageOverview />
             </section>
-        </ProtectedPage>
+        </AuthenticationRequired>
     );
 }
 
