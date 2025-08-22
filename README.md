@@ -114,7 +114,7 @@ or
 
 ## Deployment Workflow:
 ### 1.  DNS Configuration
-- Create a DNS record for `storasense.de` in your OS pointing to the server's IP address (loopback-adress): `127.0.0.1 storasense.de api.storasense.de auth.storasense.de traefik.storasense.de`
+- Create a DNS record for `storasense.de` in your OS pointing to the server's IP address (loopback-adress): `127.0.0.1 storasense.de api.storasense.de auth.storasense.de traefik.storasense.de kafka-ui.storasense.de`
 ### 2. .env Configuration
 - Verify `.env` configuration (root directory) - checkout `.env.example` for reference.
 ### 3. Docker Configuration
