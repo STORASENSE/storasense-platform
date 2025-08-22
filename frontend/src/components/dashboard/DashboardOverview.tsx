@@ -21,13 +21,12 @@ const MONITORING_ORDER: Record<SensorType, number> = {
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-interface StorageMonitoringProps {
-    storageId: string;
-}
+const SensorsOverview: FC = () => {
+    // never undefined because component is wrapped  in <ActiveStorageRequired>
+    const activeStorage = useSelector((state: RootState) => state.storage.activeStorage)!;
 
-const StorageMonitoring: FC<StorageMonitoringProps> = ({ storageId }) => {
     const {data, isLoading, isError, error} = useGetSensorsQuery({
-        storage_id: storageId,
+        storage_id: activeStorage.id,
     });
 
     const sortedSensors = useMemo<Sensor[] | undefined>(() => {
@@ -94,30 +93,6 @@ const StorageMonitoring: FC<StorageMonitoringProps> = ({ storageId }) => {
                 ))
             }
         </ul>
-    );
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////
-
-const SensorsOverview: FC = () => {
-    const activeStorage = useSelector((state: RootState) => state.storage.activeStorage);
-
-    if (!activeStorage) {
-        return (
-            <Alert className="mt-2 p-2">
-                <InfoIcon />
-                <AlertTitle>
-                    You cannot view this content.
-                </AlertTitle>
-                <AlertDescription>
-                    No storage is currently selected!
-                </AlertDescription>
-            </Alert>
-        );
-    }
-
-    return (
-        <StorageMonitoring storageId={activeStorage.id} />
     );
 }
 

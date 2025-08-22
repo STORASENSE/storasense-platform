@@ -3,6 +3,7 @@
 import {FC} from "react";
 import useKeycloak from '@/auth/useKeycloak';
 import ActiveStorageSelection from "./ActiveStorageSelection";
+import {Button} from "@/components/ui/button";
 
 const TopBar: FC = () => {
     const { keycloak, isLoading, isError } = useKeycloak();
@@ -17,19 +18,13 @@ const TopBar: FC = () => {
                 {(!keycloak || isLoading || isError) ? (
                     <></>
                 ) : keycloak.authenticated ? (
-                    <button
-                        onClick={() => keycloak.logout()}
-                        className="px-4 py-2 bg-red-500 text-white rounded"
-                    >
+                    <Button onClick={() => keycloak.logout()}>
                         Logout
-                    </button>
+                    </Button>
                 ) : (
-                    <button
-                        onClick={() => keycloak.login()}
-                        className="px-4 py-2 bg-blue-whale text-white border-blue-whale"
-                    >
+                    <Button onClick={() => keycloak.login()}>
                         Login
-                    </button>
+                    </Button>
                 )}
             </div>
         </div>

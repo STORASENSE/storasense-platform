@@ -109,10 +109,7 @@ const StorageOverview: FC = () => {
                 <div className="text-sm text-gray-600">
                     {storages?.length || 0} Storages
                 </div>
-                <Button
-                    onClick={() => setIsModalOpen(true)}
-                    className="bg-blue-whale text-white border-blue-whale"
-                >
+                <Button onClick={() => setIsModalOpen(true)}>
                     <Plus className="w-4 h-4 mr-2" />
                     Add Storage
                 </Button>
