@@ -1,0 +1,15 @@
+{
+"name": "mqtt-source-s5",
+"config": {
+  "connector.class": "be.jovacon.kafka.connect.MQTTSourceConnector",
+  "mqtt.broker": "tcp://aicon.dhbw-heidenheim.de:1883",
+  "mqtt.username": "nesslerr@aicon.dhbw-heidenheim.de",
+  "mqtt.password": "Baum12345!",
+  "mqtt.topic": "dhbw/ai/si2023/4/ULTRASONIC/ad5b8443-aef7-39a8-a530-75282ecb075f",
+  "kafka.topic": "iot-sensordata",
+  "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+  "key.converter.schemas.enable": "false",
+  "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+  "value.converter.schemas.enable": "false"
+  }
+}
