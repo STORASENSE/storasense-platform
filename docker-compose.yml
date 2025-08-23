@@ -228,14 +228,14 @@ services:
   kafka-init:
     image: bitnami/kafka:latest
     container_name: storasense-kafka-init
-    depends_on:
-        - kafka
     volumes:
         - ./kafka/scripts:/opt/scripts:ro
     environment:
       - BOOTSTRAP=kafka:9092
       - IOT_PARTITIONS=5
       - ALARM_PARTITIONS=1
+    depends_on:
+      - kafka
     networks:
         - storasense-network
     command: ["/bin/bash", "-c", "/opt/scripts/wait-for-kafka.sh kafka 9092 90 && /opt/scripts/create-topics.sh"]
