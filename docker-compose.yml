@@ -224,23 +224,6 @@ services:
     networks:
       - storasense-network
 
-  # Initial process for creating topics (iot-data, alarms) on Kafka Broker
-  kafka-init:
-    image: bitnami/kafka:latest
-    container_name: storasense-kafka-init
-    volumes:
-        - ./kafka/scripts:/opt/scripts:ro
-    environment:
-      - BOOTSTRAP=kafka:9092
-      - IOT_PARTITIONS=5
-      - ALARM_PARTITIONS=1
-    depends_on:
-      - kafka
-    networks:
-        - storasense-network
-    command: ["/bin/bash", "-c", "/opt/scripts/wait-for-kafka.sh kafka 9092 90 && /opt/scripts/create-topics.sh"]
-    init: true
-
   # Kafka UI (Redpanda Console)
   kafka-ui:
     image: redpandadata/console:latest
@@ -253,15 +236,46 @@ services:
     networks:
       - storasense-network
     labels:
-        - "traefik.enable=true"
-        - "traefik.http.routers.kafka-ui-http.rule=Host(`kafka-ui.storasense.de`)"
-        - "traefik.http.routers.kafka-ui-http.entrypoints=web"
-        - "traefik.http.routers.kafka-ui-http.middlewares=https-redirect@docker"
+      - "traefik.enable=true"
+      - "traefik.http.routers.kafka-ui-http.rule=Host(`kafka-ui.storasense.de`)"
+      - "traefik.http.routers.kafka-ui-http.entrypoints=web"
+      - "traefik.http.routers.kafka-ui-http.middlewares=https-redirect@docker"
 
-        - "traefik.http.routers.kafka-ui-https.rule=Host(`kafka-ui.storasense.de`)"
-        - "traefik.http.routers.kafka-ui-https.entrypoints=websecure"
-        - "traefik.http.routers.kafka-ui-https.tls=true"
-        - "traefik.http.services.kafka-ui.loadbalancer.server.port=8080"
+      - "traefik.http.routers.kafka-ui-https.rule=Host(`kafka-ui.storasense.de`)"
+      - "traefik.http.routers.kafka-ui-https.entrypoints=websecure"
+      - "traefik.http.routers.kafka-ui-https.tls=true"
+      - "traefik.http.services.kafka-ui.loadbalancer.server.port=8080"
+
+  # Initial container for creating topics (iot-data, alarms) on Kafka Broker
+  kafka-init-topics:
+    image: bitnami/kafka:latest
+    container_name: storasense-kafka-init-topics
+    volumes:
+        - ./kafka/scripts/topics:/opt/scripts:ro
+    environment:
+      - BOOTSTRAP=kafka:9092
+      - IOT_PARTITIONS=5
+      - ALARM_PARTITIONS=1
+    depends_on:
+      - kafka
+    networks:
+        - storasense-network
+    command: ["/bin/bash", "-c", "/opt/scripts/wait-for-kafka.sh kafka 9092 90 && /opt/scripts/create-topics.sh"]
+    init: true
+
+  # Initial container for creating connectors (source, sink) on Kafka Connect Instance
+  kafka-init-connectors:
+    image: bitnami/kafka:latest
+    container_name: storasense-kafka-init-connectors
+    volumes:
+        - ./kafka/connectors:/opt/connectors:ro
+        - ./kafka/scripts/connectors:/opt/scripts:ro
+    depends_on:
+      - kafka-connect
+    networks:
+        - storasense-network
+    command: ["/bin/bash", "-c", "/opt/scripts/wait-for-connect.sh http://kafka-connect:8083/connector-plugins 60 2 && /opt/scripts/apply-all.sh http://kafka-connect:8083 /opt/connectors"]
+    init: true
 
 volumes:
   storasense_data_volume:
