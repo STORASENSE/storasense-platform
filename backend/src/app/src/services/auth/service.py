@@ -50,7 +50,6 @@ class AuthService:
         try:
             # Client gets the signing key from token
             signing_key = self.jwks_client.get_signing_key_from_jwt(token)
-            _logger.info(f"Expected vClient ID (Audience): {CLIENT_ID}")
 
             # Decrypt payload using the signing key
             payload = jwt.decode(

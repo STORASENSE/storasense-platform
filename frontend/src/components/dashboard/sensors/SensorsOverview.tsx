@@ -38,15 +38,13 @@ const useSensorWithStatus = (sensor: Sensor): EnrichedSensor => {
 };
 
 const SensorsOverview: FC = () => {
-    const activeStorage = useSelector((state: RootState) => state.storage.activeStorage);
+    const activeStorage = useSelector((state: RootState) => state.storage.activeStorage)!;
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     // Query for Storage-Sensors
     const { data: sensorsData, refetch } = useGetSensorsQuery({
-        storage_id: activeStorage?.id || ''
-    }, {
-        skip: activeStorage === undefined
+        storage_id: activeStorage.id
     });
 
     // Delete mutation
@@ -67,20 +65,6 @@ const SensorsOverview: FC = () => {
             console.error('Failed to delete sensor:', error);
         }
     };
-
-    if (!activeStorage) {
-        return (
-            <Alert className="mt-2 p-2">
-                <InfoIcon />
-                <AlertTitle>
-                    You cannot view this content.
-                </AlertTitle>
-                <AlertDescription>
-                    No storage is currently selected!
-                </AlertDescription>
-            </Alert>
-        );
-    }
 
     return (
         <div className="space-y-6">
