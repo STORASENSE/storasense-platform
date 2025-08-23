@@ -71,9 +71,6 @@ app = FastAPI(
 # configure CORS-middleware
 origins = [
     "https://storasense.de",
-    "http://storasense.de",
-    "https://auth.storasense.de",
-    "http://auth.storasense.de",
     "http://localhost:3000",
 ]
 app.add_middleware(
