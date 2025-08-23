@@ -59,6 +59,19 @@ class MeasurementRepository(BaseRepository[MeasurementModel, UUID]):
         )
         return query.all()
 
+    def find_all_by_min_date(
+        self, min_date: datetime, page_request: PageRequest
+    ) -> Page[MeasurementModel]:
+        query = (
+            self.session.query(MeasurementModel)
+            .where(MeasurementModel.created_at >= min_date)
+            .order_by(
+                MeasurementModel.sensor_id.desc(),
+                MeasurementModel.created_at.desc(),
+            )
+        )
+        return paginate(query, page_request)
+
     def find_latest_by_sensor_id(
         self, sensor_id: UUID
     ) -> MeasurementModel | None:

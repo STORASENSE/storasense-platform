@@ -98,14 +98,14 @@ const Sidebar: FC = () => {
                                     <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
                                     <div className="absolute inset-0 w-2 h-2 bg-emerald-400 rounded-full animate-ping opacity-75"></div>
                                 </div>
-                                <span className="text-xs font-medium text-emerald-600 uppercase tracking-wide">
+                                <span id = "Backend_Online" className="text-xs font-medium text-emerald-600 uppercase tracking-wide">
                                     Online
                                 </span>
                             </div>
                         ) : (
                             <div className="flex items-center space-x-2 mb-2">
                                 <div className="w-2 h-2 bg-red-400 rounded-full"></div>
-                                <span className="text-xs font-medium text-red-600 uppercase tracking-wide">
+                                <span id ="Backend_Offline" className="text-xs font-medium text-red-600 uppercase tracking-wide">
                                     Offline
                                 </span>
                             </div>

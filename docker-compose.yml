@@ -141,7 +141,10 @@ services:
       - app
 
   frontend:
-    image: ghcr.io/storasense/storasense-platform/storasense-frontend:latest
+    #image: ghcr.io/storasense/storasense-platform/storasense-frontend:latest
+    build :
+      context: .
+      dockerfile: ./frontend/Dockerfile
     restart: always
     networks:
       - storasense-network
