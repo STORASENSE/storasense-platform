@@ -1,7 +1,7 @@
 services:
 
   traefik:
-    image: "traefik:v3.0"
+    image: "traefik:v3.5"
     container_name: "traefik"
     restart: unless-stopped
     command:
@@ -97,6 +97,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - storasense_data_volume:/volume/storasense_data_volume:ro # Mount the data volume to back-up
       - ./storasense_data_volume_backup:/backup # Location to store backups (here: local directory)
+      - storasense_data_kafka_volume:/volume/storasense_data_kafka_volume:ro # Mount the data volume to back-up
+      - ./storasense_data_kafka_volume_backup:/backup # Location to store backups (here: local directory)
     networks:
       - storasense-network
     environment:
@@ -181,7 +183,7 @@ services:
   kafka:
     image: bitnami/kafka:latest
     container_name: storasense-kafka
-    restart: unless-stopped
+    restart: always
     environment:
       - KAFKA_CFG_NODE_ID=1
       - KAFKA_CFG_PROCESS_ROLES=broker,controller
@@ -194,6 +196,8 @@ services:
       - KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR=1
       - KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
       - KAFKA_CFG_TRANSACTION_STATE_LOG_MIN_ISR=1
+    volumes:
+      - storasense_data_kafka_volume:/bitnami/kafka
     networks:
       - storasense-network
 
@@ -203,7 +207,7 @@ services:
       context: .
       dockerfile: ./kafka/Dockerfile
     container_name: storasense-kafka-connect
-    restart: unless-stopped
+    restart: always
     environment:
       - CONNECT_BOOTSTRAP_SERVERS=kafka:9092
       - CONNECT_REST_ADVERTISED_HOST_NAME=storasense-kafka-connect
@@ -279,6 +283,7 @@ services:
 
 volumes:
   storasense_data_volume:
+  storasense_data_kafka_volume:
 
 networks:
   storasense-network:
