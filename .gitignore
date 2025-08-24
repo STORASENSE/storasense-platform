@@ -2,6 +2,9 @@
 keycloak-data
 storasense_data_volume_backup
 
+# Kafka-Connectors
+/kafka/connectors/mqtt-source-*.json
+
 #JetBrains config
 **/.idea
 
@@ -215,3 +218,4 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 /backend/src/mqtt_client/src/buffer.db
+/storasense_data_kafka_volume_backup/

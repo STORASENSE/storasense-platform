@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from "react";
-import ProtectedPage from "@/components/ProtectedPage";
+import AuthenticationRequired from "@/components/context/AuthenticationRequired";
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Legend,
   AreaChart, Area, Cell
@@ -145,7 +145,7 @@ export default function Page() {
   const toNum = (v: number | string) => (typeof v === "number" ? v : Number(v));
 
   return (
-    <ProtectedPage>
+    <AuthenticationRequired>
       <header className="mb-5">
         <h1 className="text-3xl font-semibold text-blue-whale">Analytics</h1>
         {errMsg && <div className="mt-2 text-sm text-red-600">Fehler: {errMsg}</div>}
@@ -269,6 +269,6 @@ export default function Page() {
 
         {loading && <div className="animate-pulse text-xs text-gray-400">Loading data…</div>}
       </section>
-    </ProtectedPage>
+    </AuthenticationRequired>
   );
 }
