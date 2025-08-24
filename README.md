@@ -124,10 +124,11 @@ or
 chmod +x ./db-scripts/db-scripts.sh
 ```
 - Build the Docker-Compose Setup: `docker-compose up -d --build`
-### 4. Kafka Setup: Add Kafka-Connector resources (.jsons) to ./Kafka/connectors
+### 4. Kafka Setup
+- Add Kafka-Connector resources (.jsons) to ./Kafka/connectors -> see [here](./kafka/README.md) for more information.
 - Make the kafka scripts executable:
 ```bash
-chmod +x ./kafka/scripts
+chmod +x ./kafka/scripts -r
 ```
 ### 5. Optional: Keycloak Configuration
 - If you don't have our original volume of the timescaledb (**storasense_data_volume**) then you have to setup the Keycloak configuration from scratch by yourself.
