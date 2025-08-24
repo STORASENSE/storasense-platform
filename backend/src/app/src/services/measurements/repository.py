@@ -43,7 +43,7 @@ class MeasurementRepository(BaseRepository[MeasurementModel, UUID]):
         """
         query = (
             self.session.query(MeasurementModel)
-            .where(MeasurementModel.sensor_id == sensor_id)
+            .filter(MeasurementModel.sensor_id == sensor_id)
             .order_by(MeasurementModel.created_at.desc())
         )
         return paginate(query, page_request)
@@ -53,8 +53,8 @@ class MeasurementRepository(BaseRepository[MeasurementModel, UUID]):
     ) -> list[MeasurementModel]:
         query = (
             self.session.query(MeasurementModel)
-            .where(MeasurementModel.sensor_id == sensor_id)
-            .where(MeasurementModel.created_at <= max_date)
+            .filter(MeasurementModel.sensor_id == sensor_id)
+            .filter(MeasurementModel.created_at <= max_date)
             .order_by(MeasurementModel.created_at.desc())
         )
         return query.all()
