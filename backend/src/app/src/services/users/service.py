@@ -16,6 +16,12 @@ from .repository import (
 from ...shared.database.engine import open_session
 
 
+def is_technical_user(token_data: TokenData) -> bool:
+    if hasattr(token_data, "client_id") and token_data.client_id:
+        return True
+    return False
+
+
 class UserService:
     def __init__(self, session: Session, user_repository: UserRepository):
         self._session = session
@@ -32,6 +38,24 @@ class UserService:
 
         if user:
             return user
+
+        # Technical User Registration flow
+        if is_technical_user(token_data):
+            new_user_data = {
+                "keycloak_id": token_data.id,
+                "username": token_data.client_id,
+                "email": None,
+                "name": None,
+            }
+            # filter out None values to avoid inserting them into the database
+            new_user_data_filtered = {
+                k: v for k, v in new_user_data.items() if v is not None
+            }
+
+            user = self._user_repository.create_user(new_user_data_filtered)
+            self._session.commit()
+            return user
+
         else:
             # creates a new user profile with the data provided in the token
             new_user_data = {
