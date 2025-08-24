@@ -6,10 +6,6 @@ from fastapi import Depends, APIRouter, status, HTTPException
 
 from backend.src.app.src.services.auth.schemas import TokenData
 from backend.src.app.src.services.auth.service import auth_service
-from backend.src.app.src.services.users.service import (
-    UserService,
-    inject_user_service,
-)
 from backend.src.app.src.shared.logger import get_logger
 from backend.src.app.src.services.measurements.service import (
     MeasurementService,
@@ -92,25 +88,21 @@ def find_measurements_by_sensor_id_and_max_date(
 async def create_measurement(
     sensor_id: UUID,
     request: CreateMeasurementRequest,
-    token_data: TokenData = Depends(auth_service.get_current_user),
-    user_service: UserService = Depends(inject_user_service),
+    current_user: TokenData = Depends(auth_service.get_current_user),
     measurement_service: MeasurementService = Depends(
         inject_measurement_service
     ),
 ):
-    # Make sure there is a user in the database for the given Keycloak ID or create one if it doesn't exist yet
-    user = user_service.get_or_create_user_by_keycloak_id(token_data)
-    if user:
-        _logger.info(
-            f"User with Keycloak ID {token_data.id} exists or was created."
+    try:
+        measurement_service.create_measurement(
+            sensor_id, request, current_user.username
         )
-        measurement_service.create_measurement(sensor_id, request)
-    else:
-        _logger.error(
-            f"User with Keycloak ID {token_data.id} could not be created."
-        )
+        return {"status": "success"}
+    except PermissionError as e:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User could not be created or found.",
+            status_code=status.HTTP_403_FORBIDDEN, detail=str(e)
         )
-    return {"status": "success"}
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+        )

@@ -35,6 +35,20 @@ def get_keycloak_config():
     return keycloak_url, realm_name, client_id, client_secret
 
 
+def call_me_endpoint(token):
+    backend_init_url = os.getenv("MQTT_BACKEND_INIT_URL")
+    if not backend_init_url:
+        _logger.error("MQTT_BACKEND_INIT_URL environment variable not set")
+        return
+    try:
+        headers = {"Authorization": f"Bearer {token}"}
+        response = requests.get(f"{backend_init_url}", headers=headers)
+        response.raise_for_status()
+        _logger.info(f"/me response: {response.json()}")
+    except requests.exceptions.RequestException as e:
+        _logger.error(f"Error calling /me endpoint: {e}")
+
+
 def get_access_token():
     """
     Gets an access token from Keycloak using the client credentials grant flow.
@@ -68,6 +82,9 @@ def get_access_token():
         _access_token = token_data.get("access_token")
         expires_in = token_data.get("expires_in", 3600)
         _token_expires_at = time.time() + expires_in - 60  # 60 seconds buffer
+
+        # /me-Endpoint calling once after getting the token
+        call_me_endpoint(_access_token)
 
         return _access_token
 

@@ -90,21 +90,6 @@ class AuthService:
         """Dependency to get and validate the current user."""
         return await self.validate_token(token)
 
-    def has_role(self, required_role: str):
-        """Dependency to check if the user has a specific role."""
-
-        async def role_checker(
-            token_data: TokenData = Depends(self.get_current_user),
-        ):
-            if required_role not in token_data.roles:
-                raise HTTPException(
-                    status_code=403,
-                    detail=f"Access denied: Requires role '{required_role}'.",
-                )
-            return token_data
-
-        return role_checker
-
 
 # Global instance of AuthService
 auth_service = AuthService()
