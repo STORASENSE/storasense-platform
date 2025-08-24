@@ -8,13 +8,18 @@ from sqlalchemy.orm import Session
 from backend.src.app.src.services.measurements.models import MeasurementModel
 from backend.src.app.src.shared.database.engine import open_session
 from backend.src.app.src.shared.database.pagination import (
-    Page,
-    PageRequest,
-    paginate,
+    NumberedPageRequest,
+    NumberedPage,
+    CursorBasedPageRequest,
+    CursorBasedPage,
 )
 from backend.src.app.src.shared.repositories.base_repository import (
     BaseRepository,
 )
+
+
+class CusrorBasedPage:
+    pass
 
 
 class MeasurementRepository(BaseRepository[MeasurementModel, UUID]):
@@ -24,15 +29,17 @@ class MeasurementRepository(BaseRepository[MeasurementModel, UUID]):
     def find_by_id(self, object_id: UUID) -> Optional[MeasurementModel]:
         return self.session.query(MeasurementModel).get(object_id)
 
-    def find_all(self, page_request: PageRequest) -> Page[MeasurementModel]:
+    def find_all(
+        self, page_request: NumberedPageRequest
+    ) -> NumberedPage[MeasurementModel]:
         query = self.session.query(MeasurementModel).order_by(
             MeasurementModel.created_at.desc()
         )
-        return paginate(query, page_request)
+        return NumberedPage[MeasurementModel].from_query(query, page_request)
 
     def find_all_by_sensor_id(
-        self, sensor_id: UUID, page_request: PageRequest
-    ) -> Page[MeasurementModel]:
+        self, sensor_id: UUID, page_request: CursorBasedPageRequest
+    ) -> CursorBasedPage[MeasurementModel]:
         """
         Finds all measurements that were recorded by the given sensor. The results are
         ordered from newest to oldest and are stored in a page.
@@ -46,7 +53,9 @@ class MeasurementRepository(BaseRepository[MeasurementModel, UUID]):
             .where(MeasurementModel.sensor_id == sensor_id)
             .order_by(MeasurementModel.created_at.desc())
         )
-        return paginate(query, page_request)
+        return CursorBasedPage[MeasurementModel].from_query(
+            query, page_request, MeasurementModel.created_at
+        )
 
     def find_all_by_sensor_id_and_max_date(
         self, sensor_id: UUID, max_date: datetime

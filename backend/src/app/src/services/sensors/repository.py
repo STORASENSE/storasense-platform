@@ -7,9 +7,8 @@ from sqlalchemy.orm import Session
 from backend.src.app.src.services.sensors.models import SensorModel
 from backend.src.app.src.shared.database.engine import open_session
 from backend.src.app.src.shared.database.pagination import (
-    PageRequest,
-    Page,
-    paginate,
+    NumberedPage,
+    NumberedPageRequest,
 )
 from backend.src.app.src.shared.repositories.base_repository import (
     BaseRepository,
@@ -23,9 +22,11 @@ class SensorRepository(BaseRepository[SensorModel, UUID]):
     def find_by_id(self, object_id: UUID) -> Optional[SensorModel]:
         return self.session.query(SensorModel).get(object_id)
 
-    def find_all(self, page_request: PageRequest) -> Page[SensorModel]:
+    def find_all(
+        self, page_request: NumberedPageRequest
+    ) -> NumberedPage[SensorModel]:
         query = self.session.query(SensorModel).order_by(SensorModel.name)
-        return paginate(query, page_request)
+        return NumberedPage[SensorModel].from_query(query, page_request)
 
     def find_all_by_storage_id(self, storage_id: UUID) -> list[SensorModel]:
         return (

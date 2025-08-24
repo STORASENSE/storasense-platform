@@ -7,9 +7,8 @@ from sqlalchemy.orm import Session
 from backend.src.app.src.services.storages.models import StorageModel
 from backend.src.app.src.shared.database.engine import open_session
 from backend.src.app.src.shared.database.pagination import (
-    PageRequest,
-    Page,
-    paginate,
+    NumberedPageRequest,
+    NumberedPage,
 )
 from backend.src.app.src.shared.repositories.base_repository import (
     BaseRepository,
@@ -23,8 +22,12 @@ class StorageRepository(BaseRepository[StorageModel, UUID]):
     def find_by_id(self, object_id: UUID) -> Optional[StorageModel]:
         return self.session.query(StorageModel).get(object_id)
 
-    def find_all(self, page_request: PageRequest) -> Page[StorageModel]:
-        return paginate(self.session.query(StorageModel), page_request)
+    def find_all(
+        self, page_request: NumberedPageRequest
+    ) -> NumberedPage[StorageModel]:
+        return NumberedPage[StorageModel].from_query(
+            self.session.query(StorageModel), page_request
+        )
 
     def find_by_name(self, name: str) -> Optional[StorageModel]:
         return (

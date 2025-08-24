@@ -2,11 +2,28 @@
 /// Pagination
 /////////////////////////////////////////////////////////////////////////
 
-export interface Page<T> {
+export interface NumberedPageRequest {
+    page_number: number;
     page_size: number;
+}
+
+export interface CursorBasedPageRequest {
+    page_number: number;
+    cursor: number;
+}
+
+export interface Page<T> {
     page_number: number;
     total_pages: number;
     items: T[];
+}
+
+export interface NumberedPage<T> extends Page<T> {
+    page_size: number;
+}
+
+export interface CursorBasedPage<T> extends Page<T> {
+    cursor: number
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -115,7 +132,7 @@ export interface SensorStatusResponse {
 
 export interface GetMeasurementsRequest {
     sensor_id: string;
-    max_date: string;
+    page_request: CursorBasedPageRequest;
 }
 
 export interface GetMeasurementsResponse {

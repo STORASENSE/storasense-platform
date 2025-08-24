@@ -22,7 +22,11 @@ from backend.src.app.src.services.measurements.schemas import (
 )
 from backend.src.app.src.services.sensors.errors import SensorDoesNotExistError
 
-from backend.src.app.src.shared.database.pagination import PageRequest
+from backend.src.app.src.shared.database.pagination import (
+    CursorBasedPageRequest,
+    HTTPCursorBasedPageRequest,
+    HTTPCursorBasedPageResponse,
+)
 
 router = APIRouter()
 _logger = get_logger(__name__)
@@ -35,17 +39,20 @@ _logger = get_logger(__name__)
 )
 def find_sensor_measurements(
     sensor_id: UUID,
+    page_request: HTTPCursorBasedPageRequest,
     measurement_service: MeasurementService = Depends(
         inject_measurement_service
     ),
-):
-    page_request = PageRequest(0, 100)
-
+) -> HTTPCursorBasedPageResponse[MeasurementResponse]:
     try:
         measurements = measurement_service.find_all_by_sensor_id(
-            sensor_id, page_request
+            sensor_id, CursorBasedPageRequest.from_http_request(page_request)
         )
-        return measurements
+        return measurements.map(
+            lambda m: MeasurementResponse(
+                id=m.id, value=m.value, unit=m.unit, created_at=m.created_at
+            )
+        ).to_http_response()
 
     except Exception as e:
         raise HTTPException(

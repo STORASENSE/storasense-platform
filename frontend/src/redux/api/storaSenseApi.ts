@@ -13,6 +13,8 @@ import {
     DeleteSensorRequest,
     SensorStatusResponse,
     StoraSenseStorge,
+    CursorBasedPage,
+    Measurement,
 } from "@/redux/api/storaSenseApiSchemas";
 import type { RootState } from '../store';
 
@@ -116,10 +118,10 @@ export const storaSenseApi = createApi({
             })
         }),
 
-        getMeasurements: build.query<GetMeasurementsResponse, GetMeasurementsRequest>({
-            query: ({ sensor_id, max_date }) => ({
-                url: `/measurements/${sensor_id}/filter`,
-                params: { max_date }
+        getMeasurements: build.query<CursorBasedPage<Measurement>, GetMeasurementsRequest>({
+            query: ({ sensor_id, page_request }) => ({
+                url: `/measurements/${sensor_id}`,
+                body: page_request
             }),
         }),
 

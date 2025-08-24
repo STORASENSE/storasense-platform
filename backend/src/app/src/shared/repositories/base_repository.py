@@ -5,8 +5,8 @@ from sqlalchemy.orm import Session
 
 from backend.src.app.src.shared.database.base_model import BaseModel
 from backend.src.app.src.shared.database.pagination import (
-    Page,
-    PageRequest,
+    NumberedPage,
+    NumberedPageRequest,
 )
 
 
@@ -30,7 +30,8 @@ class BaseRepository[T: BaseModel, ID](ABC):
         """
         pass
 
-    def find_all(self, page_request: [PageRequest]) -> Page[T]:
+    @abstractmethod
+    def find_all(self, page_request: NumberedPageRequest) -> NumberedPage[T]:
         """
         Finds all entities and paginates the result.
 
@@ -72,7 +73,8 @@ class BaseRepository[T: BaseModel, ID](ABC):
         :param object_id: The entity's primary key.
         """
         obj = self.find_by_id(object_id)
-        self.delete(obj)
+        if obj is not None:
+            self.delete(obj)
 
     def exists(self, object_id: ID) -> bool:
         """

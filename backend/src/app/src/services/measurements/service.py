@@ -19,7 +19,10 @@ from backend.src.app.src.services.sensors.repository import (
     inject_sensor_repository,
 )
 from backend.src.app.src.shared.database.engine import open_session
-from backend.src.app.src.shared.database.pagination import Page, PageRequest
+from backend.src.app.src.shared.database.pagination import (
+    CursorBasedPage,
+    CursorBasedPageRequest,
+)
 
 
 _logger = get_logger(__name__)
@@ -37,8 +40,8 @@ class MeasurementService:
         self._sensor_repository = sensor_repository
 
     def find_all_by_sensor_id(
-        self, sensor_id: UUID, page_request: PageRequest
-    ) -> Page[MeasurementModel]:
+        self, sensor_id: UUID, page_request: CursorBasedPageRequest
+    ) -> CursorBasedPage[MeasurementModel]:
         """
         Finds all measurements that were recorded by the given sensor. The results are
         ordered from newest to oldest and are stored in a page.

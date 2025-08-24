@@ -3,6 +3,7 @@ from uuid import UUID
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
+from backend.src.app.src.services.sensors.errors import SensorDoesNotExistError
 from backend.src.app.src.services.sensors.models import SensorModel
 from backend.src.app.src.services.sensors.repository import (
     SensorRepository,
@@ -63,7 +64,12 @@ class SensorService:
 
     def find_sensor_by_id(self, sensor_id: UUID) -> SensorModel:
         """Finds a sensor by its ID."""
-        return self._sensor_repository.find_by_id(sensor_id)
+        sensor = self._sensor_repository.find_by_id(sensor_id)
+        if not sensor:
+            raise SensorDoesNotExistError(
+                "Could not find sensor by its ID because such a sensor does not exist."
+            )
+        return sensor
 
     def find_sensors_by_storage_id(
         self, storage_id: UUID
