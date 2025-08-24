@@ -63,9 +63,9 @@ class AuthService:
             # Extract information for backend
             user_id = payload.get("sub")
             username = payload.get("preferred_username")
-            roles = payload.get("realm_access", {}).get("roles", [])
             email = payload.get("email")
             name = payload.get("name")
+            client_id = payload.get("clientId")
 
             if not user_id or not username:
                 raise HTTPException(
@@ -76,9 +76,9 @@ class AuthService:
             return TokenData(
                 id=user_id,
                 username=username,
-                roles=roles,
                 email=email,
                 name=name,
+                client_id=client_id,
             )
 
         except jwt.PyJWTError as e:

@@ -84,8 +84,9 @@ class MeasurementService:
         :param username: The username of the requester, must be "mqtt-client".
         """
         if (
-            username != "mqtt-client"
-        ):  # username of technical users is always theirs client_id
+            username
+            != "service-account-mqtt-client"  # username of technical users is always theirs client_id
+        ):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Just MQTT-Clients are allowed to create measurements.",

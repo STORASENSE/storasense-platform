@@ -97,7 +97,6 @@ async def create_measurement(
         measurement_service.create_measurement(
             sensor_id, request, current_user.username
         )
-        return {"status": "success"}
     except PermissionError as e:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail=str(e)

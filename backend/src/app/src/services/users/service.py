@@ -17,7 +17,7 @@ from ...shared.database.engine import open_session
 
 
 def is_technical_user(token_data: TokenData) -> bool:
-    if hasattr(token_data, "client_id") and token_data.client_id:
+    if not token_data.email and not token_data.name:
         return True
     return False
 
@@ -43,7 +43,7 @@ class UserService:
         if is_technical_user(token_data):
             new_user_data = {
                 "keycloak_id": token_data.id,
-                "username": token_data.client_id,
+                "username": token_data.username,
                 "email": None,
                 "name": None,
             }
