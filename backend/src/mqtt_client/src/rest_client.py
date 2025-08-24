@@ -149,17 +149,22 @@ def send_one_value():
                 ).status_code
 
             except requests.exceptions.RequestException:
-                response_code = 400
+                response_code = 404
 
             expected_code = os.getenv("MQTT_HTTP_RESPONSE_OK", "200")
-            if response_code == int(expected_code):
+            if response_code == int(expected_code) or 400:
                 connection = get_db_connection()
                 with connection:
                     connection.execute(
                         "DELETE FROM sensor_data WHERE message_id = ?",
                         (row_id,),
                     )
-                _logger.info(f"Successfully sent {value}")
+                if response_code == int(expected_code):
+                    _logger.info(f"Successfully sent {value}")
+                elif response_code == 400:
+                    _logger.error(
+                        f"Bad request when sending value {value}, deleting from DB"
+                    )
 
 
 def start_rest_client(stop_event):
