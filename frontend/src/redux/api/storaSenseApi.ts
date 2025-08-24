@@ -2,7 +2,6 @@ import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
 import {
     CreateStorageRequest,
     GetMeasurementsRequest,
-    GetMeasurementsResponse,
     GetSensorsByStorageIdRequest,
     GetSensorsByStorageIdResponse,
     GetStoragesByUserIdRequest,
@@ -121,21 +120,11 @@ export const storaSenseApi = createApi({
         getMeasurements: build.query<CursorBasedPage<Measurement>, GetMeasurementsRequest>({
             query: ({ sensor_id, page_request }) => ({
                 url: `/measurements/${sensor_id}`,
-                body: page_request
+                params: {
+                    page_number: page_request.page_number,
+                    cursor: page_request.cursor
+                }
             }),
-        }),
-
-        getMeasurementsFromPastHour: build.query<GetMeasurementsResponse, Omit<GetMeasurementsRequest, "max_date">>({
-            query: ({ sensor_id }) => {
-                const max_date = new Date();
-                max_date.setHours(max_date.getHours() - 1);
-                return {
-                    url: `/measurements/${sensor_id}/filter`,
-                    params: {
-                        max_date: max_date.toISOString()
-                    }
-                };
-            }
         }),
 
         getHealth: build.query<{ status: string }, void>({
@@ -156,7 +145,6 @@ export const {
     useDeleteStorageMutation,
     useGetSensorsQuery,
     useGetMeasurementsQuery,
-    useGetMeasurementsFromPastHourQuery,
     useGetHealthQuery,
     useAddSensorMutation,
     useDeleteSensorMutation,

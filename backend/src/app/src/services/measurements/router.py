@@ -1,6 +1,5 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from uuid import UUID
-from typing import List
 
 from fastapi import Depends, APIRouter, status, HTTPException
 
@@ -34,16 +33,20 @@ _logger = get_logger(__name__)
 
 @router.get(
     "/measurements/{sensor_id}",
-    response_model=List[MeasurementResponse],
+    response_model=HTTPCursorBasedPageResponse[MeasurementResponse],
     status_code=status.HTTP_200_OK,
 )
 def find_sensor_measurements(
     sensor_id: UUID,
-    page_request: HTTPCursorBasedPageRequest,
+    page_number: int,
+    cursor: timedelta,
     measurement_service: MeasurementService = Depends(
         inject_measurement_service
     ),
 ) -> HTTPCursorBasedPageResponse[MeasurementResponse]:
+    page_request = HTTPCursorBasedPageRequest(
+        page_number=page_number, cursor=cursor
+    )
     try:
         measurements = measurement_service.find_all_by_sensor_id(
             sensor_id, CursorBasedPageRequest.from_http_request(page_request)

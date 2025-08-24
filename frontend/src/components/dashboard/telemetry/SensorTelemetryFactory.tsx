@@ -4,7 +4,7 @@ import {FC} from "react";
 import {Sensor, SensorType} from "@/redux/api/storaSenseApiSchemas";
 import SensorTelemetryCard from "@/components/dashboard/telemetry/SensorTelemetryCard";
 import SensorTelemetryChart from "@/components/dashboard/telemetry/SensorTelemetryChart";
-import {useGetMeasurementsFromPastHourQuery} from "@/redux/api/storaSenseApi";
+import {useGetMeasurementsQuery} from "@/redux/api/storaSenseApi";
 import {Skeleton} from "@/components/ui/skeleton";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 import {AlertCircleIcon} from "lucide-react";
@@ -15,10 +15,14 @@ interface SensorTelemetryFactoryProps {
 }
 
 const SensorTelemetryFactory: FC<SensorTelemetryFactoryProps> = ({ sensor }) => {
-    const {data, isLoading, isError} = useGetMeasurementsFromPastHourQuery({
-        sensor_id: sensor.id
+    const {data, isLoading, isError} = useGetMeasurementsQuery({
+        sensor_id: sensor.id,
+        page_request: {
+            page_number: 0,
+            cursor: 3600 // =1hr
+        }
     }, {
-        pollingInterval: 30000,
+        pollingInterval: 30000, // =30s
         skipPollingIfUnfocused: true
     });
 
@@ -60,7 +64,7 @@ const SensorTelemetryFactory: FC<SensorTelemetryFactoryProps> = ({ sensor }) => 
                     }>
                     <SensorTelemetryChart
                         id={`tempInside-${sensor.id}`}
-                        data={data!.measurements}
+                        data={data!.items}
                         valueName="Temperature"
                         valueUnit="°C"
                     />
@@ -79,7 +83,7 @@ const SensorTelemetryFactory: FC<SensorTelemetryFactoryProps> = ({ sensor }) => 
                     }>
                     <SensorTelemetryChart
                         id={`tempOutside-${sensor.id}`}
-                        data={data!.measurements}
+                        data={data!.items}
                         valueName="Temperature"
                         valueUnit="°C"
                     />
@@ -98,7 +102,7 @@ const SensorTelemetryFactory: FC<SensorTelemetryFactoryProps> = ({ sensor }) => 
                     }>
                     <SensorTelemetryChart
                         id={`tempInside-${sensor.id}`}
-                        data={data!.measurements}
+                        data={data!.items}
                         valueName="Humidity"
                         valueUnit="%"
                     />
@@ -118,7 +122,7 @@ const SensorTelemetryFactory: FC<SensorTelemetryFactoryProps> = ({ sensor }) => 
                     }>
                     <SensorTelemetryChart
                         id={`tempInside-${sensor.id}`}
-                        data={data!.measurements}
+                        data={data!.items}
                         valueUnit={"mm\u00B2/s"}
                     />
                 </SensorTelemetryCard>
@@ -135,7 +139,7 @@ const SensorTelemetryFactory: FC<SensorTelemetryFactoryProps> = ({ sensor }) => 
                     }>
                     <SensorTelemetryChart
                         id={`tempInside-${sensor.id}`}
-                        data={data!.measurements}
+                        data={data!.items}
                         valueUnit="%"
                     />
                 </SensorTelemetryCard>
