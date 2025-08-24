@@ -20,20 +20,25 @@ async def read_users_me(
     token_data: TokenData = Depends(auth_service.get_current_user),
     user_service: UserService = Depends(inject_user_service),
 ):
-    db_user: UserModel = user_service.get_or_create_user_by_keycloak_id(
-        token_data=token_data
-    )
-    if not db_user:
+    try:
+        db_user: UserModel = user_service.get_or_create_user_by_keycloak_id(
+            token_data=token_data
+        )
+        if not db_user:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Authenticated user not found and couldn't be created.",
+            )
+        return UserPublicResponse(
+            username=db_user.username,
+            email=db_user.email,
+            name=db_user.name,
+        )
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Authenticated user not found and couldn't be created.",
+            detail=f"Unexpected error: {str(e)}",
         )
-
-    return UserPublicResponse(
-        username=db_user.username,
-        email=db_user.email,
-        name=db_user.name,
-    )
 
 
 @router.get("/byStorageId/{storage_id}")

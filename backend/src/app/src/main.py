@@ -3,10 +3,12 @@ from contextlib import asynccontextmanager
 
 import uvicorn
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 
 from fastapi.middleware.cors import CORSMiddleware
 
+from backend.src.app.src.services.auth.schemas import TokenData
+from backend.src.app.src.services.auth.service import auth_service
 from backend.src.app.src.shared.logger import (
     get_logger,
     add_request_middleware,
@@ -66,14 +68,6 @@ app = FastAPI(
     swagger_ui_init_oauth={"clientId": CLIENT_ID, "appName": "Storasense API"},
 )
 
-add_request_middleware(app)
-
-app.include_router(users_router)
-app.include_router(measurements_router)
-app.include_router(sensors_router)
-app.include_router(storages_router)
-app.include_router(analytics_router)
-
 # configure CORS-middleware
 origins = [
     "https://storasense.de",
@@ -88,11 +82,19 @@ app.add_middleware(
 )
 
 
+add_request_middleware(app)
+
+app.include_router(users_router)
+app.include_router(measurements_router)
+app.include_router(sensors_router)
+app.include_router(storages_router)
+app.include_router(analytics_router)
+
+
 @app.get("/health", tags=["Root"])
-def read_root():
-    """
-    # checks if the API is running
-    """
+async def read_root(
+    current_user: TokenData = Depends(auth_service.get_current_user),
+):
     return {
         "status": "ok",
         "message": "welcome to STORASENSE-Platform-Backend API!",

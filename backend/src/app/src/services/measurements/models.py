@@ -23,7 +23,6 @@ class MeasurementModel(BaseModel):
     )  # Composite PK
     value: Mapped[float] = mapped_column()
     unit: Mapped[MeasurementUnit] = mapped_column(Enum(MeasurementUnit))
-
     sensor_id: Mapped[UUID] = mapped_column(
         ForeignKey("Sensor.id", ondelete="CASCADE")
     )  # cascade: delete measurements when sensor is deleted

@@ -16,9 +16,8 @@ class SensorType(Enum):
 
 class MeasurementUnit(Enum):
     CELSIUS = "CELSIUS"
-    FAHRENHEIT = "FAHRENHEIT"
     PERCENT = "PERCENT"
-    CENTIMETER = "CENTIMETER"
+    CENTIMETER = "CM"
     PPM = "PPM"
 
 

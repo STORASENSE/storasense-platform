@@ -1,7 +1,7 @@
 import {FC, ReactNode} from "react";
 import Image from "next/image";
-import Sidebar from "@/components/dashboard/Sidebar";
-import TopBar from "@/components/dashboard/TopBar";
+import Sidebar from "@/components/dashboard/layout/Sidebar";
+import TopBar from "@/components/dashboard/layout/TopBar";
 
 const Layout: FC<{ children: ReactNode }> = ({ children }) => (
     <div className="w-screen h-screen flex flex-col">

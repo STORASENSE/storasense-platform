@@ -35,6 +35,20 @@ def get_keycloak_config():
     return keycloak_url, realm_name, client_id, client_secret
 
 
+def call_me_endpoint(token):
+    backend_init_url = os.getenv("MQTT_BACKEND_INIT_URL")
+    if not backend_init_url:
+        _logger.error("MQTT_BACKEND_INIT_URL environment variable not set")
+        return
+    try:
+        headers = {"Authorization": f"Bearer {token}"}
+        response = requests.get(f"{backend_init_url}", headers=headers)
+        response.raise_for_status()
+        _logger.info(f"/me response: {response.json()}")
+    except requests.exceptions.RequestException as e:
+        _logger.error(f"Error calling /me endpoint: {e}")
+
+
 def get_access_token():
     """
     Gets an access token from Keycloak using the client credentials grant flow.
@@ -68,6 +82,9 @@ def get_access_token():
         _access_token = token_data.get("access_token")
         expires_in = token_data.get("expires_in", 3600)
         _token_expires_at = time.time() + expires_in - 60  # 60 seconds buffer
+
+        # /me-Endpoint calling once after getting the token
+        call_me_endpoint(_access_token)
 
         return _access_token
 
@@ -130,21 +147,27 @@ def send_one_value():
                         "unit": unit,
                     },
                 ).status_code
+
             except requests.exceptions.RequestException:
-                response_code = 400
+                response_code = 404
 
             expected_code = os.getenv("MQTT_HTTP_RESPONSE_OK", "200")
-            if response_code == int(expected_code):
+            if response_code == int(expected_code) or 400:
                 connection = get_db_connection()
                 with connection:
                     connection.execute(
                         "DELETE FROM sensor_data WHERE message_id = ?",
                         (row_id,),
                     )
-                _logger.info(f"Successfully sent {value}")
+                if response_code == int(expected_code):
+                    _logger.info(f"Successfully sent {value}")
+                elif response_code == 400:
+                    _logger.error(
+                        f"Bad request when sending value {value}, deleting from DB"
+                    )
 
 
 def start_rest_client(stop_event):
     while not stop_event.is_set():
         send_one_value()
-        # time.sleep(5)  # Wait for 5 seconds before retrying
+        time.sleep(5)  # Wait for 5 seconds before retrying

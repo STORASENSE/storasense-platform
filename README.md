@@ -114,17 +114,18 @@ or
 
 ## Deployment Workflow:
 ### 1.  DNS Configuration
-- Create a DNS record for `storasense.de` in your OS pointing to the server's IP address (loopback-adress): `127.0.0.1 storasense.de api.storasense.de auth.storasense.de traefik.storasense.de`
+- Create a DNS record for `storasense.de` in your OS pointing to the server's IP address (loopback-adress): `127.0.0.1 storasense.de api.storasense.de auth.storasense.de traefik.storasense.de kafka-ui.storasense.de`
 ### 2. .env Configuration
 - Verify `.env` configuration (root directory) - checkout `.env.example` for reference.
 ### 3. Docker Configuration
 - Ensure Docker is installed and running on your system.
 - Make the db-init script executable:
 ```bash
-chmod +x ./db-init/db-init.sh
+chmod +x ./db-scripts/db-scripts.sh
 ```
 - Build the Docker-Compose Setup: `docker-compose up -d --build`
-### 4. Optional: Keycloak Configuration
+### 4. Kafka Setup: Add Kafka-Connector resources (.jsons) => See [Kafka-readme](./kafka/README.md)
+### 5. Optional: Keycloak Configuration
 - If you don't have our original volume of the timescaledb (**storasense_data_volume**) then you have to setup the Keycloak configuration from scratch by yourself.
 - Follow the following steps:
   * Create an initial **temporary admin user** - add to the `docker-compose.yml` configuration: `keycloak: environment:`:

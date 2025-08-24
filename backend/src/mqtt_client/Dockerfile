@@ -24,6 +24,7 @@ COPY ./backend/src/mqtt_client .
 # Create non-root user
 RUN addgroup --system --gid 1001 mqttclientuser
 RUN adduser --system --uid 1001 mqttclientuser
+RUN chown -R mqttclientuser:mqttclientuser /mqttclient
 
 USER mqttclientuser
 
