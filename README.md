@@ -124,7 +124,8 @@ or
 chmod +x ./db-init/db-init.sh
 ```
 - Build the Docker-Compose Setup: `docker-compose up -d --build`
-### 4. Optional: Keycloak Configuration
+#### 4. Kafka Setup: Add Kafka-Connector resources (.jsons) to ./Kafka/connectors
+### 5. Optional: Keycloak Configuration
 - If you don't have our original volume of the timescaledb (**storasense_data_volume**) then you have to setup the Keycloak configuration from scratch by yourself.
 - Follow the following steps:
   * Create an initial **temporary admin user** - add to the `docker-compose.yml` configuration: `keycloak: environment:`:
