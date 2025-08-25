@@ -17,6 +17,7 @@ COPY --from=build /src/target/kafka-connect-mqtt-1.1.0-package/kafka-connect-mqt
 
 # Installs the PostgreSQL JDBC driver
 USER root
+RUN confluent-hub install --no-prompt confluentinc/kafka-connect-jdbc:10.7.5
 RUN mkdir -p /usr/share/java/postgresql && curl -fsSL -o /usr/share/java/postgresql/postgresql-jdbc.jar https://repo1.maven.org/maven2/org/postgresql/postgresql/42.7.4/postgresql-42.7.4.jar && chown -R appuser:appuser /usr/share/java/postgresql
 
 USER appuser
