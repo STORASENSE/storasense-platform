@@ -1,5 +1,5 @@
 # STORASENSE
-## Structure of the Mono-Repository
+## Structure of the Mono-Repository:
 This mono-repository contains the following main projects:
 - **Backend**: FastAPI application located in the `backend` directory.
 - **Frontend**: React application located in the `frontend` directory.
