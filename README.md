@@ -1,10 +1,10 @@
 # STORASENSE
 ## Structure of the Mono-Repository:
 This mono-repository contains the following main projects:
-- **Backend**: FastAPI application located in the `backend` directory.
+- **Backend**: FastAPI application and MQTT-Client located in the `backend` directory.
 - **Frontend**: React application located in the `frontend` directory.
 - **Kafka**: Kafka setup with connectors and scripts located in the `kafka` directory
-- **Alarm-Service**: A service for handling alarms, located in the `alarm-service` directory.
+- **Alarm-Service**: A Java application for handling alarms, located in the `alarm-service` directory.
 ***
 ## Setup:
 - Python version: **3.13**
