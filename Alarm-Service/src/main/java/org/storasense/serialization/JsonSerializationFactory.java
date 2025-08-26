@@ -34,6 +34,13 @@ public class JsonSerializationFactory {
                 return null;
             }
             try {
+                // if data is a JSON object wrapped in string quotes:
+                // unwrap data
+                var node = mapper.readTree(data);
+                if (node.isTextual()) {
+                    return (T) mapper.readValue(node.textValue(), targetType);
+                }
+                // else, convert directly
                 return (T) mapper.readValue(data, targetType);
             } catch (final IOException e) {
                 throw new SerializationException(e);
