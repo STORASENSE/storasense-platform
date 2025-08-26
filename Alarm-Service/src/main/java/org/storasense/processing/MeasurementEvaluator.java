@@ -33,7 +33,7 @@ public class MeasurementEvaluator {
                 sensorId,
                 AlarmSeverity.MEDIUM,
                 message,
-                ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT)
+                ZonedDateTime.now()
         );
     }
 
