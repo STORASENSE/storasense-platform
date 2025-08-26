@@ -165,124 +165,20 @@ services:
         condition: service_started
       app:
         condition: service_started
-
-  #  # Alarmservice
-  #  alarmservice:
-  #    image: ghcr.io/storasense/storasense-platform/storasense-alarmservice:latest
-  #    container_name: alarmservice
-  #    restart: unless-stopped
-  #    environment:
-  #      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-  #      - INPUT_TOPIC=iot-sensordata
-  #      - OUTPUT_TOPIC=alarms
-  #      - WINDOW_SECONDS=30
-  #      - THRESHOLD_VALUE=40.0
-  #    depends_on:
-  #      - kafka
-  #    networks:
-  #      - storasense-network
-
-  # Apache Kafka in KRAFT mode (without zookeper) and in PLAINTEXT-Communication mode (no TLS)
-  kafka:
-    image: bitnami/kafka:latest
-    container_name: storasense-kafka
-    restart: always
-    environment:
-      - KAFKA_CFG_NODE_ID=1
-      - KAFKA_CFG_PROCESS_ROLES=broker,controller
-      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
-      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
-      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
-      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=false
-      - KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR=1
-      - KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
-      - KAFKA_CFG_TRANSACTION_STATE_LOG_MIN_ISR=1
-    volumes:
-      - storasense_data_kafka_volume:/bitnami/kafka
-    networks:
-      - storasense-network
-
-  # Kafka Connect Instance with included MQTT-Connectors
-  kafka-connect:
+  integration-tests:
     build:
       context: .
-      dockerfile: ./kafka/Dockerfile
-    container_name: storasense-kafka-connect
-    restart: always
-    environment:
-      - CONNECT_BOOTSTRAP_SERVERS=kafka:9092
-      - CONNECT_REST_ADVERTISED_HOST_NAME=storasense-kafka-connect
-      - CONNECT_REST_PORT=8083
-      - CONNECT_GROUP_ID=connect-cluster
-      - CONNECT_CONFIG_STORAGE_TOPIC=_connect-configs
-      - CONNECT_OFFSET_STORAGE_TOPIC=_connect-offsets
-      - CONNECT_STATUS_STORAGE_TOPIC=_connect-status
-      - CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR=1
-      - CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR=1
-      - CONNECT_STATUS_STORAGE_REPLICATION_FACTOR=1
-      - CONNECT_KEY_CONVERTER=org.apache.kafka.connect.storage.StringConverter
-      - CONNECT_VALUE_CONVERTER=org.apache.kafka.connect.json.JsonConverter
-      - CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE=false
-      - CONNECT_PLUGIN_PATH=/usr/share/confluent-hub-components,/usr/share/java
-    depends_on:
-      - kafka
+      dockerfile: ./test/integration/Dockerfile
+    env_file: .env
     networks:
       - storasense-network
-
-  # Kafka UI (Redpanda Console)
-  kafka-ui:
-    image: redpandadata/console:latest
-    container_name: storasense-kafka-ui
-    restart: unless-stopped
-    environment:
-      - KAFKA_BROKERS=kafka:9092
     depends_on:
-      - kafka
-    networks:
-      - storasense-network
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.kafka-ui-http.rule=Host(`kafka-ui.storasense.de`)"
-      - "traefik.http.routers.kafka-ui-http.entrypoints=web"
-      - "traefik.http.routers.kafka-ui-http.middlewares=https-redirect@docker"
-
-      - "traefik.http.routers.kafka-ui-https.rule=Host(`kafka-ui.storasense.de`)"
-      - "traefik.http.routers.kafka-ui-https.entrypoints=websecure"
-      - "traefik.http.routers.kafka-ui-https.tls=true"
-      - "traefik.http.services.kafka-ui.loadbalancer.server.port=8080"
-
-  # Initial container for creating topics (iot-data, alarms) on Kafka Broker
-  kafka-init-topics:
-    image: bitnami/kafka:latest
-    container_name: storasense-kafka-init-topics
-    volumes:
-        - ./kafka/scripts/topics:/opt/scripts:ro
-    environment:
-      - BOOTSTRAP=kafka:9092
-      - IOT_PARTITIONS=5
-      - ALARM_PARTITIONS=1
-    depends_on:
-      - kafka
-    networks:
-        - storasense-network
-    command: ["/bin/bash", "-c", "/opt/scripts/wait-for-kafka.sh kafka 9092 90 && /opt/scripts/create-topics.sh"]
-    init: true
-
-  # Initial container for creating connectors (source, sink) on Kafka Connect Instance
-  kafka-init-connectors:
-    image: bitnami/kafka:latest
-    container_name: storasense-kafka-init-connectors
-    volumes:
-        - ./kafka/connectors:/opt/connectors:ro
-        - ./kafka/scripts/connectors:/opt/scripts:ro
-    depends_on:
-      - kafka-connect
-    networks:
-        - storasense-network
-    command: ["/bin/bash", "-c", "/opt/scripts/wait-for-connect.sh http://kafka-connect:8083/connector-plugins 60 2 && /opt/scripts/apply-all.sh http://kafka-connect:8083 /opt/connectors"]
-    init: true
+        app:
+          condition: service_started
+        keycloak:
+          condition: service_started
+    #profiles:
+    # - integration-tests
 
 volumes:
   storasense_data_volume:
