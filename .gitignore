@@ -3,7 +3,7 @@ keycloak-data
 storasense_data_volume_backup
 
 # Kafka-Connectors
-/kafka/connectors/mqtt-source-*.json
+/kafka/connectors/*.json
 
 #JetBrains config
 **/.idea
