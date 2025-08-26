@@ -169,27 +169,21 @@ services:
       app:
         condition: service_started
 
-#  alarmservice:
-#    build:
-#        context: .
-#        dockerfile: ./Alarm-Service/Dockerfile
-#    container_name: storasense-alarmservice
-#    restart: unless-stopped
-#    environment:
-#      - BOOTSTRAP_SERVERS=kafka:9092
-#      - APPLICATION_ID=storasense-alarmservice
-#      - INPUT_TOPIC=iot-sensordata
-#      - OUTPUT_TOPIC=alarms
-#      - WINDOW_SECONDS=30
-#      - DEFAULT_MIN=0.0
-#      - DEFAULT_MAX=40.0
-#      - THRESHOLDS_FILE=./Alarm-Service/config/thresholds.json
-#    volumes:
-#      - ./config/thresholds.json:/app/config/thresholds.json:ro
-#    depends_on:
-#      - kafka
-#    networks:
-#      - storasense-network
+  alarmservice:
+    build:
+        context: .
+        dockerfile: ./Alarm-Service/Dockerfile
+    container_name: storasense-alarmservice
+    restart: unless-stopped
+    environment:
+      - BOOTSTRAP_SERVERS=kafka:9092
+      - APPLICATION_ID=storasense-alarmservice
+      - INPUT_TOPIC=iot-sensordata
+      - OUTPUT_TOPIC=alarms
+    depends_on:
+      - kafka
+    networks:
+      - storasense-network
 
   # Apache Kafka in KRAFT mode (without zookeper) and in PLAINTEXT-Communication mode (no TLS)
   kafka:
