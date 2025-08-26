@@ -85,7 +85,7 @@ def delete_sensor(
 @router.get("/sensors/status/{sensor_id}", status_code=status.HTTP_200_OK)
 def check_sensor_status(
     sensor_id: UUID,
-    max_age_minutes: int = 1,  # Last minute is interesting for this check
+    max_age_minutes: int = 1,  # Last minute is important for this check
     sensor_service: SensorService = Depends(inject_sensor_service),
 ):
     try:

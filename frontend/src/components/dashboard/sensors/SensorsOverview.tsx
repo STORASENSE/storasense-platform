@@ -13,10 +13,9 @@ import {
 import { Sensor } from "@/redux/api/storaSenseApiSchemas";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface EnrichedSensor extends Sensor {
-    status: "online" | "offline" | "warning";
+    status: "online" | "offline";
     lastUpdate?: string;
 }
 
@@ -32,8 +31,9 @@ const useSensorWithStatus = (sensor: Sensor): EnrichedSensor => {
 
     return useMemo(() => ({
         ...sensor,
-        status: statusData?.is_online ? "online" : "offline" as "online" | "offline" | "warning",
-        lastUpdate: statusData?.last_measurement || undefined
+        status: statusData?.is_online ? "online" : "offline" as "online" | "offline",
+        lastUpdate: statusData?.last_measurement_time || undefined,
+        lastMeasurement: statusData?.last_measurement || undefined,
     }), [sensor, statusData]);
 };
 
@@ -86,6 +86,7 @@ const SensorsOverview: FC = () => {
                         key={sensor.id}
                         sensor={sensor}
                         onDelete={handleDeleteSensor}
+                        storageName={activeStorage.name}
                     />
                 ))}
             </main>
@@ -107,9 +108,9 @@ const SensorsOverview: FC = () => {
 };
 
 // Component for Sensor Card with Status
-const SensorCardWithStatus: FC<{ sensor: Sensor; onDelete: (id: string) => void }> = ({ sensor, onDelete }) => {
+const SensorCardWithStatus: FC<{ sensor: Sensor; onDelete: (id: string) => void; storageName: string }> = ({ sensor, onDelete, storageName }) => {
     const enrichedSensor = useSensorWithStatus(sensor);
-    return <SensorCard sensor={enrichedSensor} onDelete={onDelete} />;
+    return <SensorCard sensor={enrichedSensor} onDelete={onDelete} storageName={storageName} />;
 };
 
 // SensorStats Component
