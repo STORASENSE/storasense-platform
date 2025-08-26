@@ -1,6 +1,6 @@
 import React, {
     useEffect,
-    ReactNode,
+    ReactNode, useRef,
 } from 'react';
 import { useDispatch } from 'react-redux';
 import { setToken } from '@/redux/slices/authSlice';
@@ -17,6 +17,7 @@ export const KeycloakProvider: React.FC<KeycloakProviderProps> = ({ children }) 
         onLoad: 'check-sso',
         checkLoginIframe: false
     });
+    const createMeCalled = useRef(false);
     const [createMe] = useCreateMeMutation();
     const dispatch = useDispatch();
 
@@ -42,7 +43,11 @@ export const KeycloakProvider: React.FC<KeycloakProviderProps> = ({ children }) 
                     });
             }
             // create user if user doesn't already exist
-            createMe();
+            //createMe();
+            if (!createMeCalled.current) {
+                createMe();
+                createMeCalled.current = true;
+            }
         }
     }, [keycloak, isLoading, isError]);
 

@@ -1,28 +1,29 @@
 import {FC} from "react";
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
-import {Waves, Thermometer, Droplets, Eye, MapPin, Clock, Settings, Trash2} from "lucide-react";
+import {FaGear as Settings, FaClock as Clock, FaMapPin as MapPin, FaEye as Eye, FaDropletSlash as Droplets, FaWaveSquare as Waves, FaThermometer as Thermometer, FaTrash as TrashIcon } from "react-icons/fa6";
 
 interface Sensor {
     id: string;
     name: string;
     type: "ULTRASONIC" | "TEMPERATURE_INSIDE" | "TEMPERATURE_OUTSIDE" | "GAS" | "HUMIDITY";
-    storage_id: string;
     allowed_min: number;
     allowed_max: number;
-    status?: "online" | "offline" | "warning";
+    status?: "online" | "offline";
     value?: string;
     unit?: string;
     location?: string;
     lastUpdate?: string;
+    lastMeasurement?: string;
 }
 
 interface SensorCardProps {
     sensor: Sensor;
     onDelete?: (sensorId: string) => void;
+    storageName: string;
 }
 
-const SensorCard: FC<SensorCardProps> = ({ sensor, onDelete }) => {
+const SensorCard: FC<SensorCardProps> = ({ sensor, onDelete, storageName }) => {
     const getIcon = () => {
         switch (sensor.type) {
             case "ULTRASONIC": return <Waves className="w-5 h-5" />;
@@ -37,7 +38,6 @@ const SensorCard: FC<SensorCardProps> = ({ sensor, onDelete }) => {
     const getStatusColor = () => {
         switch (sensor.status) {
             case "online": return "bg-green-100 text-green-800 border-green-200";
-            case "warning": return "bg-yellow-100 text-yellow-800 border-yellow-200";
             case "offline": return "bg-red-100 text-red-800 border-red-200";
             default: return "bg-gray-100 text-gray-800 border-gray-200";
         }
@@ -61,11 +61,11 @@ const SensorCard: FC<SensorCardProps> = ({ sensor, onDelete }) => {
     };
 
     return (
-        <Card className="hover:shadow-lg transition-shadow duration-200 border-l-4 border-l-blue-500">
+        <Card className="hover:shadow-lg transition-shadow duration-200 border-l-4 border-blue-whale">
             <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-blue-100 rounded-lg text-blue-600">
+                        <div className="p-2 bg-blue-100 rounded-lg text-blue-whale">
                             {getIcon()}
                         </div>
                         <div>
@@ -75,7 +75,7 @@ const SensorCard: FC<SensorCardProps> = ({ sensor, onDelete }) => {
                             <div className="flex items-center gap-1 mt-1">
                                 <MapPin className="w-3 h-3 text-gray-400" />
                                 <span className="text-xs text-gray-500">
-                                    {sensor.location || `Storage: ${sensor.storage_id}`}
+                                    {`Storage: ${storageName}`}
                                 </span>
                             </div>
                             <div className="text-xs text-gray-500 mt-1">
@@ -94,7 +94,7 @@ const SensorCard: FC<SensorCardProps> = ({ sensor, onDelete }) => {
                                 onClick={handleDelete}
                                 className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 h-auto"
                             >
-                                <Trash2 className="w-4 h-4" />
+                                <TrashIcon className="w-4 h-4" />
                             </Button>
                         )}
                     </div>
@@ -105,7 +105,7 @@ const SensorCard: FC<SensorCardProps> = ({ sensor, onDelete }) => {
                     {/* Measurement */}
                     <div className="bg-gray-50 rounded-lg p-3">
                         <div className="text-2xl font-bold text-gray-900">
-                            {sensor.value || "N/A"}{sensor.unit || ""}
+                            {sensor.lastMeasurement || "N/A"}{sensor.unit || ""}
                         </div>
                         <div className="text-xs text-gray-500 uppercase tracking-wide">
                             Last value

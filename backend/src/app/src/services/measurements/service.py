@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from uuid import UUID
 
 from fastapi import Depends
@@ -96,32 +96,6 @@ class MeasurementService:
         _logger.info(f"Created measurement '{measurement}'")
         self._measurement_repository.create(measurement)
         self._session.commit()
-
-    def find_latest_by_sensor_id(
-        self, sensor_id: UUID, max_age_minutes: int
-    ) -> MeasurementModel | None:
-        """
-        Finds the latest measurement for a given sensor within the specified time window.
-
-        :param sensor_id: The ID of the sensor.
-        :param max_age_minutes: Maximum age in minutes for a measurement to be considered valid.
-        :return: The latest measurement if within time window, None otherwise.
-        """
-        # Get the latest measurement for the sensor
-        latest_measurement = (
-            self._measurement_repository.find_latest_by_sensor_id(sensor_id)
-        )
-
-        if not latest_measurement:
-            return None
-
-        # Check if the measurement is within the allowed time window
-        time_threshold = datetime.utcnow() - timedelta(minutes=max_age_minutes)
-
-        if latest_measurement.created_at >= time_threshold:
-            return latest_measurement
-        else:
-            return None
 
 
 def inject_measurement_service(

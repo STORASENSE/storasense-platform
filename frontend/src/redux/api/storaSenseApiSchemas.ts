@@ -109,6 +109,7 @@ export interface SensorStatusResponse {
   sensor_id: string;
   is_online: boolean;
   last_measurement: string | null;
+  last_measurement_time: string | null;
 }
 
 /////////////////////////////////////////////////////////////////////////
