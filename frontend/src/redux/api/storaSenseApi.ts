@@ -13,6 +13,8 @@ import {
     DeleteSensorRequest,
     SensorStatusResponse,
     StoraSenseStorge,
+    GetAlarmsByStorageIdRequest,
+    DeleteAlarmRequest,
 } from "@/redux/api/storaSenseApiSchemas";
 import type { RootState } from '../store';
 
@@ -123,6 +125,20 @@ export const storaSenseApi = createApi({
             }),
         }),
 
+        getAlarmsByStorageId: build.query<void, GetAlarmsByStorageIdRequest>({
+            query: ({ storage_id }) => ({
+                url: `/alarms/byStorageId/${storage_id}`,
+                method: 'GET',
+            }),
+        }),
+
+        deleteAlarm: build.mutation<void, DeleteAlarmRequest>({
+            query: ({ alarm_id }) => ({
+                url: `/alarms/${alarm_id}`,
+                method: 'DELETE'
+            })
+        }),
+
         getHealth: build.query<{ status: string }, void>({
             query: () => ({
                 url: '/health'
@@ -144,5 +160,7 @@ export const {
     useGetHealthQuery,
     useAddSensorMutation,
     useDeleteSensorMutation,
-    useGetSensorStatusQuery
+    useGetSensorStatusQuery,
+    useGetAlarmsByStorageIdQuery,
+    useDeleteAlarmMutation,
 } = storaSenseApi;

@@ -46,7 +46,7 @@ def find_alarm_by_id(
 
 
 @router.get(
-    "/alarms/byStorage/{storage_id}/",
+    "/alarms/byStorageId/{storage_id}/",
     response_model=List[AlarmResponse],
     status_code=status.HTTP_200_OK,
 )

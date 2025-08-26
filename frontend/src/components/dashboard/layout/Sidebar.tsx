@@ -9,6 +9,7 @@ import { MdOutlineWarehouse as StorageIcon } from "react-icons/md";
 import { MdOutlineQueryStats as AnalyticsIcon } from "react-icons/md";
 import { MdOutlineDeviceThermostat as SensorsIcon } from "react-icons/md";
 import { MdOutlinePeople as UsersIcon } from "react-icons/md";
+import { MdAlarmOn as AlarmIcon } from "react-icons/md";
 import useKeycloak from "@/auth/useKeycloak";
 import { useGetHealthQuery } from "@/redux/api/storaSenseApi";
 
@@ -79,6 +80,9 @@ const Sidebar: FC = () => {
                     </SidebarLink>
                     <SidebarLink href="/dashboard/analytics" icon={<AnalyticsIcon />}>
                         Analytics
+                    </SidebarLink>
+                     <SidebarLink href="/dashboard/alarms" icon={<AlarmIcon />}>
+                        Alarms
                     </SidebarLink>
                     <SidebarLink href="/dashboard/sensors" icon={<SensorsIcon />}>
                         Sensors

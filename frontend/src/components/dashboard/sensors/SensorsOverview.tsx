@@ -2,7 +2,7 @@
 
 import { FC, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { InfoIcon, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import SensorCard from "./SensorCard";
 import AddSensorModal from "./AddSensorModal";
 import {
