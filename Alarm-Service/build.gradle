@@ -26,9 +26,6 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.19.2'
     implementation 'com.fasterxml.jackson.core:jackson-core:2.19.2'
 
-    // JSON Schema Converter
-    implementation 'com.fasterxml.jackson.module:jackson-module-jsonSchema:2.19.2'
-
     // JUnit
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
@@ -36,6 +33,10 @@ dependencies {
 
     // Kafka Streams
     implementation 'org.apache.kafka:kafka-streams:4.0.0'
+
+    // Kafka Connect
+    implementation "org.apache.kafka:connect-api:4.0.0"
+    implementation "org.apache.kafka:connect-json:4.0.0"
 }
 
 application {

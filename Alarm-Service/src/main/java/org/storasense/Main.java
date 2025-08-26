@@ -1,12 +1,9 @@
 package org.storasense;
 
 
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
-import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator;
 import lombok.extern.log4j.Log4j2;
 import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.connect.json.JsonConverter;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
@@ -14,13 +11,13 @@ import org.apache.kafka.streams.errors.StreamsUncaughtExceptionHandler;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Produced;
-import org.storasense.models.Alarm;
-import org.storasense.models.JsonWithSchema;
 import org.storasense.models.Measurement;
 import org.storasense.processing.MeasurementEvaluator;
 import org.storasense.processing.MeasurementTimestampExtractor;
+import org.storasense.serialization.AlarmSchema;
 import org.storasense.serialization.JsonSerializationFactory;
 
+import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
@@ -57,21 +54,14 @@ public class Main {
         final StreamsBuilder builder = new StreamsBuilder();
 
         // build JSON schema for alarms
-        log.info("Building JSON schema for alarms...");
-        final var jsonSchemaGenerator = new JsonSchemaGenerator(new ObjectMapper());
-        final JsonSchema alarmJsonSchema;
-        try {
-            alarmJsonSchema = jsonSchemaGenerator.generateSchema(Alarm.class);
-        } catch (JsonMappingException e) {
-            log.fatal("Failed to generate JSON schema for alarms.", e);
-            throw new RuntimeException("Failed to generate JSON schema for alarms.", e);
-        }
+        final var jsonConverter = new JsonConverter();
+        jsonConverter.configure(Map.of("schemas.enable", "true"), false);
+        final var alarmSchema = AlarmSchema.buildSchema();
 
         // Serdes for serialization
         log.info("Building Serdes for JSON Serialization...");
         final var serdeFactory = new JsonSerializationFactory();
         final var measurementSerde = serdeFactory.buildSerde(Measurement.class);
-        final var alarmSerde = serdeFactory.buildSerdeWithSchema(alarmJsonSchema, Alarm.class);
         log.info("Serdes built successfully!");
 
         // stream for reading recorded measurements
@@ -88,24 +78,25 @@ public class Main {
 
         // map all critical measurements to alarms
         final var evaluator = new MeasurementEvaluator();
-        final KStream<String, JsonWithSchema<Alarm>> alarmStream =
+        final KStream<String, byte[]> alarmStream =
                 measurementStream
                 .mapValues((key, value) -> {
                     var sensorId = extractSensorIdFromKey(key);
                     return evaluator.evaluate(sensorId, value);
                 })
                 .filter((key, value) -> value != null)
-                .mapValues((key, value) -> new JsonWithSchema<>(alarmJsonSchema, value));
-
-        // log generated alarms
-        alarmStream.peek((key, value) -> {
-            log.debug("Generating alarm: {}", value.payload());
-        });
+                .peek((key, value) -> {
+                    log.debug("Generating alarm: {}", value);
+                })
+                .mapValues((key, value) -> {
+                    var struct = AlarmSchema.buildStruct(value);
+                    return jsonConverter.fromConnectData(outputTopic, alarmSchema, struct);
+                });
 
         // stream all alarms to the alarm topic
         alarmStream.to(
                 outputTopic,
-                Produced.with(Serdes.String(), alarmSerde)
+                Produced.with(Serdes.String(), Serdes.ByteArray())
         );
 
         log.info("Building the Kafka Streams application with the configured properties...");
