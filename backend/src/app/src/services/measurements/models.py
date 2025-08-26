@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import Enum, ForeignKey
@@ -9,7 +9,6 @@ from backend.src.app.src.shared.database.base_model import BaseModel
 from backend.src.app.src.shared.database.enums import MeasurementUnit
 
 if TYPE_CHECKING:
-    from backend.src.app.src.services.alarms.models import AlarmModel
     from backend.src.app.src.services.sensors.models import SensorModel
 
 
@@ -28,6 +27,3 @@ class MeasurementModel(BaseModel):
         ForeignKey("Sensor.id", ondelete="CASCADE")
     )  # cascade: delete measurements when sensor is deleted
     sensor: Mapped["SensorModel"] = relationship(back_populates="measurements")
-    alarm: Mapped[Optional["AlarmModel"]] = relationship(
-        back_populates="measurement"
-    )
