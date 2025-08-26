@@ -14,7 +14,7 @@ interface KeycloakProviderProps {
 
 export const KeycloakProvider: React.FC<KeycloakProviderProps> = ({ children }) => {
     const { keycloak, isLoading, isError, error } = useKeycloakBuilder({
-        //onLoad: 'check-sso', TODO add
+        onLoad: 'check-sso',
         checkLoginIframe: false
     });
     const createMeCalled = useRef(false);
