@@ -33,6 +33,9 @@ from backend.src.app.src.services.analytics.router import (
 from backend.src.app.src.services.storages.router import (
     router as storages_router,
 )
+from backend.src.app.src.services.alarms.router import (
+    router as alarms_router,
+)
 
 discover_models()
 load_dotenv()
@@ -89,6 +92,7 @@ app.include_router(measurements_router)
 app.include_router(sensors_router)
 app.include_router(storages_router)
 app.include_router(analytics_router)
+app.include_router(alarms_router)
 
 
 @app.get("/health", tags=["Root"])
