@@ -17,10 +17,10 @@ _token_expires_at = 0
 
 
 def get_keycloak_config():
-    keycloak_url = os.getenv("MQTT_KEYCLOAK_URL")
+    keycloak_url = os.getenv("TEST_KEYCLOAK_URL")
     realm_name = os.getenv("KEYCLOAK_REALM")
-    client_id = os.getenv("MQTT_KEYCLOAK_CLIENT_ID")
-    client_secret = os.getenv("MQTT_KEYCLOAK_CLIENT_SECRET")
+    client_id = os.getenv("TEST_KEYCLOAK_CLIENT_ID")
+    client_secret = os.getenv("TEST_KEYCLOAK_CLIENT_SECRET")
 
     if not all([keycloak_url, realm_name, client_id, client_secret]):
         _logger.error(
@@ -34,9 +34,9 @@ def get_keycloak_config():
 
 
 def call_me_endpoint(token):
-    backend_init_url = os.getenv("MQTT_BACKEND_INIT_URL")
+    backend_init_url = os.getenv("TEST_BACKEND_INIT_URL")
     if not backend_init_url:
-        _logger.error("MQTT_BACKEND_INIT_URL environment variable not set")
+        _logger.error("TEST_BACKEND_INIT_URL environment variable not set")
         return
     try:
         headers = {"Authorization": f"Bearer {token}"}
