@@ -53,6 +53,13 @@ export interface Sensor {
     allowed_max: number;
 }
 
+export interface Alarm {
+    id: string;
+    sensor_id: string;
+    message: string;
+    created_at: Date;
+}
+
 export interface Measurement {
     id: string;
     value: number;
@@ -128,3 +135,13 @@ export interface GetMeasurementsResponse {
 export interface CreateStorageRequest {
     name: string;
 }
+
+//////////////////////////////////////////////////////////////////////////
+export interface GetAlarmsByStorageIdRequest {
+    storage_id: string;
+}
+
+export interface DeleteAlarmRequest {
+    alarm_id: string;
+}
+//////////////////////////////////////////////////////////////////////////

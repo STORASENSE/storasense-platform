@@ -20,6 +20,5 @@ class AlarmModel(BaseModel):
     severity: Mapped[AlarmSeverity] = mapped_column(Enum(AlarmSeverity))
     message: Mapped[Optional[str]] = mapped_column()
     created_at: Mapped[datetime] = mapped_column()
-
     sensor_id: Mapped[UUID] = mapped_column(ForeignKey("Sensor.id"))
     sensor: Mapped["SensorModel"] = relationship(back_populates="alarms")

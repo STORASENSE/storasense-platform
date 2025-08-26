@@ -1,3 +1,4 @@
+from typing import List
 from uuid import UUID
 
 from fastapi import Depends, APIRouter, status, HTTPException
@@ -44,16 +45,20 @@ def find_alarm_by_id(
         )
 
 
-@router.get("/storages/{storage_id}/alarms", status_code=status.HTTP_200_OK)
+@router.get(
+    "/alarms/byStorageId/{storage_id}/",
+    response_model=List[AlarmResponse],
+    status_code=status.HTTP_200_OK,
+)
 def find_alarms_by_storage_id(
     storage_id: UUID,
     alarm_service: AlarmService = Depends(inject_alarm_service),
-) -> AlarmResponse:
+):
     """
-    Get all alarms for a specific storage, paginated and sorted by creation time (newest first).
+    Returns latest 50 alarms for a given storage.
     """
     try:
-        page_request = PageRequest(0, 100)
+        page_request = PageRequest(1, 50)
         alarms_page = alarm_service.find_alarms_by_storage_id(
             storage_id, page_request
         )
@@ -61,13 +66,12 @@ def find_alarms_by_storage_id(
             AlarmResponse(
                 id=alarm.id,
                 sensor_id=alarm.sensor_id,
-                timestamp=alarm.timestamp,
-                value=alarm.value,
+                severity=alarm.severity,
                 message=alarm.message,
+                created_at=alarm.created_at,
             )
             for alarm in alarms_page.items
         ]
-
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=str(e)
