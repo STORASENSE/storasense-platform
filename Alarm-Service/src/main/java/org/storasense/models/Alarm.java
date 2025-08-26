@@ -5,8 +5,9 @@ import java.util.UUID;
 
 
 public record Alarm(
-        UUID sensorId,
+        UUID id,
+        UUID sensor_id,
         AlarmSeverity severity,
         String message,
-        long timestamp
+        String created_at
 ) {}
