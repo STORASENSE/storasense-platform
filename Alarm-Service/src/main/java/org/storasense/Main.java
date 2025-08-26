@@ -6,6 +6,7 @@ import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
+import org.apache.kafka.streams.errors.StreamsUncaughtExceptionHandler;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Produced;
@@ -95,6 +96,14 @@ public class Main {
         final KafkaStreams streams = new KafkaStreams(builder.build(), props);
         final CountDownLatch latch = new CountDownLatch(1);
 
+        streams.setStateListener((newState, oldState) -> {
+            log.debug("Kafka Streams app transitioned from '{}' to '{}'", oldState, newState);
+        });
+        streams.setUncaughtExceptionHandler(e -> {
+            log.fatal("An unexpected exception was thrown in Kafka Streams app. Shutting Down.", e);
+            return StreamsUncaughtExceptionHandler.StreamThreadExceptionResponse.SHUTDOWN_CLIENT;
+        });
+
         // attach shutdown handler to catch control-c
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             streams.close();
@@ -103,7 +112,6 @@ public class Main {
 
         // execute app and wait for streams to close
         try {
-            log.info("Initiated Kafka Streams application startup.");
             streams.start();
             latch.await();
         } catch (Throwable e) {
