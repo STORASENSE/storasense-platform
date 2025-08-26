@@ -28,17 +28,13 @@ class AlarmRepository(BaseRepository[AlarmModel, UUID]):
     ) -> Page[AlarmModel]:
         sql = text(
             """
-                   SELECT a.*
-                   FROM "Alarm" a
-                            JOIN "Measurements" m
-                                 ON a.measurement_id = m.id
-                                     AND a.measurement_created_at = m.created_at
-                            JOIN "Sensor" s
-                                 ON s.id = m.sensor_id
-                   WHERE s.storage_id = :storage_id
-                   ORDER BY a.created_at DESC LIMIT :limit_plus_one
-                   OFFSET :offset
-                   """
+                SELECT a.*
+                FROM "Alarm" a
+                         JOIN "Sensor" s ON a.sensor_id = s.id
+                WHERE s.storage_id = :storage_id
+                ORDER BY a.created_at DESC LIMIT :limit_plus_one
+                OFFSET :offset
+                """
         )
 
         rows = self.session.execute(
@@ -51,10 +47,8 @@ class AlarmRepository(BaseRepository[AlarmModel, UUID]):
             },
         ).all()
 
-        # has_next = len(rows) > page_request.page_size
         items_data = rows[: page_request.page_size]
 
-        # Convert raw SQL rows to AlarmModel instances
         alarm_models = []
         for row in items_data:
             alarm = AlarmModel()
