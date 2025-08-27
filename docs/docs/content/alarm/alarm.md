@@ -131,11 +131,11 @@ def on_measurement(sensor_id, ts, value):
 ## 9) Sequenzdiagramme
 
 **1) Auslösung (PENDING → FIRING)**
-![Sequenzdiagramm 10.1 – Auslösung](images/alarm/pending-firing.png)
+![Sequenzdiagramm 10.1 – Auslösung](../../images/alarm/pending-firing.png)
 
 
 **2) Auflösung (FIRING → RESOLVED)**
-![Sequenzdiagramm 10.1 – Auslösung](images/alarm/firing-resolved.png)
+![Sequenzdiagramm 10.1 – Auslösung](../../images/alarm/firing-resolved.png)
 
 ---
 

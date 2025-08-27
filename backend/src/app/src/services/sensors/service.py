@@ -62,9 +62,8 @@ class SensorService:
         if last_measurement and last_time:
             if last_time.tzinfo is None:
                 last_time = last_time.replace(tzinfo=timezone.utc)
-            time_threshold = datetime.now(timezone.utc) - timedelta(
-                minutes=max_age_minutes
-            )
+            now = datetime.now(timezone.utc)
+            time_threshold = now - timedelta(minutes=max_age_minutes)
             is_online = last_time >= time_threshold
 
         return {
