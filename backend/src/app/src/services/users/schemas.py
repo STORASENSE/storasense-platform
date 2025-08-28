@@ -23,8 +23,12 @@ class UserPublicResponse(BaseModel):
     """Public User Response Schema"""
 
     username: str
-    email: str
-    name: str
+    email: Optional[str] = (
+        None  # Allow null for email to support technical users
+    )
+    name: Optional[str] = (
+        None  # Allow null for name to support technical users
+    )
 
 
 class UserByStorageIdResponse(BaseModel):

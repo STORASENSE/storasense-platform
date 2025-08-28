@@ -21,6 +21,12 @@ from ...shared.logger import get_logger
 _logger = get_logger(__name__)
 
 
+def is_technical_user(token_data: TokenData) -> bool:
+    if not token_data.email and not token_data.name:
+        return True
+    return False
+
+
 class UserService:
     def __init__(self, session: Session, user_repository: UserRepository):
         self._session = session
@@ -37,6 +43,24 @@ class UserService:
 
         if user:
             return user
+
+        # Technical User Registration flow
+        if is_technical_user(token_data):
+            new_user_data = {
+                "keycloak_id": token_data.id,
+                "username": token_data.username,
+                "email": None,
+                "name": None,
+            }
+            # filter out None values to avoid inserting them into the database
+            new_user_data_filtered = {
+                k: v for k, v in new_user_data.items() if v is not None
+            }
+
+            user = self._user_repository.create_user(new_user_data_filtered)
+            self._session.commit()
+            return user
+
         else:
             # creates a new user profile with the data provided in the token
             new_user_data = {

@@ -130,6 +130,19 @@ export const storaSenseApi = createApi({
             }),
         }),
 
+        getMeasurementsFromPastHour: build.query<GetMeasurementsResponse, Omit<GetMeasurementsRequest, "max_date">>({
+            query: ({ sensor_id }) => {
+                const max_date = new Date();
+                max_date.setHours(max_date.getHours() - 1);
+                return {
+                    url: `/measurements/${sensor_id}/filter`,
+                    params: {
+                        max_date: max_date.toISOString()
+                    }
+                };
+            }
+        }),
+
         getHealth: build.query<{ status: string }, void>({
             query: () => ({
                 url: '/health'
@@ -149,6 +162,7 @@ export const {
     useDeleteStorageMutation,
     useGetSensorsQuery,
     useGetMeasurementsQuery,
+    useGetMeasurementsFromPastHourQuery,
     useGetHealthQuery,
     useAddSensorMutation,
     useDeleteSensorMutation,
