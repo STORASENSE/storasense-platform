@@ -14,6 +14,7 @@ RUN poetry config virtualenvs.create false \
     && poetry install --with test --no-interaction --no-ansi --no-root
 
 
-COPY ./test/ ./test
 
-cmd ["pytest","./test/integration" ]
+COPY ./test/ ./test
+RUN chmod +x ./test/integration/entrypoint.sh
+ENTRYPOINT ["./test/integration/entrypoint.sh"]

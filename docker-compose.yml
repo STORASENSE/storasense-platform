@@ -33,6 +33,11 @@ services:
     image: quay.io/keycloak/keycloak:latest
     container_name: keycloak
     restart: always
+    healthcheck:
+      test: ['CMD-SHELL', '[ -f /tmp/HealthCheck.java ] || echo "public class HealthCheck { public static void main(String[] args) throws java.lang.Throwable { System.exit(java.net.HttpURLConnection.HTTP_OK == ((java.net.HttpURLConnection)new java.net.URL(args[0]).openConnection()).getResponseCode() ? 0 : 1); } }" > /tmp/HealthCheck.java && java /tmp/HealthCheck.java http://localhost:9000/health/live']
+      interval: 5s
+      timeout: 5s
+      retries: 30
     environment:
       - KC_DB=postgres
       - KC_DB_URL_HOST=${POSTGRES_HOST} # Use timescaledb as the database
@@ -44,7 +49,10 @@ services:
       - KC_PROXY=edge
       - KC_PROXY_HEADERS=xforwarded
       - KC_CACHE=local
+      - KC_HEALTH_ENABLED=true
     command: start
+
+
     networks:
       storasense-network:
         aliases:
@@ -111,7 +119,10 @@ services:
       - frontend # Start after the whole system is up
 
   app:
-    image: ghcr.io/storasense/storasense-platform/storasense-backend-app:latest
+    #image: ghcr.io/storasense/storasense-platform/storasense-backend-app:latest
+    build:
+        context: .
+        dockerfile: ./backend/src/app/Dockerfile
     env_file: .env
     restart: always
     networks:
@@ -169,14 +180,18 @@ services:
     build:
       context: .
       dockerfile: ./test/integration/Dockerfile
+    environment:
+      - OPERATING_MODE=INSIDE # Use INSIDE mode for integration tests
     env_file: .env
+
+
     networks:
       - storasense-network
     depends_on:
         app:
           condition: service_started
         keycloak:
-          condition: service_started
+          condition: service_healthy
     #profiles:
     # - integration-tests
 

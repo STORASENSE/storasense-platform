@@ -17,7 +17,10 @@ _token_expires_at = 0
 
 
 def get_keycloak_config():
-    keycloak_url = os.getenv("TEST_KEYCLOAK_URL")
+    operating_mode = os.getenv("OPERATING_MODE")
+    if not operating_mode:
+        raise RuntimeError("OPERATING_MODE environment variable not set")
+    keycloak_url = os.getenv(f"{operating_mode}_TEST_KEYCLOAK_URL")
     realm_name = os.getenv("KEYCLOAK_REALM")
     client_id = os.getenv("TEST_KEYCLOAK_CLIENT_ID")
     client_secret = os.getenv("TEST_KEYCLOAK_CLIENT_SECRET")
@@ -34,7 +37,9 @@ def get_keycloak_config():
 
 
 def call_me_endpoint(token):
-    backend_init_url = os.getenv("TEST_BACKEND_INIT_URL")
+    backend_init_url = os.getenv(
+        f"{os.getenv('OPERATING_MODE')}_TEST_BACKEND_INIT_URL"
+    )
     if not backend_init_url:
         _logger.error("TEST_BACKEND_INIT_URL environment variable not set")
         return

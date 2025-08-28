@@ -10,7 +10,7 @@ import sqlite3
 
 def login():
     options = webdriver.ChromeOptions()
-    options.add_argument("--headless")
+    # options.add_argument("--headless")
     options.add_argument("--no-sandbox")
     options.add_argument("--ignore-certificate-errors")
     driver = webdriver.Chrome(options=options)
@@ -23,7 +23,7 @@ def login():
     username_input = driver.find_element(By.ID, "username")
     username_input.send_keys(os.getenv("TEST_USER"))
     password_input = driver.find_element(By.ID, "password")
-    password_input.send_keys(os.getenv("TEST_PASSWORD"))
+    password_input.send_keys(os.getenv("TEST_USER_PASSWORD"))
     password_input.send_keys(Keys.RETURN)
     return driver
 

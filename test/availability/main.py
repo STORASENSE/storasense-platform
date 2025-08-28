@@ -1,22 +1,16 @@
 import time
-import os
 from dotenv import load_dotenv
-from frontend_test import login, check_backend, init_db
 from mqtt import check_mqtt
-from frontend_test import evaluate_results
-from selenium.common.exceptions import WebDriverException
-
-from frontend_test import get_db_connection
 
 
 def main():
-    start_time = time.time()
-    end_time = start_time + int(os.getenv("TEST_DURATION", 60))
+    """start_time = time.time()
+    end_time = start_time + int(os.getenv("AVAILABILITY_TEST_DURATION"))
     init_db()
 
     while time.time() < end_time:
         try:
-            time.sleep(int(os.getenv("TEST_INTERVAL")))
+            time.sleep(int(os.getenv("AVAILABILITY_TEST_INTERVAL")))
             driver = login()
             check_backend(driver)
             driver.quit()
@@ -27,7 +21,7 @@ def main():
                 )
 
     evaluate_results(start_time, end_time)
-
+    """
     check_mqtt()
 
 

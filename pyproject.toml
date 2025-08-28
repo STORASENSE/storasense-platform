@@ -43,6 +43,7 @@ commitizen = "^4.8.3"
 [tool.poetry.group.test.dependencies]
 selenium = "^4.35.0"
 psycopg2-binary = "^2.9.10"
+pytest-dependency = "^0.6.0"
 
 [tool.commitizen]
 name = "cz_conventional_commits"

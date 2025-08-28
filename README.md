@@ -170,3 +170,6 @@ chmod +x ./db-scripts/db-scripts.sh
 | Backend-API Documentation <br> (SwaggerUI) | [https://api.storasense.de/docs](https://api.storasense.de/docs)                                                                |
 | Keycloak-Configuration / Admin-Console     | [https://auth.storasense.de](https://auth.storasense.de) / [https://auth.storasense.de/admin](https://auth.storasense.de/admin) |
 | Traefik Dashboard                           | [https://traefik.storasense.de](https://traefik.storasense.de)                                                                  |
+
+## Run Tests
+- Integration tests```docker-compose --profile integration-tests up --abort-on-container-exit --exit-code-from integration-tests```

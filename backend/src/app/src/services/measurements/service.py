@@ -81,11 +81,12 @@ class MeasurementService:
 
         :param sensor_id: The ID of the sensor that recorded the measurement.
         :param request: The request for measurement creation.
-        :param username: The username of the requester, must be "mqtt-client".
+        :param username: The username of the requester, must be "mqtt-client" or "testUser01-client".
         """
         if (
-            username
-            != "service-account-mqtt-client"  # username of technical users is always theirs client_id
+            username != "service-account-mqtt-client"
+            and username
+            != "service-account-testuser01-client"  # username of technical users is always theirs client_id
         ):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
