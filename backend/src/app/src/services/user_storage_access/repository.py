@@ -35,6 +35,16 @@ class UserStorageAccessRepository(
             return None
         return association.role
 
+    def add_user_to_storage(
+        self, user_id: UUID, storage_id: UUID, role: UserRole
+    ):
+        if self.exists((user_id, storage_id)):
+            return
+        assoc = UserStorageAccessModel(
+            user_id=user_id, storage_id=storage_id, role=role
+        )
+        self.create(assoc)
+
 
 def inject_user_storage_access_repository(
     session: Session = Depends(open_session),

@@ -6,10 +6,17 @@ from backend.src.app.src.services.auth.errors import (
     AuthorizationError,
     UnknownAuthPrincipalError,
 )
+from backend.src.app.src.services.storages.errors import StorageNotFoundError
+from backend.src.app.src.services.storages.repository import (
+    StorageRepository,
+    inject_storage_repository,
+)
 from backend.src.app.src.services.user_storage_access.repository import (
     UserStorageAccessRepository,
     inject_user_storage_access_repository,
 )
+from backend.src.app.src.services.users.errors import UserDoesNotExistError
+from backend.src.app.src.shared.database.enums import UserRole
 from .schemas import UserByStorageIdResponse
 
 from ..auth.schemas import TokenData
@@ -32,10 +39,12 @@ class UserService:
         self,
         session: Session,
         user_repository: UserRepository,
+        storage_repository: StorageRepository,
         user_storage_access_repository: UserStorageAccessRepository,
     ):
         self._session = session
         self._user_repository = user_repository
+        self._storage_repository = storage_repository
         self._user_storage_access_repository = user_storage_access_repository
 
     def get_or_create_user_by_keycloak_id(
@@ -112,14 +121,47 @@ class UserService:
             )
         return result
 
+    def add_user_to_storage(
+        self, username: str, storage_id: UUID, token_data: TokenData
+    ):
+        principal = self._user_repository.find_by_keycloak_id(token_data.id)
+        if principal is None:
+            raise UnknownAuthPrincipalError(
+                "Could not user to storage because authentication token is invalid"
+            )
+        principal_role = self._user_storage_access_repository.find_user_role(
+            principal.id, storage_id
+        )
+        if not principal_role == UserRole.ADMIN:
+            raise AuthorizationError(
+                "Could not add user to storage because authentication principal is not admin of storage"
+            )
+        user = self._user_repository.find_by_username(username)
+        if user is None:
+            raise UserDoesNotExistError(
+                "Could not add user to storage because user does not exist"
+            )
+        if not self._storage_repository.exists(storage_id):
+            raise StorageNotFoundError(
+                "Could not add user to storage because storage does not exist"
+            )
+        self._user_storage_access_repository.add_user_to_storage(
+            user.id, storage_id, UserRole.CONTRIBUTOR
+        )
+        self._session.commit()
+
 
 def inject_user_service(
     session: Session = Depends(open_session),
     user_repository: UserRepository = Depends(inject_user_repository),
+    storage_repository: StorageRepository = Depends(inject_storage_repository),
     user_storage_access_repository: UserStorageAccessRepository = Depends(
         inject_user_storage_access_repository
     ),
 ) -> UserService:
     return UserService(
-        session, user_repository, user_storage_access_repository
+        session,
+        user_repository,
+        storage_repository,
+        user_storage_access_repository,
     )

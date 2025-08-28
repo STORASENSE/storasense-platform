@@ -5,6 +5,8 @@ from backend.src.app.src.services.auth.errors import (
     AuthorizationError,
     UnknownAuthPrincipalError,
 )
+from backend.src.app.src.services.storages.errors import StorageNotFoundError
+from backend.src.app.src.services.users.errors import UserDoesNotExistError
 from ..auth.service import auth_service, TokenData
 from ..users.service import UserService, inject_user_service
 from .models import UserModel
@@ -53,4 +55,24 @@ async def find_users_by_storage_id(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authentication principal is not authorized to access the requested resource.",
+        )
+
+
+@router.post("/{username}/addToStorage")
+def add_user_to_storage(
+    username: str,
+    storage_id: UUID,
+    token_data: TokenData = Depends(auth_service.get_current_user),
+    user_service: UserService = Depends(inject_user_service),
+):
+    try:
+        user_service.add_user_to_storage(username, storage_id, token_data)
+    except (UnknownAuthPrincipalError, AuthorizationError):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication principal is not authorized to access the requested resource.",
+        )
+    except (UserDoesNotExistError, StorageNotFoundError) as e:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail=repr(e)
         )

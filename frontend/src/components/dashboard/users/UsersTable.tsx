@@ -1,6 +1,6 @@
 "use client"
 
-import {FC, useMemo} from "react";
+import {FC, useMemo, useState} from "react";
 import {useSelector} from "react-redux";
 import {RootState} from "@/redux/store";
 import {useGetMeQuery, useGetUsersByStorageIdQuery} from "@/redux/api/storaSenseApi";
@@ -9,6 +9,9 @@ import {Skeleton} from "@/components/ui/skeleton";
 import {Card} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
 import {UserRole} from "@/redux/api/storaSenseApiSchemas";
+import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import AddUserToStorageForm from "./AddUserToStorageForm";
+import { FaTrashCan as TrashIcon } from "react-icons/fa6";
 
 
 const UsersTable: FC = () => {
@@ -21,11 +24,13 @@ const UsersTable: FC = () => {
         storage_id: activeStorage.id
     });
 
+    const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState<boolean>(false);
+
     const myRole = useMemo(() => {
         if (!users || !me) {
             return undefined;
         }
-        return users.find(user => user.id === me.id)?.role;
+        return users.find(user => user.username === me.username)?.role;
     }, [users, me]);
 
     if (isLoading || isMeLoading) {
@@ -47,9 +52,26 @@ const UsersTable: FC = () => {
         <Card className="p-3">
             {(myRole === UserRole.ADMIN) && (
                 <nav>
-                    <Button>
-                        Add User
-                    </Button>
+                    <Dialog open={isAddUserDialogOpen} onOpenChange={setIsAddUserDialogOpen}>
+                        <DialogTrigger asChild>
+                            <Button>
+                                Add User
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>
+                                    Add User
+                                </DialogTitle>
+                                <DialogDescription>
+                                    Add a new contributor to this storage.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <AddUserToStorageForm
+                                onSuccess={() => setIsAddUserDialogOpen(false)}
+                            />
+                        </DialogContent>
+                    </Dialog>
                 </nav>
             )}
 
@@ -62,17 +84,34 @@ const UsersTable: FC = () => {
                         <TableHead>
                             Role
                         </TableHead>
+                        {(myRole === UserRole.ADMIN) && (
+                            <TableHead>
+                                Actions
+                            </TableHead>
+                        )}
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {users!.map(user => (
                         <TableRow key={user.id}>
-                            <TableCell>
+                            <TableCell className="h-[50px]">
                                 {user.username}
                             </TableCell>
                             <TableCell>
                                 {user.role || <span>None</span>}
                             </TableCell>
+                            {(myRole === UserRole.ADMIN) && (
+                                <TableCell>
+                                    {(user.username !== me!.username) && (
+                                        <Button
+                                            size="sm"
+                                            variant="ghost"
+                                            className="text-cerise-red hover:text-cerise-red-700 hover:bg-cerise-red/5">
+                                            <TrashIcon />
+                                        </Button>
+                                    )}
+                                </TableCell>
+                            )}
                         </TableRow>
                     ))}
                 </TableBody>

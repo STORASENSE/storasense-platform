@@ -81,6 +81,13 @@ export type GetUsersByStorageIdResponse = Array<{
 
 /////////////////////////////////////////////////////////////////////////
 
+export interface AddUserToStorageRequest {
+    username: string;
+    storage_id: string;
+}
+
+/////////////////////////////////////////////////////////////////////////
+
 export interface GetStoragesByUserIdRequest {
     user_id: string;
 }
