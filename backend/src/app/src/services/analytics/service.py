@@ -16,8 +16,12 @@ class AnalyticsService:
         self._repo = repo
 
     def summary(self, window: str):
-        # already exists in your codebase
         return self._repo.get_sensor_summary(WINDOW_TO_INTERVAL[window])
+
+    def summary_by_sensor(self, sensor_id, window):
+        sid = str(sensor_id)
+        items = self._repo.get_sensor_summary(WINDOW_TO_INTERVAL[window])
+        return [it for it in items if it.get("sensor_id") == sid]
 
 
 def inject_analytics_service(

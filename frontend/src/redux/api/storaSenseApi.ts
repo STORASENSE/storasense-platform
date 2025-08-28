@@ -137,12 +137,11 @@ export const storaSenseApi = createApi({
         }),
 
         getAnalyticsSummary: build.query<AnalyticsSummaryResponse, AnalyticsSummaryRequest>({
-            query: (args) => ({
-                url: '/analytics/summary',
-                params: {
-                    window: args.window
-                }
-            })
+          query: ({ sensor_id, window }) => ({
+            url: `/analytics/summaryBySensorId/${sensor_id}`,
+            method: "GET",
+            params: { window },
+          }),
         }),
 
         getHealth: build.query<{ status: string }, void>({

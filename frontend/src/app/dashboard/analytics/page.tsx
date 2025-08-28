@@ -21,11 +21,11 @@ export default function Page() {
             <ActiveStorageRequired>
                 <section className="space-y-6">
                     {/* Window Switcher */}
-                    <TimeWindowSelection />´
+                    <TimeWindowSelection />
                     {/* Top stats */}
-                    <TopStatsSection />´
+                    <TopStatsSection />
                     {/* KPI Cards by type */}
-                    <KpiByTypeSection />´
+                    <KpiByTypeSection />
                     {/* Min/Max per sensor */}
                     <SensorMinMaxChart />
                     {/* Averages by sensor type */}

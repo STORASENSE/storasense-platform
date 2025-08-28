@@ -130,18 +130,20 @@ export interface CreateStorageRequest {
 
 /////////////////////////////////////////////////////////////////////////
 
+
 export type AnalyticsTimeWindow = "7d" | "30d" | "365d";
 
 export interface AnalyticsSummaryRequest {
-    window: AnalyticsTimeWindow;
+  sensor_id: string;
+  window: AnalyticsTimeWindow;
 }
 
 export interface AnalyticsSummaryItem {
-    type: SensorType;
-    sensor_id: string;
-    avg_value: number;
-    min_value: number;
-    max_value: number;
+  type: SensorType;
+  sensor_id: string;
+  avg_value: number;
+  min_value: number;
+  max_value: number;
 }
 
 export type AnalyticsSummaryResponse = AnalyticsSummaryItem[];

@@ -1,12 +1,14 @@
 "use client"
 
 import React, {FC, useMemo} from "react";
-import {useGetAnalyticsSummaryQuery} from "@/redux/api/storaSenseApi";
-import {Skeleton} from "@/components/ui/skeleton";
 import {useSelector} from "react-redux";
 import {RootState} from "@/redux/store";
+import {useGetAnalyticsSummaryQuery, useGetSensorsQuery} from "@/redux/api/storaSenseApi";
 import {AnalyticsTimeWindow} from "@/redux/api/storaSenseApiSchemas";
-
+import {Skeleton} from "@/components/ui/skeleton";
+import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
+import {FaCircleInfo as InfoIcon} from "react-icons/fa6";
+import {error} from "next/dist/build/output/log";
 
 interface StatCardProps {
     label: string;
@@ -50,13 +52,21 @@ interface TopStats {
     overallAvg: number;
 }
 
-
 const TopStatsSection: FC = () => {
     const timeWindow = useSelector((state: RootState) => state.analytics.timeWindow);
+    const activeStorage = useSelector((state: RootState) => state.storage.activeStorage);
 
-    const {data: summary, isLoading, isError, error} = useGetAnalyticsSummaryQuery({
-        window: timeWindow
-    });
+    const { data: sensors, isLoading: sensorsLoading } = useGetSensorsQuery(
+      activeStorage ? { storage_id: activeStorage.id } : ({} as any),
+      { skip: !activeStorage }
+    );
+
+    const sensorId = sensors?.[0]?.id;
+
+    const {data: summary, isLoading, isError} = useGetAnalyticsSummaryQuery({
+            sensor_id: sensorId ?? "", window: timeWindow as AnalyticsTimeWindow },
+            { skip: !sensorId
+        });
 
     const topStats = useMemo<TopStats | undefined>(() => {
         if (!summary) {
@@ -67,6 +77,21 @@ const TopStatsSection: FC = () => {
         const overallAvg = totalSensors ? summary.reduce((a, s) => a + s.avg_value, 0) / totalSensors : 0;
         return { totalSensors, totalTypes, overallAvg };
     }, [summary]);
+
+      if (sensorsLoading) return <Skeleton className="h-24 w-full" />;
+
+      if (!sensors || sensors.length === 0) {
+        return (
+          <Alert>
+            <InfoIcon className="h-4 w-4" />
+            <AlertTitle>Cannot display data.</AlertTitle>
+            <AlertDescription>There are no sensors in this storage!</AlertDescription>
+          </Alert>
+        );
+      }
+
+      if (isLoading) return <Skeleton className="h-24 w-full" />;
+      if (isError || !summary) return null;
 
     if (isLoading) {
         return (

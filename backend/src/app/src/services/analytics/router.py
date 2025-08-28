@@ -1,37 +1,35 @@
-from typing import Literal, List
-from fastapi import APIRouter, Depends, Query, status
-from pydantic import BaseModel
+from uuid import UUID
+from typing import List
+
+from fastapi import Depends, APIRouter, status, HTTPException, Query
+
+from backend.src.app.src.shared.logger import get_logger
 from backend.src.app.src.services.analytics.service import (
     AnalyticsService,
     inject_analytics_service,
 )
+from backend.src.app.src.services.analytics.schemas import (
+    Window,
+    SummaryItem,
+)
 
 router = APIRouter(tags=["analytics"])
-Window = Literal["7d", "30d", "365d"]
-
-
-class DoorOpenItem(BaseModel):
-    day: str
-    sensor_id: str
-    open_seconds: int
-
-
-class SummaryItem(BaseModel):
-    type: str
-    sensor_id: str
-    avg_value: float
-    min_value: float
-    max_value: float
+_logger = get_logger(__name__)
 
 
 @router.get(
-    "/analytics/summary",
+    "/analytics/bySensorId/${storage_id}`",  # /analytics/summaryBySensorId# url: `/analytics/bySensorId/${storage_id}`,
     response_model=List[SummaryItem],
     status_code=status.HTTP_200_OK,
 )
-def analytics_summary(
+def analytics_summary_by_sensor_id(
+    sensor_id: UUID,
     window: Window = Query("7d"),
-    svc: AnalyticsService = Depends(inject_analytics_service),
+    analytics_service: AnalyticsService = Depends(inject_analytics_service),
 ):
-    # Calls your service.summary(window) -> repo.get_sensor_summary(...)
-    return svc.summary(window)
+    try:
+        return analytics_service.summary_by_sensor(sensor_id, window)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+        )
