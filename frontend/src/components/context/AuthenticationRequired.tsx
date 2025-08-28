@@ -5,6 +5,8 @@
 import { FC, ReactNode } from "react";
 import useKeycloak from '../../auth/useKeycloak';
 import { FaLock as LockIcon } from "react-icons/fa6";
+import {useSelector} from "react-redux";
+import {RootState} from "@/redux/store";
 
 
 interface AuthenticationRequiredProps {
@@ -12,8 +14,9 @@ interface AuthenticationRequiredProps {
 }
 
 const AuthenticationRequired: FC<AuthenticationRequiredProps> = ({ children }) => {
+    const token = useSelector((state: RootState) => state.auth.token);
     const { keycloak, isLoading, isError } = useKeycloak();
-    if (isLoading || isError || !keycloak?.authenticated) {
+    if (!token || isLoading || isError || !keycloak?.authenticated) {
         return (
             <header className="mt-5 flex flex-col items-center">
                 <h1 className="flex items-center gap-2 text-blue-whale text-xl font-semibold">

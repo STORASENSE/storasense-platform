@@ -6,6 +6,7 @@ from backend.src.app.src.services.auth.errors import (
     AuthorizationError,
     UnknownAuthPrincipalError,
 )
+from .schemas import UserByStorageIdResponse
 
 from ..auth.schemas import TokenData
 from .models import UserModel
@@ -14,6 +15,10 @@ from .repository import (
     inject_user_repository,
 )
 from ...shared.database.engine import open_session
+from ...shared.logger import get_logger
+
+
+_logger = get_logger(__name__)
 
 
 class UserService:
@@ -52,18 +57,26 @@ class UserService:
 
     def find_all_by_storage_id(
         self, storage_id: UUID, token_data: TokenData
-    ) -> list[UserModel]:
-        user = self._user_repository.find_by_keycloak_id(token_data.id)
-        if user is None:
+    ) -> list[UserByStorageIdResponse]:
+        principal = self._user_repository.find_by_keycloak_id(token_data.id)
+        if principal is None:
             raise UnknownAuthPrincipalError(
                 "Could not fetch all users in storage because authentication token is invalid"
             )
         users = self._user_repository.find_all_by_storage_id(storage_id)
-        if user not in users:
+        if principal not in users:
             raise AuthorizationError(
                 "Could not fetch all users in storage because requesting client is unauthorized"
             )
-        return users
+        result: list[UserByStorageIdResponse] = []
+        for user in users:
+            role = self._user_repository.find_user_role(user.id, storage_id)
+            result.append(
+                UserByStorageIdResponse(
+                    id=user.id, username=user.username, role=role
+                )
+            )
+        return result
 
 
 def inject_user_service(

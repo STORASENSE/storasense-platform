@@ -12,7 +12,7 @@ import {
     AddSensorResponse,
     DeleteSensorRequest,
     SensorStatusResponse,
-    StoraSenseStorge,
+    StoraSenseStorge, GetUsersByStorageIdResponse, GetUsersByStorageIdRequest,
 } from "@/redux/api/storaSenseApiSchemas";
 import type { RootState } from '../store';
 
@@ -41,7 +41,7 @@ export const storaSenseApi = createApi({
         }
     }),
 
-    tagTypes: ['Me', 'MyStorages'],
+    tagTypes: ['Me', 'MyStorages', 'UsersInStorage'],
 
     endpoints: (build) => ({
 
@@ -54,6 +54,13 @@ export const storaSenseApi = createApi({
         createMe: build.mutation<StoraSenseUser | undefined, void>({
             query: () => '/users/me',
             invalidatesTags: ['Me', 'MyStorages']
+        }),
+
+        getUsersByStorageId: build.query<GetUsersByStorageIdResponse, GetUsersByStorageIdRequest>({
+            query: ({ storage_id }) => ({
+                url: `/users/byStorageId/${storage_id}`,
+            }),
+            providesTags: ['UsersInStorage']
         }),
 
         getMyStorages: build.query<StoraSenseStorge[], void>({
@@ -136,6 +143,7 @@ export const {
     useGetMeQuery,
     useCreateMeMutation,
     useGetMyStoragesQuery,
+    useGetUsersByStorageIdQuery,
     useGetStoragesByUserIdQuery,
     useCreateStorageMutation,
     useDeleteStorageMutation,
