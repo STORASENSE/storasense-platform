@@ -88,7 +88,7 @@ const AddSensorModal: FC<AddSensorModalProps> = ({ isOpen, onClose }) => {
         setErrorMessage(null);
 
         if (!isFormValid(formData)) {
-            setErrorMessage("Bitte füllen Sie alle Pflichtfelder aus.");
+            setErrorMessage("Please fill out the required fields.");
             return;
         }
 

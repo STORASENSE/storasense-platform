@@ -40,9 +40,21 @@ class StorageService:
         self.user_repository = user_repository
 
     def find_storages_by_user_id(self, user_id: UUID) -> list[StorageModel]:
+        """
+        Find all storages that belong to a specific user.
+        :param user_id: The ID of the user whose storages are to be retrieved.
+        :return: A list of StorageModel instances associated with the user.
+        :raises ValueError: If the user_id is None.
+        """
         return self.storage_repository.find_all_by_user_id(user_id)
 
     def find_my_storages(self, token_data: TokenData) -> list[StorageModel]:
+        """
+        Find all storages that belong to the authenticated user.
+        :param token_data: The token data of the authenticated user.
+        :return: A list of StorageModel instances associated with the authenticated user.
+        :raises UnknownAuthPrincipalError: If the user does not exist.
+        """
         user = self.user_repository.find_by_keycloak_id(token_data.id)
         if user is None:
             raise UnknownAuthPrincipalError(
@@ -51,6 +63,15 @@ class StorageService:
         return self.storage_repository.find_all_by_user_id(user.id)
 
     def create_storage(self, storage: StorageModel, token_data: TokenData):
+        """
+        Creates a storage and associates it with the user as an admin.
+        :param storage: The storage to be created.
+        :param token_data: The token data of the authenticated user.
+        return: None
+        :raises UnknownAuthPrincipalError: If the user does not exist.
+        :raises ValueError: If the storage name is None.
+        :raises StorageAlreadyExistsError: If a storage with the given ID or name already exists
+        """
         user = self.user_repository.find_by_keycloak_id(token_data.id)
         if user is None:
             raise UnknownAuthPrincipalError(
@@ -77,6 +98,15 @@ class StorageService:
         self.session.commit()
 
     def delete_storage(self, storage_id: UUID, token_data: TokenData):
+        """
+        Deletes a storage and associates it with the user as an admin.
+        :param storage_id: The ID of the storage to be deleted.
+        :param token_data: The token data of the authenticated user.
+        return: None
+        :raises UnknownAuthPrincipalError: If the user does not exist.
+        :raises StorageNotFoundError: If the storage does not exist.
+        :raises AuthorizationError: If the user does not have admin rights for the storage.
+        """
         user = self.user_repository.find_by_keycloak_id(token_data.id)
         if user is None:
             raise UnknownAuthPrincipalError(

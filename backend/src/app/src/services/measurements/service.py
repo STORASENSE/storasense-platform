@@ -4,8 +4,18 @@ from uuid import UUID
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
+from backend.src.app.src.services.auth.errors import (
+    UnknownAuthPrincipalError,
+    AuthorizationError,
+)
+from backend.src.app.src.services.auth.schemas import TokenData
+from backend.src.app.src.shared.database.enums import UserRole
 from backend.src.app.src.shared.logger import get_logger
 from backend.src.app.src.services.measurements.models import MeasurementModel
+from backend.src.app.src.services.users.repository import (
+    UserRepository,
+    inject_user_repository,
+)
 from backend.src.app.src.services.measurements.repository import (
     MeasurementRepository,
     inject_measurement_repository,
@@ -31,13 +41,18 @@ class MeasurementService:
         session: Session,
         measurement_repository: MeasurementRepository,
         sensor_repository: SensorRepository,
+        user_repository: UserRepository,
     ):
         self._session = session
         self._measurement_repository = measurement_repository
         self._sensor_repository = sensor_repository
+        self._user_repository = user_repository
+
+    def has_admin_or_contributor_role(self, user_role) -> bool:
+        return user_role in [UserRole.ADMIN, UserRole.CONTRIBUTOR]
 
     def find_all_by_sensor_id(
-        self, sensor_id: UUID, page_request: PageRequest
+        self, sensor_id: UUID, page_request: PageRequest, token_data: TokenData
     ) -> Page[MeasurementModel]:
         """
         Finds all measurements that were recorded by the given sensor. The results are
@@ -47,21 +62,64 @@ class MeasurementService:
         :param page_request: The pagination request.
         :return: The requested measurements.
         """
+        # Check if sensor with the given ID exists
+        sensor = self._sensor_repository.find_by_id(sensor_id)
+        if not sensor:
+            raise SensorDoesNotExistError(
+                f"Sensor with ID {sensor_id} doesnt exist."
+            )
+
+        # Validate user and their role in the storage (must be admin)
+        user = self._user_repository.find_by_keycloak_id(token_data.id)
+        if user is None:
+            raise UnknownAuthPrincipalError(
+                "Requesting authentication principal does not exist"
+            )
+        role = self._user_repository.find_user_role(user.id, sensor.storage_id)
+        if not self.has_admin_or_contributor_role(role):
+            raise AuthorizationError(
+                "User is not authorized, to view measurements of this sensor."
+            )
+
         return self._measurement_repository.find_all_by_sensor_id(
             sensor_id, page_request
         )
 
     def find_all_by_sensor_id_and_max_date(
-        self, sensor_id: UUID, max_date: datetime
+        self, sensor_id: UUID, max_date: datetime, token_data: TokenData
     ) -> list[MeasurementModel]:
+        """
+        Finds all measurements that were recorded by the given sensor after the given date.
+        The results are ordered from newest to oldest.
+        Condition: The sensor with the given ID must exist.
+        Condition_2: The user must be an admin or contributor of the storage the sensor belongs to.
+
+        :param sensor_id: The ID of the sensor whose measurements should be retrieved.
+        :param max_date: The date after which measurements should be retrieved.
+        :param token_data: The token data of the requesting user.
+        """
         _logger.info(
             f"Finding measurements for sensor '{sensor_id}' after date '{max_date}'"
         )
 
-        if not self._sensor_repository.exists(sensor_id):
+        # Check if sensor with the given ID exists
+        sensor = self._sensor_repository.find_by_id(sensor_id)
+        if not sensor:
             _logger.info(f"Requested sensor '{sensor_id}' does not exist!")
             raise SensorDoesNotExistError(
                 f"Sensor with ID '{sensor_id}' does not exist"
+            )
+
+        # Validate user and their role in the storage (must be admin)
+        user = self._user_repository.find_by_keycloak_id(token_data.id)
+        if user is None:
+            raise UnknownAuthPrincipalError(
+                "Requesting authentication principal does not exist"
+            )
+        role = self._user_repository.find_user_role(user.id, sensor.storage_id)
+        if not self.has_admin_or_contributor_role(role):
+            raise AuthorizationError(
+                "User is not authorized, to view measurements of this sensor."
             )
 
         result = (
@@ -85,7 +143,9 @@ class MeasurementService:
 
         sensor = self._sensor_repository.find_by_id(sensor_id)
         if not sensor:
-            raise ValueError(f"Sensor with ID {sensor_id} does not exist.")
+            raise SensorDoesNotExistError(
+                f"Sensor with ID {sensor_id} does not exist."
+            )
 
         measurement = MeasurementModel()
         measurement.sensor_id = sensor_id
@@ -104,7 +164,11 @@ def inject_measurement_service(
         inject_measurement_repository
     ),
     sensor_repository: SensorRepository = Depends(inject_sensor_repository),
+    user_repository: UserRepository = Depends(inject_user_repository),
 ) -> MeasurementService:
     return MeasurementService(
-        session, measurement_repository, sensor_repository
+        session,
+        measurement_repository,
+        sensor_repository,
+        user_repository,
     )

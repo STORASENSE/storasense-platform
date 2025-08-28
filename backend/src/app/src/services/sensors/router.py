@@ -2,10 +2,13 @@ from uuid import UUID
 
 from fastapi import Depends, APIRouter, status, HTTPException
 
+from backend.src.app.src.services.auth.schemas import TokenData
+from backend.src.app.src.services.auth.service import auth_service
 from backend.src.app.src.services.sensors.schemas import (
     CreateSensorRequest,
     SensorMetadata,
     SensorStatusResponse,
+    DeleteSensorRequest,
 )
 from backend.src.app.src.services.sensors.service import (
     SensorService,
@@ -59,9 +62,10 @@ def create_sensor(
     sensor_id: UUID,
     request: CreateSensorRequest,
     sensor_service: SensorService = Depends(inject_sensor_service),
+    token_data: TokenData = Depends(auth_service.get_current_user),
 ):
     try:
-        sensor_service.create_sensor(sensor_id, request)
+        sensor_service.create_sensor(sensor_id, token_data, request)
 
     except Exception as e:
         raise HTTPException(
@@ -72,10 +76,12 @@ def create_sensor(
 @router.delete("/sensors/{sensor_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_sensor(
     sensor_id: UUID,
+    request: DeleteSensorRequest,
     sensor_service: SensorService = Depends(inject_sensor_service),
+    token_data: TokenData = Depends(auth_service.get_current_user),
 ):
     try:
-        sensor_service.delete_sensor(sensor_id)
+        sensor_service.delete_sensor(sensor_id, token_data, request)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)

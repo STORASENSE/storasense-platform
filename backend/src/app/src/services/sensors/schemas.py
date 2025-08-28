@@ -24,6 +24,10 @@ class CreateSensorRequest(BaseModel):
     allowed_max: float | None = None
 
 
+class DeleteSensorRequest(BaseModel):
+    storage_id: UUID
+
+
 class SensorResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

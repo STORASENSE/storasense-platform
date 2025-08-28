@@ -21,5 +21,5 @@ class UserPublicResponse(BaseModel):
     """Public User Response Schema"""
 
     username: str
-    email: str
-    name: str
+    email: Optional[str] = None
+    name: Optional[str] = None

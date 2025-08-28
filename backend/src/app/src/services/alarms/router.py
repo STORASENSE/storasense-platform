@@ -10,6 +10,8 @@ from backend.src.app.src.services.alarms.service import (
     AlarmService,
     inject_alarm_service,
 )
+from backend.src.app.src.services.auth.schemas import TokenData
+from backend.src.app.src.services.auth.service import auth_service
 from backend.src.app.src.shared.database.pagination import PageRequest
 
 router = APIRouter()
@@ -19,10 +21,11 @@ router = APIRouter()
 def find_alarm_by_id(
     alarm_id: UUID,
     alarm_service: AlarmService = Depends(inject_alarm_service),
+    token_data: TokenData = Depends(auth_service.get_current_user),
 ) -> AlarmResponse:
     """Get a specific alarm by its ID."""
     try:
-        alarm = alarm_service.find_alarm_by_id(alarm_id)
+        alarm = alarm_service.find_alarm_by_id(alarm_id, token_data)
         if not alarm:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -53,6 +56,7 @@ def find_alarm_by_id(
 def find_alarms_by_storage_id(
     storage_id: UUID,
     alarm_service: AlarmService = Depends(inject_alarm_service),
+    token_data: TokenData = Depends(auth_service.get_current_user),
 ):
     """
     Returns latest 50 alarms for a given storage.
@@ -60,7 +64,7 @@ def find_alarms_by_storage_id(
     try:
         page_request = PageRequest(1, 50)
         alarms_page = alarm_service.find_alarms_by_storage_id(
-            storage_id, page_request
+            storage_id, page_request, token_data
         )
         return [
             AlarmResponse(
@@ -72,6 +76,25 @@ def find_alarms_by_storage_id(
             )
             for alarm in alarms_page.items
         ]
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=str(e)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+        )
+
+
+@router.delete("/alarms/{alarm_id}", status_code=status.HTTP_200_OK)
+def delete_alarm(
+    alarm_id: UUID,
+    token_data: TokenData = Depends(auth_service.get_current_user),
+    alarm_service: AlarmService = Depends(inject_alarm_service),
+) -> None:
+    """Delete a specific alarm by its ID."""
+    try:
+        alarm_service.delete_alarm(alarm_id, token_data)
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=str(e)

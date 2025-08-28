@@ -98,9 +98,6 @@ export const storaSenseApi = createApi({
                 url: `/sensors/${sensor_id}`,
                 method: 'POST',
                 body: sensor,
-                headers: {
-                    'Content-Type': 'application/json'
-                }
             })
         }),
 
@@ -112,9 +109,10 @@ export const storaSenseApi = createApi({
         }),
 
         deleteSensor: build.mutation<void, DeleteSensorRequest>({
-            query: ({ sensor_id }) => ({
+            query: ({ sensor_id, sensor }) => ({
                 url: `/sensors/${sensor_id}`,
-                method: 'DELETE'
+                method: 'DELETE',
+                body: sensor
             })
         }),
 
@@ -141,7 +139,8 @@ export const storaSenseApi = createApi({
 
         getHealth: build.query<{ status: string }, void>({
             query: () => ({
-                url: '/health'
+                url: '/health',
+                method: 'GET'
             })
         }),
 

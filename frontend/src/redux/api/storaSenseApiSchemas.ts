@@ -110,6 +110,9 @@ export interface AddSensorResponse {
 
 export interface DeleteSensorRequest {
     sensor_id: string;
+    sensor: {
+        storage_id: string;
+    }
 }
 
 export interface SensorStatusResponse {

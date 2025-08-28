@@ -1,9 +1,15 @@
+import os
 import random
 from datetime import datetime, timedelta
 
 from sqlalchemy.orm import Session
 from uuid import UUID
 
+from backend.src.app.src.services.alarms.models import AlarmModel
+from backend.src.app.src.services.users.models import UserModel
+from backend.src.app.src.shared.database.join_tables.user_storage import (
+    UserStorageAccess,
+)
 from backend.src.app.src.shared.logger import get_logger
 from backend.src.app.src.services.measurements.models import MeasurementModel
 from backend.src.app.src.services.sensors.models import SensorModel
@@ -11,14 +17,12 @@ from backend.src.app.src.services.storages.models import StorageModel
 from backend.src.app.src.shared.database.enums import (
     SensorType,
     MeasurementUnit,
+    AlarmSeverity,
+    UserRole,
 )
 
 
 _logger = get_logger(__name__)
-
-
-def seed_users(session: Session):
-    pass
 
 
 def seed_storages(session: Session):
@@ -106,7 +110,56 @@ def seed_measurements(session: Session):
 
 
 def seed_alarms(session: Session):
-    pass
+    sensor = session.query(SensorModel).first()
+    if not sensor:
+        _logger.warning("Kein Sensor gefunden, Alarm-Seeding übersprungen.")
+        return
+
+    alarm = AlarmModel(
+        message="Testalarm: Temperatur out of range",
+        severity=AlarmSeverity.HIGH,
+        sensor_id=sensor.id,
+        created_at=datetime.now(),
+    )
+    session.add(alarm)
+    _logger.info(f"Alarm for sensor {sensor.name} created.")
+
+
+def seed_users(session: Session):
+    keycloak_user_id = UUID(os.environ.get("TEST_USER_KEYCLOAK_ID"))
+    email = os.environ.get("TEST_USER_EMAIL")
+    name = os.environ.get("TEST_USER_NAME")
+    username = os.environ.get("TEST_USER")
+
+    if not keycloak_user_id and not email and not name and not username:
+        raise RuntimeError(
+            "Seeding dev environment is not configured correctly. Please check environment variables."
+        )
+
+    user = (
+        session.query(UserModel)
+        .filter_by(keycloak_id=str(keycloak_user_id))
+        .first()
+    )
+    if not user:
+        user = UserModel(
+            keycloak_id=str(keycloak_user_id),
+            email=email,
+            name=name,
+            username=username,
+        )
+        session.add(user)
+        session.flush()
+
+    storage = session.query(StorageModel).first()
+    if storage:
+        user_storage = UserStorageAccess(
+            user_id=user.id,
+            storage_id=storage.id,
+            role=UserRole.ADMIN,
+        )
+        session.add(user_storage)
+        session.flush()
 
 
 def seed_dev_data(session: Session):
@@ -120,6 +173,7 @@ def seed_dev_data(session: Session):
         seed_sensors(session)
         seed_measurements(session)
         seed_alarms(session)
+        seed_users(session)
         session.commit()
         _logger.info("Seeding successful!")
     except Exception as e:

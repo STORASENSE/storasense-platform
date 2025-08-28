@@ -38,12 +38,13 @@ def find_sensor_measurements(
     measurement_service: MeasurementService = Depends(
         inject_measurement_service
     ),
+    token_data: TokenData = Depends(auth_service.get_current_user),
 ):
     page_request = PageRequest(0, 100)
 
     try:
         measurements = measurement_service.find_all_by_sensor_id(
-            sensor_id, page_request
+            sensor_id, page_request, token_data
         )
         return measurements
 
@@ -64,11 +65,12 @@ def find_measurements_by_sensor_id_and_max_date(
     measurement_service: MeasurementService = Depends(
         inject_measurement_service
     ),
+    token_data: TokenData = Depends(auth_service.get_current_user),
 ) -> GetMeasurementsResponse:
     _logger.info("Got HTTP request at '/measurements/{sensor_id}/filter'")
     try:
         result = measurement_service.find_all_by_sensor_id_and_max_date(
-            sensor_id, max_date
+            sensor_id, max_date, token_data
         )
     except SensorDoesNotExistError:
         _logger.info("Returning HTTP error due to nonexistent sensor")
