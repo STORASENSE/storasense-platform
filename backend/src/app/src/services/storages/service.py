@@ -17,15 +17,15 @@ from backend.src.app.src.services.storages.repository import (
     StorageRepository,
     inject_storage_repository,
 )
+from backend.src.app.src.services.user_storage_access.models import (
+    UserStorageAccessModel,
+)
 from backend.src.app.src.services.users.repository import (
     UserRepository,
     inject_user_repository,
 )
 from backend.src.app.src.shared.database.engine import open_session
 from backend.src.app.src.shared.database.enums import UserRole
-from backend.src.app.src.shared.database.join_tables.user_storage import (
-    UserStorageAccess,
-)
 
 
 class StorageService:
@@ -71,7 +71,7 @@ class StorageService:
                 "Could not create storage because a storage with the given name already exists"
             )
         storage.user_associations.append(
-            UserStorageAccess(user=user, role=UserRole.ADMIN)
+            UserStorageAccessModel(user=user, role=UserRole.ADMIN)
         )
         self.storage_repository.create(storage)
         self.session.commit()

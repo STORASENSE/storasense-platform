@@ -6,6 +6,10 @@ from backend.src.app.src.services.auth.errors import (
     AuthorizationError,
     UnknownAuthPrincipalError,
 )
+from backend.src.app.src.services.user_storage_access.repository import (
+    UserStorageAccessRepository,
+    inject_user_storage_access_repository,
+)
 from .schemas import UserByStorageIdResponse
 
 from ..auth.schemas import TokenData
@@ -15,10 +19,6 @@ from .repository import (
     inject_user_repository,
 )
 from ...shared.database.engine import open_session
-from ...shared.logger import get_logger
-
-
-_logger = get_logger(__name__)
 
 
 def is_technical_user(token_data: TokenData) -> bool:
@@ -28,9 +28,15 @@ def is_technical_user(token_data: TokenData) -> bool:
 
 
 class UserService:
-    def __init__(self, session: Session, user_repository: UserRepository):
+    def __init__(
+        self,
+        session: Session,
+        user_repository: UserRepository,
+        user_storage_access_repository: UserStorageAccessRepository,
+    ):
         self._session = session
         self._user_repository = user_repository
+        self._user_storage_access_repository = user_storage_access_repository
 
     def get_or_create_user_by_keycloak_id(
         self, token_data: TokenData
@@ -94,7 +100,11 @@ class UserService:
             )
         result: list[UserByStorageIdResponse] = []
         for user in users:
-            role = self._user_repository.find_user_role(user.id, storage_id)
+            role = self._user_storage_access_repository.find_user_role(
+                user.id, storage_id
+            )
+            if role is None:
+                continue
             result.append(
                 UserByStorageIdResponse(
                     id=user.id, username=user.username, role=role
@@ -106,5 +116,10 @@ class UserService:
 def inject_user_service(
     session: Session = Depends(open_session),
     user_repository: UserRepository = Depends(inject_user_repository),
+    user_storage_access_repository: UserStorageAccessRepository = Depends(
+        inject_user_storage_access_repository
+    ),
 ) -> UserService:
-    return UserService(session, user_repository)
+    return UserService(
+        session, user_repository, user_storage_access_repository
+    )
