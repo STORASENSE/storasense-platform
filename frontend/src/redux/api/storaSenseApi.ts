@@ -12,8 +12,13 @@ import {
     AddSensorResponse,
     DeleteSensorRequest,
     SensorStatusResponse,
-    StoraSenseStorge, GetUsersByStorageIdResponse, GetUsersByStorageIdRequest,
-    AddUserToStorageRequest, RemoveUserFromStorageRequest,
+    StoraSenseStorge,
+    AnalyticsSummaryResponse,
+    AnalyticsSummaryRequest,
+    GetUsersByStorageIdResponse,
+    GetUsersByStorageIdRequest,
+    AddUserToStorageRequest,
+    RemoveUserFromStorageRequest,
 } from "@/redux/api/storaSenseApiSchemas";
 import type { RootState } from '../store';
 
@@ -162,6 +167,14 @@ export const storaSenseApi = createApi({
             }
         }),
 
+        getAnalyticsSummary: build.query<AnalyticsSummaryResponse, AnalyticsSummaryRequest>({
+          query: ({ sensor_id, window }) => ({
+            url: `/analytics/summaryBySensorId/${sensor_id}`,
+            method: "GET",
+            params: { window },
+          }),
+        }),
+
         getHealth: build.query<{ status: string }, void>({
             query: () => ({
                 url: '/health'
@@ -187,5 +200,6 @@ export const {
     useGetHealthQuery,
     useAddSensorMutation,
     useDeleteSensorMutation,
-    useGetSensorStatusQuery
+    useGetSensorStatusQuery,
+    useGetAnalyticsSummaryQuery,
 } = storaSenseApi;
