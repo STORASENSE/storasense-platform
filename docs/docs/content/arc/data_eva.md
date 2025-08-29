@@ -2,7 +2,7 @@
 
 ## Datenmodellierung (Konzeptuell)
 Vor der Auswahl einer spezifischen Datenbanktechnologie wird das fachliche Datenmodell definiert, das alle für das System STORASENSE relevanten Informationen und deren Beziehungen
-zueinander abbildet. Diese ergeben sich aus den definierten [Anforderungen](mvp.md). <br> Insgesamt basiert das Modell auf **fünf Entitäten**:
+zueinander abbildet. Diese ergeben sich aus den definierten [Anforderungen](content/about/mvp.md). <br> Insgesamt basiert das Modell auf **fünf Entitäten**:
 
 * **User**: Stellt eine Person dar, die mit dem System interagiert.
 Ein Benutzer beinhaltet folgende Attribute:
@@ -47,7 +47,7 @@ Das erwartete Datenvolumen ist moderat, da das System in erster Linie Echtzeitda
 
 ### Datenmenge
 #### Measurement:
-Wie eingangs im [Projektüberblick](mvp.md#funktionale-anforderungen) beschrieben, besteht die Sensorik des Systems aus vier Sensoren die täglich für 2.5 Monate alle 30 Sekunden Messwerte erfassen.
+Wie eingangs im [Projektüberblick](content/about/mvp.md#funktionale-anforderungen) beschrieben, besteht die Sensorik des Systems aus vier Sensoren die täglich für 2.5 Monate alle 30 Sekunden Messwerte erfassen.
 Folgende Rechnung verdeutlicht die erwartete Datenmenge:
 
 * Anzahl der Sensoren: 4
@@ -63,7 +63,7 @@ Insgesamt werden also ca. **864.000 Messpunkte** erwartet, die in der Datenbank 
 #### Weitere Entitäten:
 Die weiteren Entitäten haben eine deutlich geringere Anzahl an Instanzen:
 
-* Wie bereits im [Projektüberblick](mvp.md#funktionale-anforderungen) beschrieben unterstützt das System bis zu 500 Benutzer und 50 Lagerorte.
+* Wie bereits im [Projektüberblick](content/about/mvp.md#funktionale-anforderungen) beschrieben unterstützt das System bis zu 500 Benutzer und 50 Lagerorte.
 * Weiter sind 2 Rollen vorgesehen, die den Benutzern zugeordnet werden können.
 * Die letzten 500 Alarme eines Lagerorts werden ebenfalls gespeichert. So ergibt sich eine maximale Anzahl von 25.000 Alarm-Einträgen (500 Alarme x 50 Lagerorte).
 
@@ -137,7 +137,7 @@ Die Auswahl der Datenbanktechnologie erfolgt nun anhand folgender Kriterien:
 
 * **Unterstützung des Datenmodells**: Die Datenbank muss in der Lage sein, die definierten Entitäten und deren Beziehungen ([vgl. Datenmodellierung](data_eva.md#datenmodellierung)) effizient abzubilden. Beispielsweise gilt es die Grundlage für die Sicherheit des Systems zu schaffen (vgl. [Nichtfunktionale Anforderungen <=> Datendomäne](data_eva.md#nicht-funktionale-anforderungen--datendomäne)). <br>
 <br>
-* **Komplexität**: Die Implementierung des Datenmodells sollte sich insbesondere den fachlichen [Rahmenbedingungen](mvp.md#rahmenbedingungen) des Projekts anpassen. <br> Aufgrund der Projektlaufzeit von 2.5 Monaten und der Teamgröße von 4 Personen gilt es somit unnötige Komplexität zu vermeiden. <br>
+* **Komplexität**: Die Implementierung des Datenmodells sollte sich insbesondere den fachlichen [Rahmenbedingungen](content/about/mvp.md#rahmenbedingungen) des Projekts anpassen. <br> Aufgrund der Projektlaufzeit von 2.5 Monaten und der Teamgröße von 4 Personen gilt es somit unnötige Komplexität zu vermeiden. <br>
   * *Anmerkung: Das berechnete [Datenvolumen](data_eva.md#datenvolumen) ist mit unter 1 MB pro Woche sehr gering. Daher sind Skalierungsmechanismen (wie z.B. horizontales Sharding) für dieses Projekt nicht relevant. Das Kriterium bewertet stattdessen, wie gut die Datenbanktechnologie mit diesem spezifischen, moderaten Datenvolumen umgeht, ohne unnötigen administrativen oder ressourcentechnischen Overhead zu erzeugen. <br>*
 
 
@@ -209,7 +209,7 @@ Stattdessen identifiziert TimescaleDB sofort, welcher Chunk (oder welche wenigen
 
 Die modellierte Datenbank sieht wie folgt aus:
 
-![](./images/data_eva/erd.svg)
+![](../../images/data_eva/erd.svg)
 
 Hierbei wurden die folgenden Konzepte wahrgenommen:
 
