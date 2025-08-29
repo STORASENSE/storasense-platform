@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from backend.src.app.src.services.users.models import UserModel
 
 
-class UserStorageAccess(BaseModel):
+class UserStorageAccessModel(BaseModel):
     """
     This class represents the junktion table for the many-to-many relationship between
     the `User` and the `Storage` tables. It also contains the `UserRole` that can be used

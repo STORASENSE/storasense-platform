@@ -13,6 +13,11 @@ export interface Page<T> {
 /// Enums
 /////////////////////////////////////////////////////////////////////////
 
+export enum UserRole {
+    ADMIN = "ADMIN",
+    CONTRIBUTOR = "CONTRIBUTOR",
+}
+
 export enum MeasurementUnit {
     CELSIUS,
     FAHRENHEIT,
@@ -62,6 +67,32 @@ export interface Measurement {
 
 /////////////////////////////////////////////////////////////////////////
 /// Requests & Responses
+/////////////////////////////////////////////////////////////////////////
+
+export interface GetUsersByStorageIdRequest {
+    storage_id: string;
+}
+
+export type GetUsersByStorageIdResponse = Array<{
+    id: string;
+    username: string;
+    role: UserRole;
+}>;
+
+/////////////////////////////////////////////////////////////////////////
+
+export interface AddUserToStorageRequest {
+    username: string;
+    storage_id: string;
+}
+
+/////////////////////////////////////////////////////////////////////////
+
+export interface RemoveUserFromStorageRequest {
+    username: string;
+    storage_id: string;
+}
+
 /////////////////////////////////////////////////////////////////////////
 
 export interface GetStoragesByUserIdRequest {

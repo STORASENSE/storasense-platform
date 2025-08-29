@@ -5,10 +5,12 @@ from backend.src.app.src.services.auth.errors import (
     AuthorizationError,
     UnknownAuthPrincipalError,
 )
+from backend.src.app.src.services.storages.errors import StorageNotFoundError
+from backend.src.app.src.services.users.errors import UserDoesNotExistError
 from ..auth.service import auth_service, TokenData
 from ..users.service import UserService, inject_user_service
 from .models import UserModel
-from .schemas import UserPublicResponse
+from .schemas import UserPublicResponse, UserByStorageIdResponse
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -46,19 +48,51 @@ async def find_users_by_storage_id(
     storage_id: UUID,
     token_data: TokenData = Depends(auth_service.get_current_user),
     user_service: UserService = Depends(inject_user_service),
-) -> list[UserPublicResponse]:
+) -> list[UserByStorageIdResponse]:
     try:
-        users = user_service.find_all_by_storage_id(storage_id, token_data)
+        return user_service.find_all_by_storage_id(storage_id, token_data)
     except (UnknownAuthPrincipalError, AuthorizationError):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authentication principal is not authorized to access the requested resource.",
         )
-    return [
-        UserPublicResponse(
-            username=user.username,
-            email=user.email,
-            name=user.name,
+
+
+@router.post("/{username}/addToStorage")
+def add_user_to_storage(
+    username: str,
+    storage_id: UUID,
+    token_data: TokenData = Depends(auth_service.get_current_user),
+    user_service: UserService = Depends(inject_user_service),
+):
+    try:
+        user_service.add_user_to_storage(username, storage_id, token_data)
+    except (UnknownAuthPrincipalError, AuthorizationError):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication principal is not authorized to access the requested resource.",
         )
-        for user in users
-    ]
+    except (UserDoesNotExistError, StorageNotFoundError) as e:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail=repr(e)
+        )
+
+
+@router.delete("/{username}/removeFromStorage")
+def remove_user_from_storage(
+    username: str,
+    storage_id: UUID,
+    token_data: TokenData = Depends(auth_service.get_current_user),
+    user_service: UserService = Depends(inject_user_service),
+):
+    try:
+        user_service.remove_user_from_storage(username, storage_id, token_data)
+    except (UnknownAuthPrincipalError, AuthorizationError):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication principal is not authorized to access the requested resource.",
+        )
+    except (UserDoesNotExistError, StorageNotFoundError) as e:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail=repr(e)
+        )

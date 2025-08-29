@@ -12,7 +12,13 @@ import {
     AddSensorResponse,
     DeleteSensorRequest,
     SensorStatusResponse,
-    StoraSenseStorge, AnalyticsSummaryResponse, AnalyticsSummaryRequest,
+    StoraSenseStorge,
+    AnalyticsSummaryResponse,
+    AnalyticsSummaryRequest,
+    GetUsersByStorageIdResponse,
+    GetUsersByStorageIdRequest,
+    AddUserToStorageRequest,
+    RemoveUserFromStorageRequest,
 } from "@/redux/api/storaSenseApiSchemas";
 import type { RootState } from '../store';
 
@@ -41,7 +47,7 @@ export const storaSenseApi = createApi({
         }
     }),
 
-    tagTypes: ['Me', 'MyStorages'],
+    tagTypes: ['Me', 'MyStorages', 'UsersInStorage'],
 
     endpoints: (build) => ({
 
@@ -54,6 +60,31 @@ export const storaSenseApi = createApi({
         createMe: build.mutation<StoraSenseUser | undefined, void>({
             query: () => '/users/me',
             invalidatesTags: ['Me', 'MyStorages']
+        }),
+
+        getUsersByStorageId: build.query<GetUsersByStorageIdResponse, GetUsersByStorageIdRequest>({
+            query: ({ storage_id }) => ({
+                url: `/users/byStorageId/${storage_id}`,
+            }),
+            providesTags: ['UsersInStorage']
+        }),
+
+        addUserToStorage: build.mutation<void, AddUserToStorageRequest>({
+            query: ({ username, storage_id }) => ({
+                url: `/users/${username}/addToStorage`,
+                params: { storage_id },
+                method: 'POST'
+            }),
+            invalidatesTags: ['UsersInStorage']
+        }),
+
+        removeUserFromStorage: build.mutation<void, RemoveUserFromStorageRequest>({
+            query: ({ username, storage_id }) => ({
+                url: `/users/${username}/removeFromStorage`,
+                params: { storage_id },
+                method: 'DELETE'
+            }),
+            invalidatesTags: ['UsersInStorage']
         }),
 
         getMyStorages: build.query<StoraSenseStorge[], void>({
@@ -157,6 +188,9 @@ export const {
     useGetMeQuery,
     useCreateMeMutation,
     useGetMyStoragesQuery,
+    useGetUsersByStorageIdQuery,
+    useAddUserToStorageMutation,
+    useRemoveUserFromStorageMutation,
     useGetStoragesByUserIdQuery,
     useCreateStorageMutation,
     useDeleteStorageMutation,
