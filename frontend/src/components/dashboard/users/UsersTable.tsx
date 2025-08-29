@@ -3,7 +3,7 @@
 import {FC, useMemo, useState} from "react";
 import {useSelector} from "react-redux";
 import {RootState} from "@/redux/store";
-import {useGetMeQuery, useGetUsersByStorageIdQuery} from "@/redux/api/storaSenseApi";
+import {useGetMeQuery, useGetUsersByStorageIdQuery, useRemoveUserFromStorageMutation} from "@/redux/api/storaSenseApi";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {Skeleton} from "@/components/ui/skeleton";
 import {Card} from "@/components/ui/card";
@@ -24,14 +24,32 @@ const UsersTable: FC = () => {
         storage_id: activeStorage.id
     });
 
-    const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState<boolean>(false);
-
     const myRole = useMemo(() => {
         if (!users || !me) {
             return undefined;
         }
         return users.find(user => user.username === me.username)?.role;
     }, [users, me]);
+
+    //////////////////////////////////////////////////////////////////////////////////
+
+    const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState<boolean>(false);
+
+    //////////////////////////////////////////////////////////////////////////////////
+
+    const [removeUserFromStorage] = useRemoveUserFromStorageMutation();
+
+    function handleRemoveUserFromStorage(username: string) {
+        removeUserFromStorage({
+            username, storage_id: activeStorage.id
+        })
+        .unwrap()
+        .catch((error: any) => {
+            console.error(`Failed to remove user '${username}' from storage '${activeStorage.name}'`, error);
+        });
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////
 
     if (isLoading || isMeLoading) {
         return (
@@ -106,6 +124,7 @@ const UsersTable: FC = () => {
                                         <Button
                                             size="sm"
                                             variant="ghost"
+                                            onClick={() => handleRemoveUserFromStorage(user.username)}
                                             className="text-cerise-red hover:text-cerise-red-700 hover:bg-cerise-red/5">
                                             <TrashIcon />
                                         </Button>

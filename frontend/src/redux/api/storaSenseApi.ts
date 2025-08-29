@@ -13,7 +13,7 @@ import {
     DeleteSensorRequest,
     SensorStatusResponse,
     StoraSenseStorge, GetUsersByStorageIdResponse, GetUsersByStorageIdRequest,
-    AddUserToStorageRequest,
+    AddUserToStorageRequest, RemoveUserFromStorageRequest,
 } from "@/redux/api/storaSenseApiSchemas";
 import type { RootState } from '../store';
 
@@ -69,6 +69,15 @@ export const storaSenseApi = createApi({
                 url: `/users/${username}/addToStorage`,
                 params: { storage_id },
                 method: 'POST'
+            }),
+            invalidatesTags: ['UsersInStorage']
+        }),
+
+        removeUserFromStorage: build.mutation<void, RemoveUserFromStorageRequest>({
+            query: ({ username, storage_id }) => ({
+                url: `/users/${username}/removeFromStorage`,
+                params: { storage_id },
+                method: 'DELETE'
             }),
             invalidatesTags: ['UsersInStorage']
         }),
@@ -168,6 +177,7 @@ export const {
     useGetMyStoragesQuery,
     useGetUsersByStorageIdQuery,
     useAddUserToStorageMutation,
+    useRemoveUserFromStorageMutation,
     useGetStoragesByUserIdQuery,
     useCreateStorageMutation,
     useDeleteStorageMutation,

@@ -45,6 +45,11 @@ class UserStorageAccessRepository(
         )
         self.create(assoc)
 
+    def remove_user_from_storage(self, user_id: UUID, storage_id: UUID):
+        if not self.exists((user_id, storage_id)):
+            return
+        self.delete_by_id((user_id, storage_id))
+
 
 def inject_user_storage_access_repository(
     session: Session = Depends(open_session),

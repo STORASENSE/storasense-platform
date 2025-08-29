@@ -121,21 +121,26 @@ class UserService:
             )
         return result
 
-    def add_user_to_storage(
-        self, username: str, storage_id: UUID, token_data: TokenData
+    def _raise_error_if_not_admin(
+        self, storage_id: UUID, token_data: TokenData
     ):
         principal = self._user_repository.find_by_keycloak_id(token_data.id)
         if principal is None:
             raise UnknownAuthPrincipalError(
-                "Could not user to storage because authentication token is invalid"
+                "Could not commit to storage because authentication token is invalid"
             )
         principal_role = self._user_storage_access_repository.find_user_role(
             principal.id, storage_id
         )
         if not principal_role == UserRole.ADMIN:
             raise AuthorizationError(
-                "Could not add user to storage because authentication principal is not admin of storage"
+                "Could not commit to storage because authentication principal is not admin of storage"
             )
+
+    def add_user_to_storage(
+        self, username: str, storage_id: UUID, token_data: TokenData
+    ):
+        self._raise_error_if_not_admin(storage_id, token_data)
         user = self._user_repository.find_by_username(username)
         if user is None:
             raise UserDoesNotExistError(
@@ -147,6 +152,31 @@ class UserService:
             )
         self._user_storage_access_repository.add_user_to_storage(
             user.id, storage_id, UserRole.CONTRIBUTOR
+        )
+        self._session.commit()
+
+    def remove_user_from_storage(
+        self, username: str, storage_id: UUID, token_data: TokenData
+    ):
+        self._raise_error_if_not_admin(storage_id, token_data)
+        user = self._user_repository.find_by_username(username)
+        if user is None:
+            raise UserDoesNotExistError(
+                "Could not remove user from storage because user does not exist"
+            )
+        user_role = self._user_storage_access_repository.find_user_role(
+            user.id, storage_id
+        )
+        if user_role == UserRole.ADMIN:
+            raise AuthorizationError(
+                "Could not remove user from storage because user is admin of storage"
+            )
+        if not self._storage_repository.exists(storage_id):
+            raise StorageNotFoundError(
+                "Could not remove user from storage because storage does not exist"
+            )
+        self._user_storage_access_repository.remove_user_from_storage(
+            user.id, storage_id
         )
         self._session.commit()
 

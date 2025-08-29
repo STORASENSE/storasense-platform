@@ -88,6 +88,13 @@ export interface AddUserToStorageRequest {
 
 /////////////////////////////////////////////////////////////////////////
 
+export interface RemoveUserFromStorageRequest {
+    username: string;
+    storage_id: string;
+}
+
+/////////////////////////////////////////////////////////////////////////
+
 export interface GetStoragesByUserIdRequest {
     user_id: string;
 }

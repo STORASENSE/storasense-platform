@@ -76,3 +76,23 @@ def add_user_to_storage(
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail=repr(e)
         )
+
+
+@router.delete("/{username}/removeFromStorage")
+def remove_user_from_storage(
+    username: str,
+    storage_id: UUID,
+    token_data: TokenData = Depends(auth_service.get_current_user),
+    user_service: UserService = Depends(inject_user_service),
+):
+    try:
+        user_service.remove_user_from_storage(username, storage_id, token_data)
+    except (UnknownAuthPrincipalError, AuthorizationError):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication principal is not authorized to access the requested resource.",
+        )
+    except (UserDoesNotExistError, StorageNotFoundError) as e:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail=repr(e)
+        )
