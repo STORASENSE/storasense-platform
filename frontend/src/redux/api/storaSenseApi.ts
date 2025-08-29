@@ -12,7 +12,8 @@ import {
     AddSensorResponse,
     DeleteSensorRequest,
     SensorStatusResponse,
-    StoraSenseStorge,
+    StoraSenseStorge, GetUsersByStorageIdResponse, GetUsersByStorageIdRequest,
+    AddUserToStorageRequest, RemoveUserFromStorageRequest,
 } from "@/redux/api/storaSenseApiSchemas";
 import type { RootState } from '../store';
 
@@ -41,7 +42,7 @@ export const storaSenseApi = createApi({
         }
     }),
 
-    tagTypes: ['Me', 'MyStorages'],
+    tagTypes: ['Me', 'MyStorages', 'UsersInStorage'],
 
     endpoints: (build) => ({
 
@@ -54,6 +55,31 @@ export const storaSenseApi = createApi({
         createMe: build.mutation<StoraSenseUser | undefined, void>({
             query: () => '/users/me',
             invalidatesTags: ['Me', 'MyStorages']
+        }),
+
+        getUsersByStorageId: build.query<GetUsersByStorageIdResponse, GetUsersByStorageIdRequest>({
+            query: ({ storage_id }) => ({
+                url: `/users/byStorageId/${storage_id}`,
+            }),
+            providesTags: ['UsersInStorage']
+        }),
+
+        addUserToStorage: build.mutation<void, AddUserToStorageRequest>({
+            query: ({ username, storage_id }) => ({
+                url: `/users/${username}/addToStorage`,
+                params: { storage_id },
+                method: 'POST'
+            }),
+            invalidatesTags: ['UsersInStorage']
+        }),
+
+        removeUserFromStorage: build.mutation<void, RemoveUserFromStorageRequest>({
+            query: ({ username, storage_id }) => ({
+                url: `/users/${username}/removeFromStorage`,
+                params: { storage_id },
+                method: 'DELETE'
+            }),
+            invalidatesTags: ['UsersInStorage']
         }),
 
         getMyStorages: build.query<StoraSenseStorge[], void>({
@@ -123,6 +149,19 @@ export const storaSenseApi = createApi({
             }),
         }),
 
+        getMeasurementsFromPastHour: build.query<GetMeasurementsResponse, Omit<GetMeasurementsRequest, "max_date">>({
+            query: ({ sensor_id }) => {
+                const max_date = new Date();
+                max_date.setHours(max_date.getHours() - 1);
+                return {
+                    url: `/measurements/${sensor_id}/filter`,
+                    params: {
+                        max_date: max_date.toISOString()
+                    }
+                };
+            }
+        }),
+
         getHealth: build.query<{ status: string }, void>({
             query: () => ({
                 url: '/health'
@@ -136,11 +175,15 @@ export const {
     useGetMeQuery,
     useCreateMeMutation,
     useGetMyStoragesQuery,
+    useGetUsersByStorageIdQuery,
+    useAddUserToStorageMutation,
+    useRemoveUserFromStorageMutation,
     useGetStoragesByUserIdQuery,
     useCreateStorageMutation,
     useDeleteStorageMutation,
     useGetSensorsQuery,
     useGetMeasurementsQuery,
+    useGetMeasurementsFromPastHourQuery,
     useGetHealthQuery,
     useAddSensorMutation,
     useDeleteSensorMutation,

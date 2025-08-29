@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from uuid import UUID
 
-from fastapi import Depends
+from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from backend.src.app.src.shared.logger import get_logger
@@ -73,29 +73,48 @@ class MeasurementService:
         return result
 
     def create_measurement(
-        self, sensor_id: UUID, request: CreateMeasurementRequest
+        self, sensor_id: UUID, request: CreateMeasurementRequest, username: str
     ):
         """
         Creates a new measurement.
-        Condition: The sensor with the given ID must exist.
+        Condition: The sensor with the given ID must exist and the requester must be "mqtt-client" (just Keycloak hard defined technical users named 'mqtt-client' are allowed to create measurements!).
 
         :param sensor_id: The ID of the sensor that recorded the measurement.
         :param request: The request for measurement creation.
+        :param username: The username of the requester, must be "mqtt-client".
         """
+        if (
+            username
+            != "service-account-mqtt-client"  # username of technical users is always theirs client_id
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Just MQTT-Clients are allowed to create measurements.",
+            )
 
-        sensor = self._sensor_repository.find_by_id(sensor_id)
-        if not sensor:
-            raise ValueError(f"Sensor with ID {sensor_id} does not exist.")
+        try:
+            sensor = self._sensor_repository.find_by_id(sensor_id)
+            if not sensor:
+                raise ValueError(f"Sensor with ID {sensor_id} does not exist.")
 
-        measurement = MeasurementModel()
-        measurement.sensor_id = sensor_id
-        measurement.value = request.value
-        measurement.unit = request.unit
-        measurement.created_at = request.created_at
+            measurement = MeasurementModel()
+            measurement.sensor_id = sensor_id
+            measurement.value = request.value
+            measurement.unit = request.unit
+            measurement.created_at = request.created_at
 
-        _logger.info(f"Created measurement '{measurement}'")
-        self._measurement_repository.create(measurement)
-        self._session.commit()
+            self._measurement_repository.create(measurement)
+            self._session.commit()
+        except ValueError as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(e),
+            )
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid request: {e}",
+            )
 
     def find_latest_by_sensor_id(
         self, sensor_id: UUID, max_age_minutes: int

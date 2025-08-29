@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from uuid import UUID, uuid4
 
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import DeclarativeBase
 
 
 class BaseModel(DeclarativeBase):
@@ -14,4 +13,4 @@ class BaseModel(DeclarativeBase):
         id (UUID): The model's primary key.
     """
 
-    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    pass
