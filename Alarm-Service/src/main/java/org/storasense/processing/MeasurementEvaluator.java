@@ -3,12 +3,9 @@ package org.storasense.processing;
 
 import lombok.NonNull;
 import org.storasense.models.Alarm;
-import org.storasense.models.AlarmSeverity;
 import org.storasense.models.Measurement;
 
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.UUID;
 
 
@@ -31,7 +28,6 @@ public class MeasurementEvaluator {
         return new Alarm(
                 UUID.randomUUID(),
                 sensorId,
-                AlarmSeverity.MEDIUM,
                 message,
                 ZonedDateTime.now()
         );

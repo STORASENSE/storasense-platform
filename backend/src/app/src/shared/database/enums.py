@@ -19,9 +19,3 @@ class MeasurementUnit(Enum):
     PERCENT = "PERCENT"
     CENTIMETER = "CM"
     PPM = "PPM"
-
-
-class AlarmSeverity(Enum):
-    HIGH = "HIGH"
-    MEDIUM = "MEDIUM"
-    LOW = "LOW"

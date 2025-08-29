@@ -17,7 +17,6 @@ from backend.src.app.src.services.storages.models import StorageModel
 from backend.src.app.src.shared.database.enums import (
     SensorType,
     MeasurementUnit,
-    AlarmSeverity,
     UserRole,
 )
 
@@ -117,7 +116,6 @@ def seed_alarms(session: Session):
 
     alarm = AlarmModel(
         message="Testalarm: Temperatur out of range",
-        severity=AlarmSeverity.HIGH,
         sensor_id=sensor.id,
         created_at=datetime.now(),
     )

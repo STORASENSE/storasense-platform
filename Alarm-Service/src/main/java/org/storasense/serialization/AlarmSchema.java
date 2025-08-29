@@ -14,7 +14,6 @@ public class AlarmSchema {
         return SchemaBuilder.struct()
                 .field("id", Schema.STRING_SCHEMA)
                 .field("sensor_id", Schema.STRING_SCHEMA)
-                .field("severity", Schema.STRING_SCHEMA)
                 .field("message",  Schema.STRING_SCHEMA)
                 .field("created_at", Timestamp.SCHEMA)
                 .build();
@@ -25,7 +24,6 @@ public class AlarmSchema {
         return new Struct(schema)
                 .put("id", alarm.id().toString())
                 .put("sensor_id", alarm.sensorId().toString())
-                .put("severity", alarm.severity().toString())
                 .put("message", alarm.message())
                 .put("created_at", Date.from(alarm.createdAt().toInstant()));
     }

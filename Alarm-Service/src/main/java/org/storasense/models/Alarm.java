@@ -13,7 +13,6 @@ public record Alarm(
         UUID id,
         @JsonProperty("sensor_id")
         UUID sensorId,
-        AlarmSeverity severity,
         String message,
         @JsonProperty("created_at")
         @JsonSerialize(using=ZonedDateTimeSerializer.class)
