@@ -16,7 +16,7 @@ def main():
     start_time = time.time()
     end_time = start_time + int(os.getenv("AVAILABILITY_TEST_DURATION"))
     init_db()
-
+    print("hey ")
     while time.time() < end_time:
         try:
             time.sleep(int(os.getenv("AVAILABILITY_TEST_INTERVAL")))
@@ -30,6 +30,8 @@ def main():
                 )
 
     evaluate_results(start_time, end_time)
+    report_file = os.getenv("AVAILABILITY_REPORT_FILE")
+    os.makedirs(os.path.dirname(report_file), exist_ok=True)
     with open(os.getenv("AVAILABILITY_REPORT_FILE"), "a") as file:
         file.write("\nMQTT Availability Report\n")
 

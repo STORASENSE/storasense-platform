@@ -6,11 +6,12 @@ import urllib3
 from urllib3.exceptions import InsecureRequestWarning
 
 
-from logging import getLogger
+import logging
 
 urllib3.disable_warnings(InsecureRequestWarning)
 
-_logger = getLogger(__name__)
+_logger = logging.getLogger(__name__)
+_logger.setLevel(logging.DEBUG)
 
 _access_token = None
 _token_expires_at = 0

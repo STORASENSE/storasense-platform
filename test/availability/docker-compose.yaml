@@ -1,0 +1,14 @@
+
+services:
+  availability:
+    build:
+      context: ../../
+      dockerfile: test/availability/Dockerfile
+    volumes:
+      - ../reports:/etc/reports
+    environment:
+        - OPERATING_MODE=OUTSIDE
+    env_file:
+      - ../../.env
+    command: ["python", "./test/availability/main.py"]
+    network_mode: "host"

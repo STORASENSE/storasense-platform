@@ -67,6 +67,7 @@ def check_backend(driver):
 def evaluate_results(start_time, end_time):
     start_time = datetime.fromtimestamp(start_time).isoformat()
     end_time = datetime.fromtimestamp(end_time).isoformat()
+
     with get_db_connection() as connection:
         frontend_alive = connection.execute(
             "SELECT COUNT(*) FROM test_data WHERE FRONTEND_ALIVE =1"
