@@ -10,6 +10,7 @@
 # def activate_alarmsystem_after_shutdown():
 #     """
 #     Script that activates the alarm system after the application shutdown.
+#     It pushes all (current) sensor-values (min, max) to Kafka to ensure the alarm system is aware of their states.
 #     """
 #     _environment = os.getenv("ENVIRONMENT")  # TEST / DEV / PROD
 #
