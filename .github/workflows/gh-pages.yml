@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - dev
-      - feat/add_doc_strings
+      - feat/*
 
 jobs:
   deploy:
