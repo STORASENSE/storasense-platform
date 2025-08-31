@@ -73,6 +73,14 @@ app = FastAPI(
     swagger_ui_init_oauth={"clientId": CLIENT_ID, "appName": "Storasense API"},
 )
 
+add_request_middleware(app)
+
+app.include_router(users_router)
+app.include_router(measurements_router)
+app.include_router(sensors_router)
+app.include_router(storages_router)
+app.include_router(analytics_router)
+
 # configure CORS-middleware
 origins = [
     "https://storasense.de",

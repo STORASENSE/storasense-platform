@@ -1,5 +1,5 @@
 from typing import TYPE_CHECKING
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from sqlalchemy import Enum, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -18,6 +18,8 @@ if TYPE_CHECKING:
 
 class SensorModel(BaseModel):
     __tablename__ = "Sensor"
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
 
     type: Mapped[SensorType] = mapped_column(Enum(SensorType))
     name: Mapped[str] = mapped_column(nullable=True)

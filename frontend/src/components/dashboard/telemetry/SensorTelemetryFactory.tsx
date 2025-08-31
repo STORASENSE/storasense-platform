@@ -1,10 +1,10 @@
 "use client"
 
-import {FC, useEffect, useState} from "react";
+import {FC} from "react";
 import {Sensor, SensorType} from "@/redux/api/storaSenseApiSchemas";
 import SensorTelemetryCard from "@/components/dashboard/telemetry/SensorTelemetryCard";
 import SensorTelemetryChart from "@/components/dashboard/telemetry/SensorTelemetryChart";
-import {useGetMeasurementsQuery} from "@/redux/api/storaSenseApi";
+import {useGetMeasurementsFromPastHourQuery} from "@/redux/api/storaSenseApi";
 import {Skeleton} from "@/components/ui/skeleton";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 import {AlertCircleIcon} from "lucide-react";
@@ -15,23 +15,11 @@ interface SensorTelemetryFactoryProps {
 }
 
 const SensorTelemetryFactory: FC<SensorTelemetryFactoryProps> = ({ sensor }) => {
-    const [maxDate, setMaxDate] = useState<Date>(new Date());
-
-    useEffect(() => {
-        const counter = setTimeout(() => {
-            const now = new Date();
-            now.setMinutes(now.getMinutes() - 30);
-            setMaxDate(now);
-        }, 30000);
-
-        return () => {
-            clearTimeout(counter);
-        }
-    }, []);
-
-    const {data, isLoading, isError} = useGetMeasurementsQuery({
-        sensor_id: sensor.id,
-        max_date: maxDate.toISOString()
+    const {data, isLoading, isError} = useGetMeasurementsFromPastHourQuery({
+        sensor_id: sensor.id
+    }, {
+        pollingInterval: 30000,
+        skipPollingIfUnfocused: true
     });
 
     if (isLoading) {

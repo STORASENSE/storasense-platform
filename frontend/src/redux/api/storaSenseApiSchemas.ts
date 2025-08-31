@@ -13,6 +13,11 @@ export interface Page<T> {
 /// Enums
 /////////////////////////////////////////////////////////////////////////
 
+export enum UserRole {
+    ADMIN = "ADMIN",
+    CONTRIBUTOR = "CONTRIBUTOR",
+}
+
 export enum MeasurementUnit {
     CELSIUS,
     FAHRENHEIT,
@@ -69,6 +74,32 @@ export interface Measurement {
 
 /////////////////////////////////////////////////////////////////////////
 /// Requests & Responses
+/////////////////////////////////////////////////////////////////////////
+
+export interface GetUsersByStorageIdRequest {
+    storage_id: string;
+}
+
+export type GetUsersByStorageIdResponse = Array<{
+    id: string;
+    username: string;
+    role: UserRole;
+}>;
+
+/////////////////////////////////////////////////////////////////////////
+
+export interface AddUserToStorageRequest {
+    username: string;
+    storage_id: string;
+}
+
+/////////////////////////////////////////////////////////////////////////
+
+export interface RemoveUserFromStorageRequest {
+    username: string;
+    storage_id: string;
+}
+
 /////////////////////////////////////////////////////////////////////////
 
 export interface GetStoragesByUserIdRequest {
@@ -148,3 +179,23 @@ export interface DeleteAlarmRequest {
     alarm_id: string;
 }
 //////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////////
+
+
+export type AnalyticsTimeWindow = "7d" | "30d" | "365d";
+
+export interface AnalyticsSummaryRequest {
+  sensor_id: string;
+  window: AnalyticsTimeWindow;
+}
+
+export interface AnalyticsSummaryItem {
+  type: SensorType;
+  sensor_id: string;
+  avg_value: number;
+  min_value: number;
+  max_value: number;
+}
+
+export type AnalyticsSummaryResponse = AnalyticsSummaryItem[];

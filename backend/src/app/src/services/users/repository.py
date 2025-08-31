@@ -7,11 +7,7 @@ from sqlalchemy.orm import Session
 
 from backend.src.app.src.services.users.models import UserModel
 from backend.src.app.src.shared.database.engine import open_session
-from backend.src.app.src.shared.database.enums import UserRole
-from backend.src.app.src.shared.database.join_tables.user_storage import (
-    UserStorageAccess,
-)
-from backend.src.app.src.shared.repositories.base_repository import (
+from backend.src.app.src.shared.database.base_repository import (
     BaseRepository,
 )
 
@@ -32,38 +28,19 @@ class UserRepository(BaseRepository[UserModel, UUID]):
             query
         ).one_or_none()  # returns a single UserModel or None
 
+    def find_by_username(self, username: str) -> Optional[UserModel]:
+        return (
+            self.session.query(UserModel)
+            .where(UserModel.username == username)
+            .one_or_none()
+        )
+
     def find_all_by_storage_id(self, storage_id: UUID) -> list[UserModel]:
         return (
             self.session.query(UserModel)
             .join(UserModel.accessed_storages)
             .filter_by(id=storage_id)
             .all()
-        )
-
-    def find_user_role(
-        self, user_id: UUID, storage_id: UUID
-    ) -> Optional[UserRole]:
-        association = (
-            self.session.query(UserStorageAccess)
-            .where(UserStorageAccess.user_id == user_id)
-            .where(UserStorageAccess.storage_id == storage_id)
-            .one_or_none()
-        )
-        if association is None:
-            return None
-        return association.role
-
-    def find_admin_by_storage_id(
-        self, storage_id: UUID
-    ) -> Optional[UserModel]:
-        return (
-            self.session.query(UserModel)
-            .join(UserStorageAccess, UserModel.id == UserStorageAccess.user_id)
-            .filter(
-                UserStorageAccess.storage_id == storage_id,
-                UserStorageAccess.role == UserRole.ADMIN,
-            )
-            .one_or_none()
         )
 
     def create_user(self, user_data: dict) -> UserModel:

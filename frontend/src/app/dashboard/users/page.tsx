@@ -1,5 +1,7 @@
 import {FC} from "react";
 import AuthenticationRequired from "@/components/context/AuthenticationRequired";
+import ActiveStorageRequired from "@/components/context/ActiveStorageRequired";
+import UsersTable from "@/components/dashboard/users/UsersTable";
 
 
 const Page: FC = () => {
@@ -10,9 +12,9 @@ const Page: FC = () => {
                     Users
                 </h1>
             </header>
-            <section>
-
-            </section>
+            <ActiveStorageRequired>
+                <UsersTable />
+            </ActiveStorageRequired>
         </AuthenticationRequired>
     );
 }
