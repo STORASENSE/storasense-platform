@@ -5,10 +5,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { MdSpaceDashboard as DashboardIcon } from "react-icons/md";
-import { MdOutlineWarehouse as StorageIcon } from "react-icons/md";
-import { MdOutlineQueryStats as AnalyticsIcon } from "react-icons/md";
-import { MdOutlineDeviceThermostat as SensorsIcon } from "react-icons/md";
-import { MdOutlinePeople as UsersIcon } from "react-icons/md";
+import { FaBoxArchive as StorageIcon } from "react-icons/fa6";
+import { SiGoogleanalytics as AnalyticsIcon } from "react-icons/si";
+import { FaThermometer as SensorsIcon } from "react-icons/fa6";
+import { FaUserPlus as UsersIcon } from "react-icons/fa6";
 import useKeycloak from "@/auth/useKeycloak";
 import { useGetHealthQuery } from "@/redux/api/storaSenseApi";
 
@@ -71,14 +71,14 @@ const Sidebar: FC = () => {
                 aria-label="external links"
                 className="flex flex-col gap-3 flex-grow mt-6">
                 <ul className="list-none flex flex-col gap-4">
-                    <SidebarLink href="/dashboard/storages" icon={<StorageIcon />}>
-                        Storages
-                    </SidebarLink>
                     <SidebarLink href="/dashboard" icon={<DashboardIcon />}>
                         Overview
                     </SidebarLink>
                     <SidebarLink href="/dashboard/analytics" icon={<AnalyticsIcon />}>
                         Analytics
+                    </SidebarLink>
+                    <SidebarLink href="/dashboard/storages" icon={<StorageIcon />}>
+                        Storages
                     </SidebarLink>
                     <SidebarLink href="/dashboard/sensors" icon={<SensorsIcon />}>
                         Sensors
