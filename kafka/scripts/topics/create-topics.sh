@@ -18,5 +18,7 @@ create_topic() {
 
 create_topic "iot-sensordata" "${IOT_PARTITIONS:-5}" 1
 create_topic "alarms" "${ALARM_PARTITIONS:-1}" 1
+create_topic "sensor_values" 5 1
+create_topic "alarms-notify" 3 1
 
 echo "All topics ensured."

@@ -11,17 +11,13 @@ import java.util.UUID;
 
 public class MeasurementEvaluator {
 
-    // sample limits for demonstration purposes!
-    private static final double ALLOWED_MIN = -5.0;
-    private static final double ALLOWED_MAX = 5.0;
-
-    public Alarm evaluate(@NonNull UUID sensorId, @NonNull Measurement measurement) {
+    public Alarm evaluate(@NonNull UUID sensorId, @NonNull Measurement measurement, double allowedMin, double allowedMax) {
         double value = measurement.value()[0];
         String message;
-        if (value < ALLOWED_MIN) {
-            message = "Measured value %f is below the allowed minimum of %f".formatted(value, ALLOWED_MIN);
-        } else if (value > ALLOWED_MAX) {
-            message = "Measured value %f is above the allowed maximum of %f".formatted(value, ALLOWED_MAX);
+        if (value < allowedMin) {
+            message = "Measured value %f is below the allowed minimum of %f".formatted(value, allowedMin);
+        } else if (value > allowedMax) {
+            message = "Measured value %f is above the allowed maximum of %f".formatted(value, allowedMax);
         } else {
             return null;
         }

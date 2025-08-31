@@ -42,18 +42,20 @@ class StorageService:
     def find_storages_by_user_id(self, user_id: UUID) -> list[StorageModel]:
         """
         Find all storages that belong to a specific user.
+        Condition: The user must be either an admin or a contributor of the storage.
+
         :param user_id: The ID of the user whose storages are to be retrieved.
         :return: A list of StorageModel instances associated with the user.
-        :raises ValueError: If the user_id is None.
         """
         return self.storage_repository.find_all_by_user_id(user_id)
 
     def find_my_storages(self, token_data: TokenData) -> list[StorageModel]:
         """
         Find all storages that belong to the authenticated user.
+        Condition: The user must be either an admin or a contributor of the storage.
+
         :param token_data: The token data of the authenticated user.
         :return: A list of StorageModel instances associated with the authenticated user.
-        :raises UnknownAuthPrincipalError: If the user does not exist.
         """
         user = self.user_repository.find_by_keycloak_id(token_data.id)
         if user is None:
@@ -65,31 +67,21 @@ class StorageService:
     def create_storage(self, storage: StorageModel, token_data: TokenData):
         """
         Creates a storage and associates it with the user as an admin.
+
         :param storage: The storage to be created.
         :param token_data: The token data of the authenticated user.
-        return: None
-        :raises UnknownAuthPrincipalError: If the user does not exist.
-        :raises ValueError: If the storage name is None.
-        :raises StorageAlreadyExistsError: If a storage with the given ID or name already exists
+        :return: None
         """
         user = self.user_repository.find_by_keycloak_id(token_data.id)
         if user is None:
             raise UnknownAuthPrincipalError(
                 "Requesting authentication principal does not exist"
             )
-        if storage.name is None:
-            raise ValueError(
-                "Could not create storage because given storage name was None"
-            )
         if storage.id is not None and self.storage_repository.exists(
             storage.id
         ):
             raise StorageAlreadyExistsError(
                 "Could not create storage because a storage with the given ID already exists"
-            )
-        if self.storage_repository.exists_by_name(storage.name):
-            raise StorageAlreadyExistsError(
-                "Could not create storage because a storage with the given name already exists"
             )
         storage.user_associations.append(
             UserStorageAccess(user=user, role=UserRole.ADMIN)
@@ -100,12 +92,11 @@ class StorageService:
     def delete_storage(self, storage_id: UUID, token_data: TokenData):
         """
         Deletes a storage and associates it with the user as an admin.
+        Condition: Only an admin of the storage can delete it.
+
         :param storage_id: The ID of the storage to be deleted.
         :param token_data: The token data of the authenticated user.
-        return: None
-        :raises UnknownAuthPrincipalError: If the user does not exist.
-        :raises StorageNotFoundError: If the storage does not exist.
-        :raises AuthorizationError: If the user does not have admin rights for the storage.
+        :return: None
         """
         user = self.user_repository.find_by_keycloak_id(token_data.id)
         if user is None:

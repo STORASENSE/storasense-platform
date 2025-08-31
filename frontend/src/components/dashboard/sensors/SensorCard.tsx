@@ -6,7 +6,7 @@ import {FaGear as Settings, FaClock as Clock, FaMapPin as MapPin, FaEye as Eye, 
 interface Sensor {
     id: string;
     name: string;
-    type: "ULTRASONIC" | "TEMPERATURE_INSIDE" | "TEMPERATURE_OUTSIDE" | "GAS" | "HUMIDITY";
+    type: "ULTRASONIC" | "TEMPERATURE_INSIDE" | "TEMPERATURE_OUTSIDE" | "CO2" | "HUMIDITY";
     allowed_min: number;
     allowed_max: number;
     status?: "online" | "offline";
@@ -30,7 +30,7 @@ const SensorCard: FC<SensorCardProps> = ({ sensor, onDelete, storageName }) => {
             case "TEMPERATURE_INSIDE": return <Thermometer className="w-5 h-5" />;
             case "TEMPERATURE_OUTSIDE": return <Thermometer className="w-5 h-5" />;
             case "HUMIDITY": return <Droplets className="w-5 h-5" />;
-            case "GAS": return <Eye className="w-5 h-5" />;
+            case "CO2": return <Eye className="w-5 h-5" />;
             default: return <Settings className="w-5 h-5" />;
         }
     };
@@ -49,7 +49,7 @@ const SensorCard: FC<SensorCardProps> = ({ sensor, onDelete, storageName }) => {
             case "TEMPERATURE_INSIDE": return "Temperature (Inside)";
             case "TEMPERATURE_OUTSIDE": return "Temperature (Outside)";
             case "HUMIDITY": return "Humidity";
-            case "GAS": return "Gas";
+            case "CO2": return "CO2";
             default: return type;
         }
     };

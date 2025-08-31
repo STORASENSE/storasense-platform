@@ -23,7 +23,7 @@ const SENSOR_TYPE_OPTIONS = [
     { value: "TEMPERATURE_INSIDE", label: "Temperature (Inside)" },
     { value: "TEMPERATURE_OUTSIDE", label: "Temperature (Outside)" },
     { value: "HUMIDITY", label: "Humidity" },
-    { value: "GAS", label: "Gas" },
+    { value: "CO2", label: "CO2" },
 ] as const;
 
 function mapFormDataToAddSensorRequest(formData: FormData): AddSensorRequest {

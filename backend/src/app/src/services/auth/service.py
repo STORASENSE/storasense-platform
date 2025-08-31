@@ -40,7 +40,12 @@ class AuthService:
         self.jwks_client = PyJWKClient(JWKS_URL)
 
     async def validate_token(self, token: str) -> TokenData:
-        """Validates the JWT token and extracts user information."""
+        """
+        Validates the JWT token and extracts user information.
+
+        :param token: JWT token from the Authorization header.
+        :return: TokenData containing user information.
+        """
         if not token:
             raise HTTPException(
                 status_code=401,
@@ -87,23 +92,13 @@ class AuthService:
     async def get_current_user(
         self, token: str = Depends(oauth2_scheme)
     ) -> TokenData:
-        """Dependency to get and validate the current user."""
+        """
+        Dependency to get and validate the current user.
+
+        :param token: JWT token from the Authorization header.
+        :return: TokenData containing user information.
+        """
         return await self.validate_token(token)
-
-    def has_role(self, required_role: str):
-        """Dependency to check if the user has a specific role."""
-
-        async def role_checker(
-            token_data: TokenData = Depends(self.get_current_user),
-        ):
-            if required_role not in token_data.roles:
-                raise HTTPException(
-                    status_code=403,
-                    detail=f"Access denied: Requires role '{required_role}'.",
-                )
-            return token_data
-
-        return role_checker
 
 
 # Global instance of AuthService

@@ -15,7 +15,7 @@ const MONITORING_ORDER: Record<SensorType, number> = {
     TEMPERATURE_INSIDE: 1,
     TEMPERATURE_OUTSIDE: 2,
     HUMIDITY: 3,
-    GAS: 4,
+    CO2: 4,
     ULTRASONIC: 5,
 }
 

@@ -48,9 +48,6 @@ class MeasurementService:
         self._sensor_repository = sensor_repository
         self._user_repository = user_repository
 
-    def has_admin_or_contributor_role(self, user_role) -> bool:
-        return user_role in [UserRole.ADMIN, UserRole.CONTRIBUTOR]
-
     def find_all_by_sensor_id(
         self, sensor_id: UUID, page_request: PageRequest, token_data: TokenData
     ) -> Page[MeasurementModel]:
@@ -60,6 +57,7 @@ class MeasurementService:
 
         :param sensor_id: The ID of the sensor whose measurements should be retrieved.
         :param page_request: The pagination request.
+        :param token_data: The token data of the requesting user.
         :return: The requested measurements.
         """
         # Check if sensor with the given ID exists
@@ -76,7 +74,7 @@ class MeasurementService:
                 "Requesting authentication principal does not exist"
             )
         role = self._user_repository.find_user_role(user.id, sensor.storage_id)
-        if not self.has_admin_or_contributor_role(role):
+        if role not in [UserRole.ADMIN, UserRole.CONTRIBUTOR]:
             raise AuthorizationError(
                 "User is not authorized, to view measurements of this sensor."
             )
@@ -97,6 +95,7 @@ class MeasurementService:
         :param sensor_id: The ID of the sensor whose measurements should be retrieved.
         :param max_date: The date after which measurements should be retrieved.
         :param token_data: The token data of the requesting user.
+        :return: The requested measurements.
         """
         _logger.info(
             f"Finding measurements for sensor '{sensor_id}' after date '{max_date}'"
@@ -117,7 +116,7 @@ class MeasurementService:
                 "Requesting authentication principal does not exist"
             )
         role = self._user_repository.find_user_role(user.id, sensor.storage_id)
-        if not self.has_admin_or_contributor_role(role):
+        if role not in [UserRole.ADMIN, UserRole.CONTRIBUTOR]:
             raise AuthorizationError(
                 "User is not authorized, to view measurements of this sensor."
             )
@@ -139,6 +138,7 @@ class MeasurementService:
 
         :param sensor_id: The ID of the sensor that recorded the measurement.
         :param request: The request for measurement creation.
+        :return: None
         """
 
         sensor = self._sensor_repository.find_by_id(sensor_id)

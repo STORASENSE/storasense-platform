@@ -137,6 +137,8 @@ services:
         condition: service_healthy
       keycloak:
         condition: service_started
+      alarmservice:
+        condition: service_started
 
   mqtt-client:
     image: ghcr.io/storasense/storasense-platform/storasense-backend-mqtt-client:latest
@@ -148,7 +150,10 @@ services:
       - app
 
   frontend:
-    image: ghcr.io/storasense/storasense-platform/storasense-frontend:latest
+    #image: ghcr.io/storasense/storasense-platform/storasense-frontend:latest
+    build:
+        context: .
+        dockerfile: ./frontend/Dockerfile
     restart: always
     networks:
       - storasense-network

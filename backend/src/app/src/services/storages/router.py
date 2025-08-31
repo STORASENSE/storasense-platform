@@ -48,7 +48,13 @@ def storages_by_user_id(
     user_id: UUID,
     storage_service: StorageService = Depends(inject_storage_service),
 ) -> list[StorageResponse]:
-    storages = storage_service.find_storages_by_user_id(user_id)
+    try:
+        storages = storage_service.find_storages_by_user_id(user_id)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=repr(e),
+        )
     return [
         StorageResponse(id=storage.id, name=storage.name)
         for storage in storages

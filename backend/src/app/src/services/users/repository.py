@@ -53,6 +53,19 @@ class UserRepository(BaseRepository[UserModel, UUID]):
             return None
         return association.role
 
+    def find_admin_by_storage_id(
+        self, storage_id: UUID
+    ) -> Optional[UserModel]:
+        return (
+            self.session.query(UserModel)
+            .join(UserStorageAccess, UserModel.id == UserStorageAccess.user_id)
+            .filter(
+                UserStorageAccess.storage_id == storage_id,
+                UserStorageAccess.role == UserRole.ADMIN,
+            )
+            .one_or_none()
+        )
+
     def create_user(self, user_data: dict) -> UserModel:
         """
         Creates a new user in the database - based on the provided Keycloak user data.

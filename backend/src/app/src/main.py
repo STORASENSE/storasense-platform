@@ -58,6 +58,8 @@ async def lifespan(app: FastAPI):
     _logger.info("Initializing database...")
     initialize_database()
     _logger.info("Database initialization completed successfully!")
+    _logger.info("Initializing services...")
+    # activate_alarmsystem_after_shutdown()
 
     yield
     _logger.info("Shutting down application...")
@@ -83,7 +85,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 add_request_middleware(app)
 

@@ -24,7 +24,7 @@ export enum SensorType {
     TEMPERATURE_OUTSIDE = 'TEMPERATURE_OUTSIDE',
     HUMIDITY = 'HUMIDITY',
     ULTRASONIC = 'ULTRASONIC',
-    GAS = 'GAS',
+    CO2 = 'CO2',
 }
 
 /////////////////////////////////////////////////////////////////////////

@@ -6,6 +6,10 @@ from backend.src.app.src.services.storages.models import StorageModel
 from backend.src.app.src.services.sensors.models import SensorModel
 from backend.src.app.src.shared.database.enums import SensorType
 
+"""
+DEPRECATED: This file is deprecated and not used in the current application setup.
+Left here for reference purposes only.
+"""
 
 _logger = get_logger(__name__)
 

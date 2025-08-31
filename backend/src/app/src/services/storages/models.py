@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 class StorageModel(BaseModel):
     __tablename__ = "Storage"
 
-    name: Mapped[str] = mapped_column(unique=True)
+    name: Mapped[str] = mapped_column(unique=False)
     description: Mapped[Optional[str]] = mapped_column()
 
     user_associations: Mapped[list[UserStorageAccess]] = relationship(

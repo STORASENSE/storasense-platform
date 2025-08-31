@@ -12,7 +12,6 @@ from sqlalchemy.orm import sessionmaker
 
 from backend.src.app.src.shared.logger import get_logger
 from backend.src.app.src.seed_dev import seed_dev_data
-from backend.src.app.src.seed_prod import seed_prod_data
 from backend.src.app.src.shared.database.base_model import BaseModel
 from backend.src.app.src.shared.database.engine import db_engine
 from backend.src.app.src.shared.database.model_discovery import discover_models
@@ -95,7 +94,7 @@ def initialize_database():
             "Production mode detected. Creating hypertables and seeding production data..."
         )
         generate_hypertables()
-        seed_prod_data(session)
+
     else:
         msg = (
             "Unknown environment detected. Aborting database initialization. Have you set the ENVIRONMENT variable "

@@ -21,10 +21,11 @@ router = APIRouter()
 @router.get("/sensors/{sensor_id}", status_code=status.HTTP_200_OK)
 def find_sensor_by_id(
     sensor_id: UUID,
+    token_data: TokenData = Depends(auth_service.get_current_user),
     sensor_service: SensorService = Depends(inject_sensor_service),
 ):
     try:
-        sensor = sensor_service.find_sensor_by_id(sensor_id)
+        sensor = sensor_service.find_sensor_by_id(sensor_id, token_data)
         return {"id": sensor.id}
     except Exception as e:
         raise HTTPException(
@@ -37,10 +38,13 @@ def find_sensor_by_id(
 )
 def find_sensors_by_storage_id(
     storage_id: UUID,
+    token_data: TokenData = Depends(auth_service.get_current_user),
     sensor_service: SensorService = Depends(inject_sensor_service),
 ) -> list[SensorMetadata]:
     try:
-        sensors = sensor_service.find_sensors_by_storage_id(storage_id)
+        sensors = sensor_service.find_sensors_by_storage_id(
+            storage_id, token_data
+        )
         return [
             SensorMetadata(
                 id=sensor.id,
@@ -92,11 +96,12 @@ def delete_sensor(
 def check_sensor_status(
     sensor_id: UUID,
     max_age_minutes: int = 1,  # Last minute is important for this check
+    token_data: TokenData = Depends(auth_service.get_current_user),
     sensor_service: SensorService = Depends(inject_sensor_service),
 ):
     try:
         status_info = sensor_service.check_sensor_status(
-            sensor_id, max_age_minutes
+            sensor_id, max_age_minutes, token_data
         )
         return SensorStatusResponse(**status_info)
     except ValueError as e:

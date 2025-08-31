@@ -1,7 +1,9 @@
 package org.storasense;
 
-
 import lombok.extern.log4j.Log4j2;
+import org.apache.kafka.streams.kstream.KTable;
+import org.apache.kafka.streams.kstream.Repartitioned;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.connect.json.JsonConverter;
 import org.apache.kafka.streams.KafkaStreams;
@@ -12,6 +14,7 @@ import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Produced;
 import org.storasense.models.Measurement;
+import org.storasense.models.SensorConfig;
 import org.storasense.processing.MeasurementEvaluator;
 import org.storasense.processing.MeasurementTimestampExtractor;
 import org.storasense.serialization.AlarmSchema;
@@ -25,7 +28,7 @@ import java.util.concurrent.CountDownLatch;
 
 @Log4j2
 public class Main {
-
+    public record MeasurementWithSensorId(UUID sensorId, Measurement measurement) {}
     public static void main(String[] args) {
         log.info("Starting alarm service!");
 
@@ -49,6 +52,7 @@ public class Main {
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
         // builder for the streams
         final StreamsBuilder builder = new StreamsBuilder();
@@ -62,6 +66,7 @@ public class Main {
         log.info("Building Serdes for JSON Serialization...");
         final var serdeFactory = new JsonSerializationFactory();
         final var measurementSerde = serdeFactory.buildSerde(Measurement.class);
+        final var sensorConfigSerde = serdeFactory.buildSerde(SensorConfig.class);
         log.info("Serdes built successfully!");
 
         // stream for reading recorded measurements
@@ -71,25 +76,55 @@ public class Main {
                         .withTimestampExtractor(new MeasurementTimestampExtractor())
         );
 
-        // log collected measurements
+         // log collected measurements
         measurementStream.peek((key, value) -> {
             log.debug("Reading measurement at '{}': {}", key, value);
         });
 
-        // map all critical measurements to alarms
+        KTable<String, SensorConfig> sensorConfigTable = builder.table(
+        "sensor_values",
+                Consumed.with(Serdes.String(), sensorConfigSerde)
+        );
+
+        sensorConfigTable.toStream()
+            .peek((k, v) -> log.debug("CONF: k='{}' v={}", k, v));
+
+         // Rekey, Repartition on sensorId (extracted from the original topic-key)
+        final KStream<String, Measurement> rekeyed = measurementStream
+                .selectKey((key, value) -> extractSensorIdFromKey(key).toString())
+                .repartition(Repartitioned.with(Serdes.String(), measurementSerde).withNumberOfPartitions(5).withName("rekeyed-iot-sensordata"))
+                .peek((k, v) -> log.info("MEAS REKEYED (post-repartition): k='{}' v={}", k, v));
+
+
         final var evaluator = new MeasurementEvaluator();
-        final KStream<String, byte[]> alarmStream =
-                measurementStream
-                .mapValues((key, value) -> {
-                    var sensorId = extractSensorIdFromKey(key);
-                    return evaluator.evaluate(sensorId, value);
-                })
-                .filter((key, value) -> value != null)
-                .peek((key, value) -> {
-                    log.debug("Generating alarm: {}", value);
-                })
-                .mapValues((key, value) -> {
-                    var struct = AlarmSchema.buildStruct(value);
+
+        final KStream<String, byte[]> alarmStream = rekeyed
+                    .leftJoin(
+                        sensorConfigTable,
+                        (readOnlyKey, measurement, cfg) -> {
+                            final boolean ok = cfg != null && cfg.getAllowedMin() != null && cfg.getAllowedMax() != null;
+                            log.info("JOIN: k='{}' hasCfg={} min={} max={}", readOnlyKey, ok,
+                                    ok ? cfg.getAllowedMin() : null, ok ? cfg.getAllowedMax() : null);
+                            if (!ok) return null;
+                            try {
+                            UUID sensorId = UUID.fromString(readOnlyKey);
+                            return evaluator.evaluate(
+                                    UUID.fromString(readOnlyKey),
+                                    measurement,
+                                    cfg.getAllowedMin(),
+                                    cfg.getAllowedMax()
+                            );
+                            } catch (IllegalArgumentException ex) {
+                                log.error("JOIN: key is not a valid UUID: '{}'", readOnlyKey);
+                                return null;
+                            }
+
+                        }
+                )
+                .filter((k, alarm) -> alarm != null)
+                .peek((k, alarm) -> log.info("ALARM OBJ: k='{}' v={}", k, alarm))
+                .mapValues((k, alarm) -> {
+                    var struct = AlarmSchema.buildStruct(alarm);
                     return jsonConverter.fromConnectData(outputTopic, alarmSchema, struct);
                 });
 
@@ -107,8 +142,8 @@ public class Main {
             log.debug("Kafka Streams app transitioned from '{}' to '{}'", oldState, newState);
         });
         streams.setUncaughtExceptionHandler(e -> {
-            log.fatal("An unexpected exception was thrown in Kafka Streams app. Shutting Down.", e);
-            return StreamsUncaughtExceptionHandler.StreamThreadExceptionResponse.SHUTDOWN_CLIENT;
+            log.fatal("An unexpected exception was thrown in Kafka Streams app.", e);
+            return StreamsUncaughtExceptionHandler.StreamThreadExceptionResponse.REPLACE_THREAD;
         });
 
         // attach shutdown handler to catch control-c

@@ -6,7 +6,7 @@ ENV PYTHONPATH=/app
 WORKDIR /app
 
 # Install build dependencies including gcc and sqlite
-RUN apk add --no-cache gcc musl-dev libffi-dev sqlite-dev
+RUN apk add --no-cache gcc musl-dev libffi-dev sqlite-dev openssl-dev librdkafka-dev
 
 RUN pip install "poetry==$POETRY_VERSION"
 
@@ -16,6 +16,8 @@ RUN poetry config virtualenvs.create false \
     && poetry install --no-interaction --no-ansi --no-root
 
 COPY . /app
+
+RUN pip install --no-cache-dir confluent-kafka==2.10.0
 
 # Create non-root user
 RUN addgroup --system --gid 1001 appuser

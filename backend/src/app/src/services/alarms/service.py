@@ -54,9 +54,6 @@ class AlarmService:
 
         :param alarm_id: The ID of the alarm to find.
         :param token_data: The token data of the requesting user.
-        :raises ValueError: If the alarm with the given ID does not exist.
-        :raises UnknownAuthPrincipalError: If the requesting user does not exist.
-        :raises AuthorizationError: If the requesting user is not part of the storage.
         :return: The found alarm or None if not found.
         """
         alarm = self._alarm_repository.find_by_id(alarm_id)
@@ -73,7 +70,7 @@ class AlarmService:
                 "Requesting authentication principal does not exist"
             )
         role = self._user_repository.find_user_role(user.id, sensor.storage_id)
-        if role != UserRole.ADMIN or role != UserRole.CONTRIBUTOR:
+        if role not in (UserRole.ADMIN, UserRole.CONTRIBUTOR):
             raise AuthorizationError(
                 "Could not delete alarm because requesting user is not part of the storage"
             )
@@ -86,9 +83,6 @@ class AlarmService:
 
         :param alarm_id: The ID of the alarm to delete.
         :param token_data: The token data of the requesting user.
-        :raises ValueError: If the alarm with the given ID does not exist.
-        :raises UnknownAuthPrincipalError: If the requesting user does not exist.
-        :raises AuthorizationError: If the requesting user does not have admin rights in the storage.
         :return: None
         """
 
@@ -130,7 +124,6 @@ class AlarmService:
         :param page_request: The pagination request.
         :param token_data: The token data of the requesting user.
         :return: A page containing the requested alarm data.
-        :raises ValueError: If the storage with the given ID does not exist.
         """
         # Verify storage exists first
         storage = self._storage_repository.find_by_id(storage_id)
@@ -144,7 +137,7 @@ class AlarmService:
                 "Requesting authentication principal does not exist"
             )
         role = self._user_repository.find_user_role(user.id, storage.id)
-        if role != UserRole.ADMIN or role != UserRole.CONTRIBUTOR:
+        if role not in (UserRole.ADMIN, UserRole.CONTRIBUTOR):
             raise AuthorizationError(
                 "Could not return alarm(s) because requesting user is not part of the storage"
             )

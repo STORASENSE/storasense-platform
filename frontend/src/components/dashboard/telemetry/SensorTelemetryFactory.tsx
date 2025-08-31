@@ -116,7 +116,7 @@ const SensorTelemetryFactory: FC<SensorTelemetryFactoryProps> = ({ sensor }) => 
                     />
                 </SensorTelemetryCard>
             );
-        case SensorType.GAS:
+        case SensorType.CO2:
             return (
                 <SensorTelemetryCard
                     sensor={sensor}

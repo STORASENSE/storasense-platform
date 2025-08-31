@@ -22,7 +22,7 @@ const COLORS = {
     TEMPERATURE_INSIDE: "#0ea5e9",
     TEMPERATURE_OUTSIDE: "#3b82f6",
     HUMIDITY: "#10b981",
-    GAS: "#f59e0b",
+    CO2: "#f59e0b",
     ULTRASONIC: "#ef4444",
   } as Record<string, string>,
 };
