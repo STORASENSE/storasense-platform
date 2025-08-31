@@ -192,8 +192,8 @@ services:
           condition: service_started
         keycloak:
           condition: service_healthy
-    #profiles:
-    # - integration-tests
+    profiles:
+     - integration-tests
 
 volumes:
   storasense_data_volume:

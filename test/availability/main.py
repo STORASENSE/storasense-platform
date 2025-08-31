@@ -1,10 +1,19 @@
 import time
 from dotenv import load_dotenv
-from mqtt import check_mqtt
+from test.availability.mqtt import check_mqtt
+from test.availability.frontend_test import (
+    login,
+    check_backend,
+    get_db_connection,
+    init_db,
+    evaluate_results,
+)
+from selenium.common.exceptions import WebDriverException
+import os
 
 
 def main():
-    """start_time = time.time()
+    start_time = time.time()
     end_time = start_time + int(os.getenv("AVAILABILITY_TEST_DURATION"))
     init_db()
 
@@ -21,8 +30,10 @@ def main():
                 )
 
     evaluate_results(start_time, end_time)
-    """
-    check_mqtt()
+    with open(os.getenv("AVAILABILITY_REPORT_FILE"), "a") as file:
+        file.write("\nMQTT Availability Report\n")
+
+    check_mqtt(start_time, end_time)
 
 
 if __name__ == "__main__":

@@ -10,7 +10,7 @@ import sqlite3
 
 def login():
     options = webdriver.ChromeOptions()
-    # options.add_argument("--headless")
+    options.add_argument("--headless")
     options.add_argument("--no-sandbox")
     options.add_argument("--ignore-certificate-errors")
     driver = webdriver.Chrome(options=options)
@@ -77,7 +77,7 @@ def evaluate_results(start_time, end_time):
         total_checks = connection.execute(
             "SELECT COUNT(*) FROM test_data"
         ).fetchone()[0]
-        with open("availability_test_results.txt", "a") as file:
+        with open(os.getenv("AVAILABILITY_REPORT_FILE"), "a") as file:
             file.write(f"Test run from {start_time} to {end_time}\n")
             file.write(
                 f"Frontend able to login: {frontend_alive} out of {total_checks}  {frontend_alive / total_checks * 100}%\n"
