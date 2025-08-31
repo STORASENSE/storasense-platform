@@ -59,6 +59,8 @@ plugins:
   - search
   - minify:
       minify_html: true
+  - mkdocstrings:
+      default_handler: python
 
 nav:
   - Home: index.md
