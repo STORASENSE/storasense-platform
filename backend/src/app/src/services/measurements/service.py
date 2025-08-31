@@ -12,6 +12,10 @@ from backend.src.app.src.services.auth.schemas import TokenData
 from backend.src.app.src.shared.database.enums import UserRole
 from backend.src.app.src.shared.logger import get_logger
 from backend.src.app.src.services.measurements.models import MeasurementModel
+from backend.src.app.src.services.user_storage_access.repository import (
+    UserStorageAccessRepository,
+    inject_user_storage_access_repository,
+)
 from backend.src.app.src.services.users.repository import (
     UserRepository,
     inject_user_repository,
@@ -42,11 +46,13 @@ class MeasurementService:
         measurement_repository: MeasurementRepository,
         sensor_repository: SensorRepository,
         user_repository: UserRepository,
+        user_storage_access_repository: UserStorageAccessRepository,
     ):
         self._session = session
         self._measurement_repository = measurement_repository
         self._sensor_repository = sensor_repository
         self._user_repository = user_repository
+        self._user_storage_access_repository = user_storage_access_repository
 
     def find_all_by_sensor_id(
         self, sensor_id: UUID, page_request: PageRequest, token_data: TokenData
@@ -73,7 +79,9 @@ class MeasurementService:
             raise UnknownAuthPrincipalError(
                 "Requesting authentication principal does not exist"
             )
-        role = self._user_repository.find_user_role(user.id, sensor.storage_id)
+        role = self._user_storage_access_repository.find_user_role(
+            user.id, sensor.storage_id
+        )
         if role not in [UserRole.ADMIN, UserRole.CONTRIBUTOR]:
             raise AuthorizationError(
                 "User is not authorized, to view measurements of this sensor."
@@ -115,7 +123,9 @@ class MeasurementService:
             raise UnknownAuthPrincipalError(
                 "Requesting authentication principal does not exist"
             )
-        role = self._user_repository.find_user_role(user.id, sensor.storage_id)
+        role = self._user_storage_access_repository.find_user_role(
+            user.id, sensor.storage_id
+        )
         if role not in [UserRole.ADMIN, UserRole.CONTRIBUTOR]:
             raise AuthorizationError(
                 "User is not authorized, to view measurements of this sensor."
@@ -172,10 +182,14 @@ def inject_measurement_service(
     ),
     sensor_repository: SensorRepository = Depends(inject_sensor_repository),
     user_repository: UserRepository = Depends(inject_user_repository),
+    user_storage_access_repository: UserStorageAccessRepository = Depends(
+        inject_user_storage_access_repository
+    ),
 ) -> MeasurementService:
     return MeasurementService(
         session,
         measurement_repository,
         sensor_repository,
         user_repository,
+        user_storage_access_repository,
     )

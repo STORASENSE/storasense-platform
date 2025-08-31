@@ -30,6 +30,10 @@ from backend.src.app.src.services.users.repository import (
     UserRepository,
     inject_user_repository,
 )
+from backend.src.app.src.services.user_storage_access.repository import (
+    UserStorageAccessRepository,
+    inject_user_storage_access_repository,
+)
 from backend.src.app.src.shared.database.engine import open_session
 from backend.src.app.src.shared.database.enums import UserRole
 
@@ -41,12 +45,14 @@ class SensorService:
         sensor_repository: SensorRepository,
         storage_repository: StorageRepository,
         measurement_repository: MeasurementRepository,
+        user_storage_access_repository: UserStorageAccessRepository,
         user_repository: UserRepository,
     ):
         self._measurement_repository = measurement_repository
         self._session = session
         self._sensor_repository = sensor_repository
         self._storage_repository = storage_repository
+        self._user_storage_access_repository = user_storage_access_repository
         self._user_repository = user_repository
 
     def check_sensor_status(
@@ -73,7 +79,9 @@ class SensorService:
         if sensor is None:
             raise ValueError(f"Sensor with ID {sensor_id} doesnt exist.")
 
-        role = self._user_repository.find_user_role(user.id, sensor.storage_id)
+        role = self._user_storage_access_repository.find_user_role(
+            user.id, sensor.storage_id
+        )
         if role not in (UserRole.ADMIN, UserRole.CONTRIBUTOR):
             raise AuthorizationError(
                 "Could not return sensor status because requesting user is not part of the storage"
@@ -130,7 +138,9 @@ class SensorService:
         if sensor is None:
             raise ValueError(f"Sensor with ID {sensor_id} doesnt exist.")
 
-        role = self._user_repository.find_user_role(user.id, sensor.storage_id)
+        role = self._user_storage_access_repository.find_user_role(
+            user.id, sensor.storage_id
+        )
         if role not in (UserRole.ADMIN, UserRole.CONTRIBUTOR):
             raise AuthorizationError(
                 "Could not return sensor because requesting user is not part of the storage"
@@ -151,7 +161,8 @@ class SensorService:
         Condition: The storage with the given ID must exist.
         Condition_2: The user must be part of the storage.
 
-        :param storage_id:
+        :param storage_id: The ID of the storage to find sensors for.
+        :param token_data: The token data of the requesting user.
         :return: A list of sensors belonging to the specified storage.
         """
         storage = self._storage_repository.find_by_id(storage_id)
@@ -164,7 +175,9 @@ class SensorService:
                 "Requesting authentication principal does not exist"
             )
 
-        role = self._user_repository.find_user_role(user.id, storage_id)
+        role = self._user_storage_access_repository.find_user_role(
+            user.id, storage_id
+        )
         if role not in (UserRole.ADMIN, UserRole.CONTRIBUTOR):
             raise AuthorizationError(
                 "Could not return sensors because requesting user is not part of the storage"
@@ -189,7 +202,7 @@ class SensorService:
             raise UnknownAuthPrincipalError(
                 "Requesting authentication principal does not exist"
             )
-        role = self._user_repository.find_user_role(
+        role = self._user_storage_access_repository.find_user_role(
             user.id, request.storage_id
         )
         if role != UserRole.ADMIN:
@@ -260,7 +273,7 @@ class SensorService:
             raise UnknownAuthPrincipalError(
                 "Requesting authentication principal does not exist"
             )
-        role = self._user_repository.find_user_role(
+        role = self._user_storage_access_repository.find_user_role(
             user.id, request.storage_id
         )
         if role != UserRole.ADMIN:
@@ -289,8 +302,10 @@ class SensorService:
             return  # No sensors to push
         for sensor in sensors:
             # Admin-User for the storage the sensor belongs to (to get the admins email for notifications)
-            admin_user = self._user_repository.find_admin_by_storage_id(
-                sensor.storage_id
+            admin_user = (
+                self._user_storage_access_repository.find_admin_by_storage_id(
+                    sensor.storage_id
+                )
             )
             email = admin_user.email if admin_user else None
             sensor_data = {
@@ -314,6 +329,9 @@ def inject_sensor_service(
     measurement_repository: MeasurementRepository = Depends(
         inject_measurement_repository
     ),
+    user_storage_access_repository: UserStorageAccessRepository = Depends(
+        inject_user_storage_access_repository
+    ),
     user_repository: UserRepository = Depends(inject_user_repository),
 ) -> SensorService:
     return SensorService(
@@ -321,5 +339,6 @@ def inject_sensor_service(
         sensor_repository,
         storage_repository,
         measurement_repository,
+        user_storage_access_repository,
         user_repository,
     )

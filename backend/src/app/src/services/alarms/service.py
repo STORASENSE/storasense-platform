@@ -26,6 +26,10 @@ from backend.src.app.src.services.users.repository import (
     UserRepository,
     inject_user_repository,
 )
+from backend.src.app.src.services.user_storage_access.repository import (
+    UserStorageAccessRepository,
+    inject_user_storage_access_repository,
+)
 from backend.src.app.src.shared.database.engine import open_session
 from backend.src.app.src.shared.database.enums import UserRole
 from backend.src.app.src.shared.database.pagination import PageRequest, Page
@@ -39,12 +43,14 @@ class AlarmService:
         storage_repository: StorageRepository,
         sensor_repository: SensorRepository,
         user_repository: UserRepository,
+        user_storage_access_repository: UserStorageAccessRepository,
     ):
         self._session = session
         self._alarm_repository = alarm_repository
         self._storage_repository = storage_repository
         self._sensor_repository = sensor_repository
         self._user_repository = user_repository
+        self._user_storage_access_repository = user_storage_access_repository
 
     def find_alarm_by_id(
         self, alarm_id: UUID, token_data: TokenData
@@ -69,7 +75,9 @@ class AlarmService:
             raise UnknownAuthPrincipalError(
                 "Requesting authentication principal does not exist"
             )
-        role = self._user_repository.find_user_role(user.id, sensor.storage_id)
+        role = self._user_storage_access_repository.find_user_role(
+            user.id, sensor.storage_id
+        )
         if role not in (UserRole.ADMIN, UserRole.CONTRIBUTOR):
             raise AuthorizationError(
                 "Could not delete alarm because requesting user is not part of the storage"
@@ -100,7 +108,9 @@ class AlarmService:
             raise UnknownAuthPrincipalError(
                 "Requesting authentication principal does not exist"
             )
-        role = self._user_repository.find_user_role(user.id, sensor.storage_id)
+        role = self._user_storage_access_repository.find_user_role(
+            user.id, sensor.storage_id
+        )
         if role != UserRole.ADMIN:
             raise AuthorizationError(
                 "Could not delete alarm because requesting user does not have admin rights"
@@ -136,7 +146,9 @@ class AlarmService:
             raise UnknownAuthPrincipalError(
                 "Requesting authentication principal does not exist"
             )
-        role = self._user_repository.find_user_role(user.id, storage.id)
+        role = self._user_storage_access_repository.find_user_role(
+            user.id, storage_id
+        )
         if role not in (UserRole.ADMIN, UserRole.CONTRIBUTOR):
             raise AuthorizationError(
                 "Could not return alarm(s) because requesting user is not part of the storage"
@@ -153,6 +165,9 @@ def inject_alarm_service(
     storage_repository: StorageRepository = Depends(inject_storage_repository),
     sensor_repository: SensorRepository = Depends(inject_sensor_repository),
     user_repository: UserRepository = Depends(inject_user_repository),
+    user_storage_access_repository: UserRepository = Depends(
+        inject_user_storage_access_repository
+    ),
 ) -> AlarmService:
     return AlarmService(
         session,
@@ -160,4 +175,5 @@ def inject_alarm_service(
         storage_repository,
         sensor_repository,
         user_repository,
+        user_storage_access_repository,
     )
