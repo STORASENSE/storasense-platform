@@ -17,7 +17,11 @@ from backend.src.app.src.shared.database.pagination import PageRequest
 router = APIRouter()
 
 
-@router.get("/alarms/{alarm_id}", status_code=status.HTTP_200_OK)
+@router.get(
+    "/alarms/{alarm_id}",
+    status_code=status.HTTP_200_OK,
+    description="Gets a specific alarm by its ID.",
+)
 def find_alarm_by_id(
     alarm_id: UUID,
     alarm_service: AlarmService = Depends(inject_alarm_service),
@@ -52,6 +56,7 @@ def find_alarm_by_id(
     "/alarms/byStorageId/{storage_id}/",
     response_model=List[AlarmResponse],
     status_code=status.HTTP_200_OK,
+    description="Gets latest 50 alarms for a given storage.",
 )
 def find_alarms_by_storage_id(
     storage_id: UUID,
@@ -86,7 +91,11 @@ def find_alarms_by_storage_id(
         )
 
 
-@router.delete("/alarms/{alarm_id}", status_code=status.HTTP_200_OK)
+@router.delete(
+    "/alarms/{alarm_id}",
+    status_code=status.HTTP_200_OK,
+    description="Deletes a specific alarm by its ID.",
+)
 def delete_alarm(
     alarm_id: UUID,
     token_data: TokenData = Depends(auth_service.get_current_user),

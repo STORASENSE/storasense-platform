@@ -32,6 +32,7 @@ _logger = get_logger(__name__)
     "/measurements/{sensor_id}",
     response_model=List[MeasurementResponse],
     status_code=status.HTTP_200_OK,
+    description="Return latest 100 measurements by sensor ID",
 )
 def find_sensor_measurements(
     sensor_id: UUID,
@@ -58,6 +59,7 @@ def find_sensor_measurements(
     "/measurements/{sensor_id}/filter",
     response_model=GetMeasurementsResponse,
     status_code=status.HTTP_200_OK,
+    description="Return measurements by sensor ID and Max-Date",
 )
 def find_measurements_by_sensor_id_and_max_date(
     sensor_id: UUID,
@@ -90,7 +92,11 @@ def find_measurements_by_sensor_id_and_max_date(
     return GetMeasurementsResponse(measurements=measurements)
 
 
-@router.post("/measurements/{sensor_id}", status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/measurements/{sensor_id}",
+    status_code=status.HTTP_201_CREATED,
+    description="Creates a new measurement for a sensor (given by its ID)",
+)
 async def create_measurement(
     sensor_id: UUID,
     request: CreateMeasurementRequest,

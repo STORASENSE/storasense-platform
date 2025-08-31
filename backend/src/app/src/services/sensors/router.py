@@ -18,7 +18,11 @@ from backend.src.app.src.services.sensors.service import (
 router = APIRouter()
 
 
-@router.get("/sensors/{sensor_id}", status_code=status.HTTP_200_OK)
+@router.get(
+    "/sensors/{sensor_id}",
+    status_code=status.HTTP_200_OK,
+    description="Gets information about a sensor by its ID.",
+)
 def find_sensor_by_id(
     sensor_id: UUID,
     token_data: TokenData = Depends(auth_service.get_current_user),
@@ -34,7 +38,9 @@ def find_sensor_by_id(
 
 
 @router.get(
-    "/sensors/byStorageId/{storage_id}", status_code=status.HTTP_200_OK
+    "/sensors/byStorageId/{storage_id}",
+    status_code=status.HTTP_200_OK,
+    description="Gets a list of sensors associated with a specific storage ID.",
 )
 def find_sensors_by_storage_id(
     storage_id: UUID,
@@ -61,7 +67,11 @@ def find_sensors_by_storage_id(
         )
 
 
-@router.post("/sensors/{sensor_id}", status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/sensors/{sensor_id}",
+    status_code=status.HTTP_201_CREATED,
+    description="Creates a new sensor with the given ID and metadata for a specific storage.",
+)
 def create_sensor(
     sensor_id: UUID,
     request: CreateSensorRequest,
@@ -77,7 +87,11 @@ def create_sensor(
         )
 
 
-@router.delete("/sensors/{sensor_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/sensors/{sensor_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    description="Deletes a sensor with the given ID from a specific storage.",
+)
 def delete_sensor(
     sensor_id: UUID,
     request: DeleteSensorRequest,
@@ -92,7 +106,11 @@ def delete_sensor(
         )
 
 
-@router.get("/sensors/status/{sensor_id}", status_code=status.HTTP_200_OK)
+@router.get(
+    "/sensors/status/{sensor_id}",
+    status_code=status.HTTP_200_OK,
+    description="Checks the status of a sensor, including its online status (Was a measurement sent at the last minute?).",
+)
 def check_sensor_status(
     sensor_id: UUID,
     max_age_minutes: int = 1,  # Last minute is important for this check

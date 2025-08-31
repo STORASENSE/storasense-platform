@@ -14,7 +14,10 @@ router = APIRouter(prefix="/users", tags=["Users"])
 
 
 @router.get(
-    "/me", response_model=UserPublicResponse, status_code=status.HTTP_200_OK
+    "/me",
+    response_model=UserPublicResponse,
+    status_code=status.HTTP_200_OK,
+    description="Get the authenticated user's information.",
 )
 async def read_users_me(
     token_data: TokenData = Depends(auth_service.get_current_user),
@@ -44,7 +47,11 @@ async def read_users_me(
         )
 
 
-@router.get("/byStorageId/{storage_id}")
+@router.get(
+    "/byStorageId/{storage_id}",
+    status_code=status.HTTP_200_OK,
+    description="Find all users associated with a given storage ID.",
+)
 async def find_users_by_storage_id(
     storage_id: UUID,
     token_data: TokenData = Depends(auth_service.get_current_user),
