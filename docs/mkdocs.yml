@@ -68,9 +68,9 @@ nav:
       - Vision: intro_goals.md
       - MVP: mvp.md
   - Technologies: techstack.md
-  - Architecture:
-      - Architecture Overview: arc.md
-      - Data Domain: data_eva.md
+ # - Architecture:
+  #    - Architecture Overview: arc.md
+    #  - Data Domain: data_eva.md
   - Components:
       - Storasense-Sensoric (Arduino): arduino.md
       - Backend: backend.md
