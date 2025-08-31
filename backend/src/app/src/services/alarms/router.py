@@ -75,7 +75,6 @@ def find_alarms_by_storage_id(
             AlarmResponse(
                 id=alarm.id,
                 sensor_id=alarm.sensor_id,
-                severity=alarm.severity,
                 message=alarm.message,
                 created_at=alarm.created_at,
             )

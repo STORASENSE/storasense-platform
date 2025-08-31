@@ -50,7 +50,7 @@ const AlarmOverview: FC = () => {
             {alarms.length === 0 && (
                 <section className="text-center py-12">
                     <p className="text-gray-500 mb-4">
-                        There seems to be no alarm in the storage.
+                        There seems to be no alarms in the storage.
                     </p>
                 </section>
             )}
