@@ -6,10 +6,10 @@ from sqlalchemy.orm import Session
 from uuid import UUID
 
 from backend.src.app.src.services.alarms.models import AlarmModel
-from backend.src.app.src.services.users.models import UserModel
-from backend.src.app.src.shared.database.join_tables.user_storage import (
-    UserStorageAccess,
+from backend.src.app.src.services.user_storage_access.models import (
+    UserStorageAccessModel,
 )
+from backend.src.app.src.services.users.models import UserModel
 from backend.src.app.src.shared.logger import get_logger
 from backend.src.app.src.services.measurements.models import MeasurementModel
 from backend.src.app.src.services.sensors.models import SensorModel
@@ -100,7 +100,7 @@ def seed_measurements(session: Session):
                     value=value,
                     unit=MeasurementUnit.CELSIUS,
                     sensor_id=sensor.id,
-                    created_at=datetime.now() - timedelta(seconds=30 * i),
+                    timestamp=datetime.now() - timedelta(seconds=30 * i),
                 )
             )
 
@@ -151,7 +151,7 @@ def seed_users(session: Session):
 
     storage = session.query(StorageModel).first()
     if storage:
-        user_storage = UserStorageAccess(
+        user_storage = UserStorageAccessModel(
             user_id=user.id,
             storage_id=storage.id,
             role=UserRole.ADMIN,
