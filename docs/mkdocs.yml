@@ -74,6 +74,6 @@ nav:
   - Components:
       - Storasense-Sensoric (Arduino): arduino.md
       - Backend: backend.md
-
+  - Reference: reference.md
 extra_css:
   - styles/extra.css
