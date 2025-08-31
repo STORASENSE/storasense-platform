@@ -14,7 +14,7 @@ from backend.src.app.src.services.auth.schemas import TokenData
 from backend.src.app.src.services.auth.service import auth_service
 from backend.src.app.src.shared.database.pagination import PageRequest
 
-router = APIRouter()
+router = APIRouter(tags=["Alarms"])
 
 
 @router.get(

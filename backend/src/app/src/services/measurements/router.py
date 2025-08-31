@@ -24,7 +24,7 @@ from backend.src.app.src.services.sensors.errors import SensorDoesNotExistError
 
 from backend.src.app.src.shared.database.pagination import PageRequest
 
-router = APIRouter()
+router = APIRouter(tags=["Measurements"])
 _logger = get_logger(__name__)
 
 

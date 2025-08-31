@@ -15,7 +15,7 @@ from backend.src.app.src.services.sensors.service import (
     inject_sensor_service,
 )
 
-router = APIRouter()
+router = APIRouter(tags=["Sensors"])
 
 
 @router.get(

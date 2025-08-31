@@ -6,7 +6,7 @@ from backend.src.app.src.services.analytics.service import (
     inject_analytics_service,
 )
 
-router = APIRouter(tags=["analytics"])
+router = APIRouter(tags=["Analytics"])
 Window = Literal["7d", "30d", "365d"]
 
 
