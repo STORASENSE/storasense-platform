@@ -9,20 +9,13 @@ from logger import get_logger
 _logger = get_logger(__name__)
 
 
-def get_topics():
-    topics = os.getenv("MQTT_TOPICS", "").split(",")
-
-    topic_tuples = []
-    for topic in topics:
-        topic_tuples.append((topic, int(os.getenv("MQTT_QOS", "0"))))
-    return topic_tuples
-
-
 def on_subscribe(client, userdata, mid, reason_code_list, properties):
     _logger.info("Subscribed")
 
 
 def on_message(client, userdata, message):
+    if os.getenv("MQTT_IGNORE_TOPIC") in message.topic.lower():
+        return
     sensor_id = message.topic.split("/")[-1]
     message_data = json.loads(message.payload.decode("utf-8"))
 
@@ -43,7 +36,7 @@ def on_connect(client, userdata, flags, reason_code, properties):
     if reason_code.is_failure:
         _logger.error(f"Failed to connect: {reason_code}.")
     else:
-        client.subscribe(get_topics())
+        client.subscribe(os.getenv("MQTT_TOPIC"))
 
 
 def start_mqtt_client():
