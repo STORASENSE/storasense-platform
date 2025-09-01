@@ -56,7 +56,7 @@ def check_sensor(sensor_id: str, start_time: float, end_time: float):  #
         .timestamp()
         for creation_date in creation_dates
     ]
-    print(f"creation_dates: {creation_dates}")
+
     outages = []
     for index, creation_date in enumerate(creation_dates):
         if index == 0:
@@ -85,5 +85,5 @@ def check_mqtt(start_time: float, end_time: float):
             sensor["id"]
             for sensor in get_request(f"sensors/byStorageId/{storage_id}")
         ]
-    sensor_id = sensor_ids[0]
-    check_sensor(sensor_id, start_time, end_time)
+    for sensor_id in sensor_ids:
+        check_sensor(sensor_id, start_time, end_time)

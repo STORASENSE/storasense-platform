@@ -1,13 +1,12 @@
 
 services:
   availability:
-    build:
-      context: ../../
-      dockerfile: test/availability/Dockerfile
+    image: ghcr.io/storasense/storasense-platform/storasense-availability-test:latest
     volumes:
       - ../reports:/etc/reports
     environment:
         - OPERATING_MODE=OUTSIDE
+        - PYTHONUNBUFFERED=1
     env_file:
       - ../../.env
     command: ["python", "./test/availability/main.py"]

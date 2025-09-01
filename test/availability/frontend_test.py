@@ -14,9 +14,11 @@ def login():
     options.add_argument("--no-sandbox")
     options.add_argument("--ignore-certificate-errors")
     driver = webdriver.Chrome(options=options)
-    driver.implicitly_wait(2)
+    driver.implicitly_wait(
+        float(os.getenv("AVAILABILITY_TEST_ACCEPTABLE_WAIT_TIME"))
+    )
     driver.get("https://storasense.de")
-    time.sleep(0.5)
+    time.sleep(float(os.getenv("AVAILABILITY_TEST_AUTH_WAIT_TIME")))
     login_button = driver.find_element(By.ID, "login-button")
     login_button.click()
 
