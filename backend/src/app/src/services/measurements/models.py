@@ -15,12 +15,10 @@ if TYPE_CHECKING:
 
 class MeasurementModel(BaseModel):
     __tablename__ = "Measurements"
-    __timescaledb_hypertable__ = {"time_column_name": "created_at"}
+    __timescaledb_hypertable__ = {"time_column_name": "timestamp"}
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
-
-    # Composite PK
-    created_at: Mapped[datetime] = mapped_column(
+    timestamp: Mapped[datetime] = mapped_column(
         primary_key=True
     )  # Composite PK
     value: Mapped[float] = mapped_column()

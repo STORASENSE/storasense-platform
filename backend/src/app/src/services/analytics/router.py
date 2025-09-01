@@ -13,14 +13,15 @@ from backend.src.app.src.services.analytics.schemas import (
     SummaryItem,
 )
 
-router = APIRouter(tags=["analytics"])
+router = APIRouter(tags=["Analytics"])
 _logger = get_logger(__name__)
 
 
 @router.get(
-    "/analytics/bySensorId/${storage_id}`",  # /analytics/summaryBySensorId# url: `/analytics/bySensorId/${storage_id}`,
+    "/analytics/bySensorId/${storage_id}`",
     response_model=List[SummaryItem],
     status_code=status.HTTP_200_OK,
+    description="Get analytics summary by storage ID",
 )
 def analytics_summary_by_sensor_id(
     sensor_id: UUID,

@@ -78,7 +78,7 @@ def find_measurements_by_sensor_id_and_max_date(
 
     measurements = [
         MeasurementResponse(
-            id=m.id, value=m.value, unit=m.unit, created_at=m.created_at
+            id=m.id, value=m.value, unit=m.unit, created_at=m.timestamp
         )
         for m in result
     ]

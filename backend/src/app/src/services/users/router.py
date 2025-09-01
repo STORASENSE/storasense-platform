@@ -68,7 +68,11 @@ async def find_users_by_storage_id(
         )
 
 
-@router.post("/{username}/addToStorage")
+@router.post(
+    "/{username}/addToStorage",
+    status_code=status.HTTP_200_OK,
+    description="Add a user to a storage by username.",
+)
 def add_user_to_storage(
     username: str,
     storage_id: UUID,
@@ -88,7 +92,11 @@ def add_user_to_storage(
         )
 
 
-@router.delete("/{username}/removeFromStorage")
+@router.delete(
+    "/{username}/removeFromStorage",
+    status_code=status.HTTP_200_OK,
+    description="Remove a user from a storage by username.",
+)
 def remove_user_from_storage(
     username: str,
     storage_id: UUID,

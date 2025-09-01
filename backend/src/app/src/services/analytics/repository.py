@@ -72,7 +72,7 @@ class AnalyticsRepository:
                 func.max(MeasurementModel.value).label("max_value"),
             )
             .join(SensorModel, SensorModel.id == MeasurementModel.sensor_id)
-            .filter(MeasurementModel.created_at >= start_ts)
+            .filter(MeasurementModel.timestamp >= start_ts)
             .group_by(SensorModel.type, MeasurementModel.sensor_id)
             .order_by(SensorModel.type.asc(), MeasurementModel.sensor_id.asc())
             .all()

@@ -98,7 +98,7 @@ class SensorService:
         )
 
         last_value = last_measurement.value if last_measurement else None
-        last_time = last_measurement.created_at if last_measurement else None
+        last_time = last_measurement.timestamp if last_measurement else None
 
         # Set is_online based on the age of the last measurement (is it within max_age_minutes?)
         is_online = False

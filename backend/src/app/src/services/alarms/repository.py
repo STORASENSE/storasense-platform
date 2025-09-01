@@ -11,7 +11,7 @@ from backend.src.app.src.shared.database.pagination import (
     PageRequest,
     Page,
 )
-from backend.src.app.src.shared.repositories.base_repository import (
+from backend.src.app.src.shared.database.base_repository import (
     BaseRepository,
 )
 

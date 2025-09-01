@@ -169,7 +169,7 @@ class MeasurementService:
         measurement.sensor_id = sensor_id
         measurement.value = request.value
         measurement.unit = request.unit
-        measurement.created_at = request.created_at
+        measurement.timestamp = request.created_at
 
         self._measurement_repository.create(measurement)
         self._session.commit()

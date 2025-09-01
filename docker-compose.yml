@@ -140,14 +140,14 @@ services:
       alarmservice:
         condition: service_started
 
-  mqtt-client:
-    image: ghcr.io/storasense/storasense-platform/storasense-backend-mqtt-client:latest
-    env_file: .env
-    restart: on-failure
-    networks:
-      - storasense-network
-    depends_on:
-      - app
+#  mqtt-client:
+#    image: ghcr.io/storasense/storasense-platform/storasense-backend-mqtt-client:latest
+#    env_file: .env
+#    restart: on-failure
+#    networks:
+#      - storasense-network
+#    depends_on:
+#      - app
 
   frontend:
     #image: ghcr.io/storasense/storasense-platform/storasense-frontend:latest
