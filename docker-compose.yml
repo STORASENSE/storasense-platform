@@ -33,6 +33,11 @@ services:
     image: quay.io/keycloak/keycloak:latest
     container_name: keycloak
     restart: always
+    healthcheck:
+      test: ['CMD-SHELL', '[ -f /tmp/HealthCheck.java ] || echo "public class HealthCheck { public static void main(String[] args) throws java.lang.Throwable { System.exit(java.net.HttpURLConnection.HTTP_OK == ((java.net.HttpURLConnection)new java.net.URL(args[0]).openConnection()).getResponseCode() ? 0 : 1); } }" > /tmp/HealthCheck.java && java /tmp/HealthCheck.java http://localhost:9000/health/live']
+      interval: 5s
+      timeout: 5s
+      retries: 30
     environment:
       - KC_DB=postgres
       - KC_DB_URL_HOST=${POSTGRES_HOST} # Use timescaledb as the database
@@ -83,8 +88,6 @@ services:
       - ./db-scripts:/docker-entrypoint-initdb.d
     networks:
       - storasense-network
-    ports:
-      - "5432:5432"
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
       interval: 5s
@@ -136,7 +139,7 @@ services:
       timescaledb:
         condition: service_healthy
       keycloak:
-        condition: service_started
+        condition: service_healthy
       alarmservice:
         condition: service_started
 
@@ -169,14 +172,29 @@ services:
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
     depends_on:
       keycloak:
-        condition: service_started
+        condition: service_healthy
       app:
         condition: service_started
 
+  integration-tests:
+    image: ghcr.io/storasense/storasense-platform/storasense-integration-tests:latest
+    environment:
+      - OPERATING_MODE=INSIDE # Use INSIDE mode for integration tests
+    env_file: .env
+    networks:
+      - storasense-network
+    depends_on:
+        app:
+          condition: service_started
+        keycloak:
+          condition: service_healthy
+    profiles:
+     - integration-tests
+
   alarmservice:
     build:
-        context: .
-        dockerfile: ./Alarm-Service/Dockerfile
+      context: .
+      dockerfile: ./Alarm-Service/Dockerfile
     container_name: storasense-alarmservice
     restart: unless-stopped
     environment:
@@ -265,7 +283,7 @@ services:
     image: bitnami/kafka:latest
     container_name: storasense-kafka-init-topics
     volumes:
-        - ./kafka/scripts/topics:/opt/scripts:ro
+      - ./kafka/scripts/topics:/opt/scripts:ro
     environment:
       - BOOTSTRAP=kafka:9092
       - IOT_PARTITIONS=5
@@ -273,7 +291,7 @@ services:
     depends_on:
       - kafka
     networks:
-        - storasense-network
+      - storasense-network
     command: ["/bin/bash", "-c", "/opt/scripts/wait-for-kafka.sh kafka 9092 90 && /opt/scripts/create-topics.sh"]
     init: true
 
@@ -282,12 +300,12 @@ services:
     image: bitnami/kafka:latest
     container_name: storasense-kafka-init-connectors
     volumes:
-        - ./kafka/connectors:/opt/connectors:ro
-        - ./kafka/scripts/connectors:/opt/scripts:ro
+      - ./kafka/connectors:/opt/connectors:ro
+      - ./kafka/scripts/connectors:/opt/scripts:ro
     depends_on:
       - kafka-connect
     networks:
-        - storasense-network
+      - storasense-network
     command: ["/bin/bash", "-c", "/opt/scripts/wait-for-connect.sh http://kafka-connect:8083/connector-plugins 60 2 && /opt/scripts/apply-all.sh http://kafka-connect:8083 /opt/connectors"]
     init: true
 

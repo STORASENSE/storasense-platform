@@ -48,3 +48,15 @@ jobs:
           IMAGE_NAME=ghcr.io/$REPO_NAME/storasense-backend-mqtt-client:latest
           docker build -f backend/src/mqtt_client/Dockerfile -t $IMAGE_NAME .
           docker push $IMAGE_NAME
+      - name: Build and push availability-test image
+        run: |
+          REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE_NAME=ghcr.io/$REPO_NAME/storasense-availability-test:latest
+          docker build -f test/availability/Dockerfile -t $IMAGE_NAME .
+          docker push $IMAGE_NAME
+      - name: Build and push integration-tests image
+        run: |
+          REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE_NAME=ghcr.io/$REPO_NAME/storasense-integration-tests:latest
+          docker build -f test/integration/Dockerfile -t $IMAGE_NAME .
+          docker push $IMAGE_NAME

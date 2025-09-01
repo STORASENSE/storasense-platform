@@ -39,6 +39,13 @@ urllib3 = "^2.5.0"
 [tool.poetry.group.dev.dependencies]
 commitizen = "^4.8.3"
 
+
+[tool.poetry.group.test.dependencies]
+selenium = "^4.35.0"
+psycopg2-binary = "^2.9.10"
+pytest-dependency = "^0.6.0"
+numpy = "^2.3.2"
+
 [tool.commitizen]
 name = "cz_conventional_commits"
 tag_format = "$version"
