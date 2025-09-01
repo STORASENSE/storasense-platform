@@ -60,3 +60,15 @@ jobs:
           IMAGE_NAME=ghcr.io/$REPO_NAME/storasense-integration-tests:latest
           docker build -f test/integration/Dockerfile -t $IMAGE_NAME .
           docker push $IMAGE_NAME
+      - name: Build and push alarm-service image
+        run: |
+          REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE_NAME=ghcr.io/$REPO_NAME/storasense-alarm-service:latest
+          docker build -f ./Alarm-Service/Dockerfile -t $IMAGE_NAME .
+          docker push $IMAGE_NAME
+      - name: Build and push kafka-connect image
+        run: |
+          REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE_NAME=ghcr.io/$REPO_NAME/storasense-kafka-connect:latest
+          docker build -f ./kafka/Dockerfile -t $IMAGE_NAME .
+          docker push $IMAGE_NAME
