@@ -14,6 +14,8 @@ def on_subscribe(client, userdata, mid, reason_code_list, properties):
 
 
 def on_message(client, userdata, message):
+    if os.getenv("MQTT_IGNORE_TOPIC") in message.topic.lower():
+        return
     sensor_id = message.topic.split("/")[-1]
     message_data = json.loads(message.payload.decode("utf-8"))
 
