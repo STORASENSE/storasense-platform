@@ -34,6 +34,8 @@ COPY --from=mqttbuild /src/mqtt/target/kafka-connect-mqtt-1.1.0-package/kafka-co
 RUN mkdir -p /usr/share/java/kafka-connect-email
 COPY --from=emailbuild /src/email/target/scala-*/kafka-connect-email-assembly-*.jar /usr/share/java/kafka-connect-email/
 
+COPY ./kafka /kafka
+
 USER root
 RUN confluent-hub install --no-prompt confluentinc/kafka-connect-jdbc:10.7.5
 RUN mkdir -p /usr/share/java/postgresql \
