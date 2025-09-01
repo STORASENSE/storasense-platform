@@ -119,7 +119,11 @@ services:
       - frontend # Start after the whole system is up
 
   app:
-    image: ghcr.io/storasense/storasense-platform/storasense-backend-app:latest
+    #image: ghcr.io/storasense/storasense-platform/storasense-backend-app:latest
+    build:
+        context: .
+        dockerfile: ./backend/src/app/Dockerfile
+
     env_file: .env
     restart: always
     networks:
@@ -171,12 +175,11 @@ services:
       app:
         condition: service_started
   integration-tests:
-    image: ghcr.io/storasense/storasense-platform/storasense-integration-test:latest
+    image: ghcr.io/storasense/storasense-platform/storasense-integration-tests:latest
+
     environment:
       - OPERATING_MODE=INSIDE # Use INSIDE mode for integration tests
     env_file: .env
-
-
     networks:
       - storasense-network
     depends_on:
