@@ -1,4 +1,3 @@
-
 services:
   availability:
     image: ghcr.io/storasense/storasense-platform/storasense-availability-test:latest

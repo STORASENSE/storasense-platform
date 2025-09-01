@@ -11,8 +11,8 @@ services:
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
     ports:
-      - "80:80"
-      - "443:443"
+      - "8082:80"
+      - "8443:443"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     networks:
@@ -49,6 +49,7 @@ services:
       - KC_PROXY=edge
       - KC_PROXY_HEADERS=xforwarded
       - KC_CACHE=local
+      - KC_HEALTH_ENABLED=true
     command: start
     networks:
       storasense-network:
@@ -207,7 +208,7 @@ services:
     networks:
       - storasense-network
 
-  # Apache Kafka in KRAFT mode (without zookeper) and in PLAINTEXT-Communication mode (no TLS)
+  # Apache Kafka in KRAFT mode and in PLAINTEXT-Communication mode (no TLS)
   kafka:
     image: bitnami/kafka:latest
     container_name: storasense-kafka
@@ -292,7 +293,7 @@ services:
       - kafka
     networks:
       - storasense-network
-    command: ["/bin/bash", "-c", "/opt/scripts/wait-for-kafka.sh kafka 9092 90 && /opt/scripts/create-topics.sh"]
+    command: [ "/bin/bash", "-c", "/opt/scripts/wait-for-kafka.sh kafka 9092 90 && /opt/scripts/create-topics.sh" ]
     init: true
 
   # Initial container for creating connectors (source, sink) on Kafka Connect Instance
@@ -306,7 +307,7 @@ services:
       - kafka-connect
     networks:
       - storasense-network
-    command: ["/bin/bash", "-c", "/opt/scripts/wait-for-connect.sh http://kafka-connect:8083/connector-plugins 60 2 && /opt/scripts/apply-all.sh http://kafka-connect:8083 /opt/connectors"]
+    command: [ "/bin/bash", "-c", "/opt/scripts/wait-for-connect.sh http://kafka-connect:8083/connector-plugins 60 2 && /opt/scripts/apply-all.sh http://kafka-connect:8083 /opt/connectors" ]
     init: true
 
 volumes:
