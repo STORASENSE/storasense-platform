@@ -72,7 +72,7 @@ def test_measurements():
     old_measurements = get_request(f"measurements/{sensor_id}")
     post_request(
         f"measurements/{sensor_id}",
-        {"value": 42.0, "unit": "CELSIUS", "created_atcmd": 1682514000},
+        {"value": 42.0, "unit": "CELSIUS", "created_at": 1682514000},
     )
     assert any(
         measurement["value"] == 42.0

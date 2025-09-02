@@ -17,11 +17,11 @@ RUN poetry config virtualenvs.create false \
 
 COPY . /app
 
-RUN pip install --no-cache-dir confluent-kafka==2.10.0
-
 # Create non-root user
 RUN addgroup --system --gid 1001 appuser
 RUN adduser --system --uid 1001 appuser
+
+RUN pip install --no-cache-dir confluent-kafka==2.10.0
 
 USER appuser
 

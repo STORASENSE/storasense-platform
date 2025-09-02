@@ -64,10 +64,10 @@ class MeasurementRepository(BaseRepository[MeasurementModel, UUID]):
     ) -> Page[MeasurementModel]:
         query = (
             self.session.query(MeasurementModel)
-            .where(MeasurementModel.created_at >= min_date)
+            .where(MeasurementModel.timestamp >= min_date)
             .order_by(
                 MeasurementModel.sensor_id.desc(),
-                MeasurementModel.created_at.desc(),
+                MeasurementModel.timestamp.desc(),
             )
         )
         return paginate(query, page_request)

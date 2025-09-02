@@ -1,3 +1,6 @@
+from backend.src.app.src.services.user_storage_access.models import (
+    UserStorageAccessModel,
+)
 from backend.src.app.src.services.users.models import UserModel
 from backend.src.app.src.services.storages.models import StorageModel
 from backend.src.app.src.services.sensors.models import SensorModel
@@ -22,4 +25,5 @@ __all__ = [
     "SensorModel",
     "MeasurementModel",
     "AlarmModel",
+    "UserStorageAccessModel",
 ]

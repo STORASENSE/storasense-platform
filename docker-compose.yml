@@ -145,6 +145,7 @@ services:
         condition: service_started
 
   mqtt-client:
+    #image: ghcr.io/storasense/storasense-platform/storasense-backend-mqtt-client:latest
     build:
         context: .
         dockerfile: ./backend/src/mqtt_client/Dockerfile
@@ -195,6 +196,7 @@ services:
      - integration-tests
 
   alarmservice:
+    #image: ghcr.io/storasense/storasense-platform/storasense-alarm-service:latest
     build:
       context: .
       dockerfile: ./Alarm-Service/Dockerfile
@@ -234,6 +236,7 @@ services:
 
   # Kafka Connect Instance with included MQTT-Connectors
   kafka-connect:
+    #image: ghcr.io/storasense/storasense-platform/storasense-kafka-connect:latest
     build:
       context: .
       dockerfile: ./kafka/Dockerfile

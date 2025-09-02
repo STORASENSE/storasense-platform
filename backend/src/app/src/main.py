@@ -57,8 +57,8 @@ async def lifespan(app: FastAPI):
     _logger.info("Initializing database...")
     initialize_database()
     _logger.info("Database initialization completed successfully!")
-    _logger.info("Initializing services...")
-    # activate_alarmsystem_after_shutdown()
+    # _logger.info("Initializing services...")
+    # push_all_sensors_to_kafka()
 
     yield
     _logger.info("Shutting down application...")

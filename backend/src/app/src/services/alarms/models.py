@@ -20,5 +20,7 @@ class AlarmModel(BaseModel):
 
     message: Mapped[Optional[str]] = mapped_column()
     created_at: Mapped[datetime] = mapped_column()
-    sensor_id: Mapped[UUID] = mapped_column(ForeignKey("Sensor.id"))
+    sensor_id: Mapped[UUID] = mapped_column(
+        ForeignKey("Sensor.id", ondelete="CASCADE")
+    )
     sensor: Mapped["SensorModel"] = relationship(back_populates="alarms")

@@ -30,5 +30,5 @@ class StorageModel(BaseModel):
     )
 
     sensors: Mapped[list["SensorModel"]] = relationship(
-        back_populates="storage"
+        back_populates="storage", cascade="all, delete-orphan"
     )
