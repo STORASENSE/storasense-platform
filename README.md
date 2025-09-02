@@ -1,4 +1,10 @@
 # STORASENSE
+## Structure of the Mono-Repository:
+This mono-repository contains the following main projects:
+- **Backend**: FastAPI application and MQTT-Client located in the `backend` directory.
+- **Frontend**: React application located in the `frontend` directory.
+- **Kafka**: Kafka setup with connectors and scripts located in the `kafka` directory
+- **Alarm-Service**: A Java application for handling alarms, located in the `alarm-service` directory.
 ***
 ## Setup:
 - Python version: **3.13**
@@ -124,7 +130,12 @@ or
 chmod +x ./db-scripts/db-scripts.sh
 ```
 - Build the Docker-Compose Setup: `docker-compose up -d --build`
-### 4. Kafka Setup: Add Kafka-Connector resources (.jsons) => See [Kafka-readme](./kafka/README.md)
+### 4. Kafka Setup
+- Add Kafka-Connector resources (.jsons) to ./Kafka/connectors -> see [here](./kafka/README.md) for more information.
+- Make the kafka scripts executable:
+```bash
+chmod +x ./kafka/scripts -r
+```
 ### 5. Optional: Keycloak Configuration
 - If you don't have our original volume of the timescaledb (**storasense_data_volume**) then you have to setup the Keycloak configuration from scratch by yourself.
 - Follow the following steps:
@@ -170,3 +181,6 @@ chmod +x ./db-scripts/db-scripts.sh
 | Backend-API Documentation <br> (SwaggerUI) | [https://api.storasense.de/docs](https://api.storasense.de/docs)                                                                |
 | Keycloak-Configuration / Admin-Console     | [https://auth.storasense.de](https://auth.storasense.de) / [https://auth.storasense.de/admin](https://auth.storasense.de/admin) |
 | Traefik Dashboard                           | [https://traefik.storasense.de](https://traefik.storasense.de)                                                                  |
+
+## Run Tests
+- Integration tests```docker-compose --profile integration-tests up --abort-on-container-exit --exit-code-from integration-tests```

@@ -9,6 +9,7 @@ import { MdOutlineWarehouse as StorageIcon } from "react-icons/md";
 import { MdOutlineQueryStats as AnalyticsIcon } from "react-icons/md";
 import { MdOutlineDeviceThermostat as SensorsIcon } from "react-icons/md";
 import { MdOutlinePeople as UsersIcon } from "react-icons/md";
+import { MdAlarmOn as AlarmIcon } from "react-icons/md";
 import useKeycloak from "@/auth/useKeycloak";
 import { useGetHealthQuery } from "@/redux/api/storaSenseApi";
 
@@ -49,7 +50,7 @@ const Sidebar: FC = () => {
 
     const { data: healthData, isSuccess } = useGetHealthQuery(undefined, {
         skip: isLoading || isError || !keycloak?.authenticated,
-        pollingInterval: 30000, // Poll every 30 seconds
+        pollingInterval: 60000, // Poll every 60 seconds
     });
 
     const username = useMemo<string>(() => {
@@ -80,6 +81,9 @@ const Sidebar: FC = () => {
                     <SidebarLink href="/dashboard/analytics" icon={<AnalyticsIcon />}>
                         Analytics
                     </SidebarLink>
+                     <SidebarLink href="/dashboard/alarms" icon={<AlarmIcon />}>
+                        Alarms
+                    </SidebarLink>
                     <SidebarLink href="/dashboard/sensors" icon={<SensorsIcon />}>
                         Sensors
                     </SidebarLink>
@@ -98,14 +102,14 @@ const Sidebar: FC = () => {
                                     <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
                                     <div className="absolute inset-0 w-2 h-2 bg-emerald-400 rounded-full animate-ping opacity-75"></div>
                                 </div>
-                                <span className="text-xs font-medium text-emerald-600 uppercase tracking-wide">
+                                <span id = "Backend_Online" className="text-xs font-medium text-emerald-600 uppercase tracking-wide">
                                     Online
                                 </span>
                             </div>
                         ) : (
                             <div className="flex items-center space-x-2 mb-2">
                                 <div className="w-2 h-2 bg-red-400 rounded-full"></div>
-                                <span className="text-xs font-medium text-red-600 uppercase tracking-wide">
+                                <span id ="Backend_Offline" className="text-xs font-medium text-red-600 uppercase tracking-wide">
                                     Offline
                                 </span>
                             </div>

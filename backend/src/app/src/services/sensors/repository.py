@@ -27,6 +27,9 @@ class SensorRepository(BaseRepository[SensorModel, UUID]):
         query = self.session.query(SensorModel).order_by(SensorModel.name)
         return paginate(query, page_request)
 
+    def find_all_unpaginated(self) -> list[SensorModel]:
+        return self.session.query(SensorModel).order_by(SensorModel.name).all()
+
     def find_all_by_storage_id(self, storage_id: UUID) -> list[SensorModel]:
         return (
             self.session.query(SensorModel)

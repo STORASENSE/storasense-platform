@@ -26,7 +26,7 @@ class MeasurementRepository(BaseRepository[MeasurementModel, UUID]):
 
     def find_all(self, page_request: PageRequest) -> Page[MeasurementModel]:
         query = self.session.query(MeasurementModel).order_by(
-            MeasurementModel.created_at.desc()
+            MeasurementModel.timestamp.desc()
         )
         return paginate(query, page_request)
 
@@ -44,7 +44,7 @@ class MeasurementRepository(BaseRepository[MeasurementModel, UUID]):
         query = (
             self.session.query(MeasurementModel)
             .filter(MeasurementModel.sensor_id == sensor_id)
-            .order_by(MeasurementModel.created_at.desc())
+            .order_by(MeasurementModel.timestamp.desc())
         )
         return paginate(query, page_request)
 
@@ -54,10 +54,23 @@ class MeasurementRepository(BaseRepository[MeasurementModel, UUID]):
         query = (
             self.session.query(MeasurementModel)
             .filter(MeasurementModel.sensor_id == sensor_id)
-            .filter(MeasurementModel.created_at >= max_date)
-            .order_by(MeasurementModel.created_at.desc())
+            .filter(MeasurementModel.timestamp >= max_date)
+            .order_by(MeasurementModel.timestamp.desc())
         )
         return query.all()
+
+    def find_all_by_min_date(
+        self, min_date: datetime, page_request: PageRequest
+    ) -> Page[MeasurementModel]:
+        query = (
+            self.session.query(MeasurementModel)
+            .where(MeasurementModel.timestamp >= min_date)
+            .order_by(
+                MeasurementModel.sensor_id.desc(),
+                MeasurementModel.timestamp.desc(),
+            )
+        )
+        return paginate(query, page_request)
 
     def find_latest_by_sensor_id(
         self, sensor_id: UUID
@@ -71,7 +84,7 @@ class MeasurementRepository(BaseRepository[MeasurementModel, UUID]):
         return (
             self.session.query(MeasurementModel)
             .filter(MeasurementModel.sensor_id == sensor_id)
-            .order_by(MeasurementModel.created_at.desc())
+            .order_by(MeasurementModel.timestamp.desc())
             .first()
         )
 

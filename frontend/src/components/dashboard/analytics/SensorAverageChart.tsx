@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
 import React, {FC, useMemo} from "react";
 import {useSelector} from "react-redux";
 import {RootState} from "@/redux/store";
-import {useGetAnalyticsSummaryQuery, useGetSensorsQuery} from "@/redux/api/storaSenseApi";
+import {useGetAnalyticsByStorageIdQuery, useGetSensorsQuery} from "@/redux/api/storaSenseApi";
 import {AnalyticsTimeWindow} from "@/redux/api/storaSenseApiSchemas";
 import {
     aggregateAnalyticsSummary,
@@ -16,37 +16,36 @@ import {Bar, BarChart, CartesianGrid, Cell, Legend, ResponsiveContainer, Tooltip
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 
 const SensorAverageChart: FC = () => {
-    const timeWindow = useSelector((state: RootState) => state.analytics.timeWindow);
-    const activeStorage = useSelector((state: RootState) => state.storage.activeStorage);
+    const timeWindow = useSelector((s: RootState) => s.analytics.timeWindow);
+    const activeStorage = useSelector((s: RootState) => s.storage.activeStorage);
+    const storageId = activeStorage?.id ?? undefined;
 
-    const {data: sensors, isLoading: sensorsLoading} = useGetSensorsQuery(
-        activeStorage ? {storage_id: activeStorage.id} : ({} as any),
-        {skip: !activeStorage}
+    const {data: sensors, isLoading: sensorsLoading, isError: sensorsError} = useGetSensorsQuery(
+        {storage_id: storageId as string},
+        {skip: !storageId}
     );
 
-    const sensorId = sensors?.[0]?.id;
-
-    const {data: summaryRaw, isLoading} = useGetAnalyticsSummaryQuery(
-        {sensor_id: sensorId ?? "", window: timeWindow as AnalyticsTimeWindow},
-        {skip: !sensorId}
+    const {data: summaryRaw, isLoading: analyticsLoading, isError: analyticsError} = useGetAnalyticsByStorageIdQuery(
+        {storage_id: storageId as string, window: timeWindow as AnalyticsTimeWindow},
+        {skip: !storageId}
     );
 
     const summary = summaryRaw ?? [];
+    const kpisByType = useMemo<KbpiAggregation[]>(() => aggregateAnalyticsSummary(summary), [summary]);
 
-    const kpisByType = useMemo<KbpiAggregation[]>(() => {
-        return aggregateAnalyticsSummary(summary);
-    }, [summary]);
-
-    const avgByTypeData = useMemo(() => {
-        return kpisByType.map(k => ({
+    const avgByTypeData = useMemo(
+        () => kpisByType.map(k => ({
             type: k.type,
             avg: +k.avg.toFixed(2),
             min: +k.min.toFixed(2),
-            max: +k.max.toFixed(2)
-        }));
-    }, [kpisByType]);
+            max: +k.max.toFixed(2),
+        })),
+        [kpisByType]
+    );
 
-    if (sensorsLoading || !sensorId) return <Skeleton className="h-40 w-full"/>;
+    if (!storageId) return null;
+
+    if (sensorsLoading) return <Skeleton className="h-40 w-full"/>;
 
     return (
         <Card>
@@ -56,7 +55,7 @@ const SensorAverageChart: FC = () => {
             </CardHeader>
             <CardContent>
                 <div className="w-full h-64 mt-3">
-                    {isLoading ? (
+                    {analyticsLoading ? (
                         <Skeleton className="w-full h-[200px]"/>
                     ) : (
                         <ResponsiveContainer>
@@ -81,6 +80,6 @@ const SensorAverageChart: FC = () => {
             </CardContent>
         </Card>
     );
-}
+};
 
 export default SensorAverageChart;

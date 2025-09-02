@@ -10,11 +10,14 @@ start:
 
 start-scaled:
     echo "Starting the application with scaling..."
-    docker-compose up -d --scale app=3
+    docker-compose up -d --scale app=3 --scale mqtt-client=3
 
 stop:
     echo "Stopping the application..."
     docker-compose down
+    if [ "$ENV" = "DEV"]; then \
+      docker compose exec timescaledb /docker-entrypoint-initdb.d/reset-app-db.sh; \
+    fi
 
 restart:
     echo "Restarting the application..."
@@ -33,6 +36,6 @@ logs:
     echo "Displaying logs..."
     docker-compose logs -f
 
-backend:
+build-be:
     echo "Building Traefik, Keycloak, TimescaleDB, and Backend..."
     docker compose up --build traefik keycloak timescaledb app

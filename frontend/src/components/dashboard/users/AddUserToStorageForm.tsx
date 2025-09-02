@@ -81,7 +81,7 @@ const AddUserToStorageForm: FC<AddUserToStorageFormProps> = ({ onSuccess }) => {
 
                         <div className="space-y-2">
                             <Label htmlFor="storageName" className="text-sm font-medium">
-                                Storage Name
+                                User Name
                             </Label>
                             <Input
                                 id="username"

@@ -29,7 +29,7 @@ export enum SensorType {
     TEMPERATURE_OUTSIDE = 'TEMPERATURE_OUTSIDE',
     HUMIDITY = 'HUMIDITY',
     ULTRASONIC = 'ULTRASONIC',
-    GAS = 'GAS',
+    CO2 = 'CO2',
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -56,6 +56,13 @@ export interface Sensor {
     storage_id: string;
     allowed_min: number;
     allowed_max: number;
+}
+
+export interface Alarm {
+    id: string;
+    sensor_id: string;
+    message: string;
+    created_at: Date;
 }
 
 export interface Measurement {
@@ -134,12 +141,16 @@ export interface AddSensorResponse {
 
 export interface DeleteSensorRequest {
     sensor_id: string;
+    sensor: {
+        storage_id: string;
+    }
 }
 
 export interface SensorStatusResponse {
   sensor_id: string;
   is_online: boolean;
   last_measurement: string | null;
+  last_measurement_time: string | null;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -159,22 +170,32 @@ export interface CreateStorageRequest {
     name: string;
 }
 
+//////////////////////////////////////////////////////////////////////////
+export interface GetAlarmsByStorageIdRequest {
+    storage_id: string;
+}
+
+export interface DeleteAlarmRequest {
+    alarm_id: string;
+}
+//////////////////////////////////////////////////////////////////////////
+
 /////////////////////////////////////////////////////////////////////////
 
 
 export type AnalyticsTimeWindow = "7d" | "30d" | "365d";
 
-export interface AnalyticsSummaryRequest {
-  sensor_id: string;
-  window: AnalyticsTimeWindow;
-}
-
-export interface AnalyticsSummaryItem {
-  type: SensorType;
+export type AnalyticsSummaryItem = {
+  type: string;
   sensor_id: string;
   avg_value: number;
   min_value: number;
   max_value: number;
-}
+};
 
 export type AnalyticsSummaryResponse = AnalyticsSummaryItem[];
+
+export type AnalyticsSummaryRequest = {
+  storage_id: string;
+  window: AnalyticsTimeWindow;
+};

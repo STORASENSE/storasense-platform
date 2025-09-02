@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "@/redux/store";
 import {setActiveStorage} from "@/redux/slices/storageSlice";
 import { Button } from "@/components/ui/button";
-import { FaTrash as TrashIcon } from "react-icons/fa6";
+import { FaTrash as TrashIcon, FaBuilding as StorageIcon } from "react-icons/fa6";
 import { useDeleteStorageMutation } from "@/redux/api/storaSenseApi";
 
 
@@ -60,28 +60,31 @@ const StorageCard: FC<StorageCardProps> = ({ storage }) => {
 
     return (
         <Card
-            data-active={isActive || undefined}
-            className="
-                p-0 hover:shadow-md select-none
-                flex flex-row justify-between items-center gap-3
-                data-active:border-l-4 data-active:border-l-blue-whale
-                duration-300
-            ">
-            <div onClick={toggleActive} className="w-full h-full flex items-center cursor-pointer">
-                <h3 className="ml-5 my-5 text-xl font-semibold text-blue-whale">
-                    {storage.name || '[Unnamed Storage]'}
-                </h3>
-            </div>
-            <div className="mr-5 my-5">
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleDelete}
-                    className="text-cerise-red hover:text-cerise-red-700 hover:bg-cerise-red/5">
-                    <TrashIcon />
-                </Button>
-            </div>
-        </Card>
+        data-active={isActive || undefined}
+        className="
+        p-0 hover:shadow-md select-none
+        flex flex-row justify-between items-center gap-3
+        data-active:border-l-4 data-active:border-l-blue-whale
+        duration-300
+    ">
+    <div className="ml-5 flex items-center">
+        <StorageIcon className="text-blue-whale text-2xl" />
+    </div>
+    <div onClick={toggleActive} className="w-full h-full flex items-center cursor-pointer">
+        <h3 className="ml-5 my-5 text-xl font-semibold text-blue-whale">
+            {storage.name || '[Unnamed Storage]'}
+        </h3>
+    </div>
+    <div className="mr-5 my-5">
+        <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleDelete}
+            className="text-cerise-red hover:text-cerise-red-700 hover:bg-cerise-red/5">
+            <TrashIcon />
+        </Button>
+    </div>
+</Card>
     );
 }
 

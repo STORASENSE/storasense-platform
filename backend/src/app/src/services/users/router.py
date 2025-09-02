@@ -16,7 +16,10 @@ router = APIRouter(prefix="/users", tags=["Users"])
 
 
 @router.get(
-    "/me", response_model=UserPublicResponse, status_code=status.HTTP_200_OK
+    "/me",
+    response_model=UserPublicResponse,
+    status_code=status.HTTP_200_OK,
+    description="Get the authenticated user's information.",
 )
 async def read_users_me(
     token_data: TokenData = Depends(auth_service.get_current_user),
@@ -28,22 +31,29 @@ async def read_users_me(
         )
         if not db_user:
             raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Authenticated user not found and couldn't be created.",
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Authenticated user not found.",
             )
+
         return UserPublicResponse(
             username=db_user.username,
             email=db_user.email,
             name=db_user.name,
         )
-    except Exception as e:
+    except HTTPException:
+        raise
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Unexpected error: {str(e)}",
+            detail="Internal server error.",
         )
 
 
-@router.get("/byStorageId/{storage_id}")
+@router.get(
+    "/byStorageId/{storage_id}",
+    status_code=status.HTTP_200_OK,
+    description="Find all users associated with a given storage ID.",
+)
 async def find_users_by_storage_id(
     storage_id: UUID,
     token_data: TokenData = Depends(auth_service.get_current_user),
@@ -58,7 +68,11 @@ async def find_users_by_storage_id(
         )
 
 
-@router.post("/{username}/addToStorage")
+@router.post(
+    "/{username}/addToStorage",
+    status_code=status.HTTP_200_OK,
+    description="Add a user to a storage by username.",
+)
 def add_user_to_storage(
     username: str,
     storage_id: UUID,
@@ -78,7 +92,11 @@ def add_user_to_storage(
         )
 
 
-@router.delete("/{username}/removeFromStorage")
+@router.delete(
+    "/{username}/removeFromStorage",
+    status_code=status.HTTP_200_OK,
+    description="Remove a user from a storage by username.",
+)
 def remove_user_from_storage(
     username: str,
     storage_id: UUID,

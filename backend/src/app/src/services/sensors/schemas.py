@@ -24,6 +24,10 @@ class CreateSensorRequest(BaseModel):
     allowed_max: float | None = None
 
 
+class DeleteSensorRequest(BaseModel):
+    storage_id: UUID
+
+
 class SensorResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -36,4 +40,5 @@ class SensorResponse(BaseModel):
 class SensorStatusResponse(BaseModel):
     sensor_id: str
     is_online: bool
-    last_measurement: Optional[datetime] = None
+    last_measurement: float | None
+    last_measurement_time: datetime | None

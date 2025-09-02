@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from backend.src.app.src.services.user_storage_access.models import (
     UserStorageAccessModel,
 )
+from backend.src.app.src.services.users.models import UserModel
 from backend.src.app.src.shared.database.engine import open_session
 from backend.src.app.src.shared.database.enums import UserRole
 from backend.src.app.src.shared.database.base_repository import BaseRepository
@@ -34,6 +35,14 @@ class UserStorageAccessRepository(
         if association is None:
             return None
         return association.role
+
+    def find_admin_by_storage_id(self, storage_id: UUID) -> UserModel | None:
+        return (
+            self.session.query(UserStorageAccessModel)
+            .where(UserStorageAccessModel.storage_id == storage_id)
+            .where(UserStorageAccessModel.role == UserRole.ADMIN)
+            .one_or_none()
+        )
 
     def add_user_to_storage(
         self, user_id: UUID, storage_id: UUID, role: UserRole

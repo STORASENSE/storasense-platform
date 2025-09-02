@@ -19,6 +19,8 @@ import {
     GetUsersByStorageIdRequest,
     AddUserToStorageRequest,
     RemoveUserFromStorageRequest,
+    GetAlarmsByStorageIdRequest,
+    DeleteAlarmRequest,
 } from "@/redux/api/storaSenseApiSchemas";
 import type { RootState } from '../store';
 
@@ -127,9 +129,6 @@ export const storaSenseApi = createApi({
                 url: `/sensors/${sensor_id}`,
                 method: 'POST',
                 body: sensor,
-                headers: {
-                    'Content-Type': 'application/json'
-                }
             })
         }),
 
@@ -141,9 +140,10 @@ export const storaSenseApi = createApi({
         }),
 
         deleteSensor: build.mutation<void, DeleteSensorRequest>({
-            query: ({ sensor_id }) => ({
+            query: ({ sensor_id, sensor }) => ({
                 url: `/sensors/${sensor_id}`,
-                method: 'DELETE'
+                method: 'DELETE',
+                body: sensor
             })
         }),
 
@@ -167,17 +167,32 @@ export const storaSenseApi = createApi({
             }
         }),
 
-        getAnalyticsSummary: build.query<AnalyticsSummaryResponse, AnalyticsSummaryRequest>({
-          query: ({ sensor_id, window }) => ({
-            url: `/analytics/summaryBySensorId/${sensor_id}`,
+        getAnalyticsByStorageId: build.query<AnalyticsSummaryResponse, AnalyticsSummaryRequest>({
+          query: ({ storage_id, window }) => ({
+              url: `/analytics/byStorageId/${storage_id}`,
             method: "GET",
             params: { window },
           }),
         }),
 
+        getAlarmsByStorageId: build.query<void, GetAlarmsByStorageIdRequest>({
+            query: ({ storage_id }) => ({
+                url: `/alarms/byStorageId/${storage_id}`,
+                method: 'GET',
+            }),
+        }),
+
+        deleteAlarm: build.mutation<void, DeleteAlarmRequest>({
+            query: ({ alarm_id }) => ({
+                url: `/alarms/${alarm_id}`,
+                method: 'DELETE'
+            })
+        }),
+
         getHealth: build.query<{ status: string }, void>({
             query: () => ({
-                url: '/health'
+                url: '/health',
+                method: 'GET'
             })
         }),
 
@@ -195,11 +210,12 @@ export const {
     useCreateStorageMutation,
     useDeleteStorageMutation,
     useGetSensorsQuery,
-    useGetMeasurementsQuery,
     useGetMeasurementsFromPastHourQuery,
     useGetHealthQuery,
     useAddSensorMutation,
     useDeleteSensorMutation,
     useGetSensorStatusQuery,
-    useGetAnalyticsSummaryQuery,
+    useGetAnalyticsByStorageIdQuery,
+    useGetAlarmsByStorageIdQuery,
+    useDeleteAlarmMutation,
 } = storaSenseApi;

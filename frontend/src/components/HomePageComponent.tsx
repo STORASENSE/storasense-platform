@@ -15,7 +15,7 @@ function HomePageComponent() {
             return;
         }
         if (keycloak?.authenticated) {
-            router.replace("/dashboard");
+            router.replace("/dashboard/storages");
         }
     }, [keycloak, isLoading, isError]);
 
@@ -40,7 +40,7 @@ function HomePageComponent() {
             <div className="space-y-6">
                 <AuthenticationMessage/>
                 <div className="text-center -mt-16">
-                    <button
+                    <button id={ "login-button" }
                         onClick={() => keycloak?.login()}
                         className="px-4 py-2 bg-blue-whale text-white border-blue-whale"
                     >
