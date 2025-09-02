@@ -20,7 +20,6 @@ from backend.src.app.src.db_init import initialize_database
 
 # ... Router imports ...
 from .services.users.router import router as users_router
-
 from backend.src.app.src.services.measurements.router import (
     router as measurements_router,
 )
@@ -80,11 +79,13 @@ app.include_router(measurements_router)
 app.include_router(sensors_router)
 app.include_router(storages_router)
 app.include_router(analytics_router)
+app.include_router(alarms_router)
 
 # configure CORS-middleware
 origins = [
     "https://storasense.de",
     "http://localhost:3000",
+    "https://api.storasense.de",
 ]
 app.add_middleware(
     CORSMiddleware,
@@ -93,15 +94,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-add_request_middleware(app)
-
-app.include_router(users_router)
-app.include_router(measurements_router)
-app.include_router(sensors_router)
-app.include_router(storages_router)
-app.include_router(analytics_router)
-app.include_router(alarms_router)
 
 
 @app.get("/health", tags=["Root"])

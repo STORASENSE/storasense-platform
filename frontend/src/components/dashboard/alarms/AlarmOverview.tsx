@@ -16,7 +16,7 @@ const AlarmOverview: FC = () => {
     // Alarme query
     const { data: alarmsData, refetch } = useGetAlarmsByStorageIdQuery({
         storage_id: activeStorage.id
-    });
+    }, {pollingInterval: 30000}); // Polling all 30 Seconds
 
     const [deleteAlarm] = useDeleteAlarmMutation();
 

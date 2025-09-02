@@ -50,7 +50,7 @@ const Sidebar: FC = () => {
 
     const { data: healthData, isSuccess } = useGetHealthQuery(undefined, {
         skip: isLoading || isError || !keycloak?.authenticated,
-        pollingInterval: 30000, // Poll every 30 seconds
+        pollingInterval: 90000, // Poll every 90 seconds
     });
 
     const username = useMemo<string>(() => {
