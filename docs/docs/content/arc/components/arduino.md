@@ -2,7 +2,7 @@
 
 ## Struktur
 
-![](./images/arduino/codebase_uml.svg)
+![](../../../images/arduino/codebase_uml.svg)
 
 Die Codebase für das Arduino System ist so aufgebaut, dass eine einfache Einführung von weiteren Sensoren möglich ist.
 Um dies zu erreichen wurde eine Klasse `AbstractSensor` angelegt, die allgemeine Eigenschaften und Funktionalitäten

@@ -1,7 +1,7 @@
 # Architektur
 
 ## Übersicht (Deployment)
-![architecture-overview](images/arc/arc_overview.png)
+![architecture-overview](../../images/arc/arc_overview.png)
 
 | Komponente                   | Technologie                                      | Aufgabe & Verantwortung                                                                                                                                                                                                           | Kommuniziert mit                                 |
 |------------------------------|--------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------|
@@ -18,9 +18,9 @@
 ### Architekturentscheidung: Entkopplung von Backend und Frontend
 Das System ist nach dem Prinzip einer entkoppelten Architektur konzipiert, bei der eine klare Trennung bzw lose Kopplung [1] zwischen der Benutzeroberfläche (Frontend) und der serverseitigen Geschäftslogik (Backend) besteht.
 
-* **Frontend (Client-Seite)**: Das Frontend, realisiert mit dem [Next.js-Framework](techstack.md#frontend), ist ausschließlich für die Darstellung und die Benutzerinteraktion verantwortlich. Seine einzige Aufgabe ist es so, dem Benutzer eine intuitive Oberfläche zu bieten und Daten über eine standardisierte Schnittstelle vom Backend abzurufen bzw. Aktionen dorthin zu senden.
+* **Frontend (Client-Seite)**: Das Frontend, realisiert mit dem [Next.js-Framework](constraints/techstack.md#frontend), ist ausschließlich für die Darstellung und die Benutzerinteraktion verantwortlich. Seine einzige Aufgabe ist es so, dem Benutzer eine intuitive Oberfläche zu bieten und Daten über eine standardisierte Schnittstelle vom Backend abzurufen bzw. Aktionen dorthin zu senden.
 
-* **Backend (Server-Seite)**: Das Backend, entwickelt mit dem [FastAPI-Framework](techstack.md#backend), fungiert als zentrales Gehirn der Anwendung. Es stellt eine klar definierte REST-API bereit, über die alle Datenoperationen und Geschäftslogiken abgewickelt werden. Es ist zuständig für die Authentifizierung von Benutzern, die Verarbeitung von Daten, die Kommunikation mit der Datenbank und die Implementierung des Alarmsystems.
+* **Backend (Server-Seite)**: Das Backend, entwickelt mit dem [FastAPI-Framework](constraints/techstack.md#backend), fungiert als zentrales Gehirn der Anwendung. Es stellt eine klar definierte REST-API bereit, über die alle Datenoperationen und Geschäftslogiken abgewickelt werden. Es ist zuständig für die Authentifizierung von Benutzern, die Verarbeitung von Daten, die Kommunikation mit der Datenbank und die Implementierung des Alarmsystems.
 
 Die Kommunikation zwischen diesen beiden Komponenten erfolgt zustandslos über HTTP-Anfragen und das Backend liefert Antworten im JSON-Format.
 
@@ -36,7 +36,7 @@ Die Integration dieser langlebigen, zustandsbehafteten Aufgabe in die Kernprozes
 
 In diesem Entwurf agiert der MQTT-Client als Messaging Gateway [2], dessen einzige Verantwortung es ist, Nachrichten aus einem Messaging-System (MQTT) in einen für das Kernsystem verständlichen Aufruf (HTTP-Request) zu übersetzen.
 
-Weiter lässt sich mit dieser Architektur die Anforderung nach einer hohen [Verfügbarkeit](mvp.md#nicht-funktionale-anforderungen) besser umsetzen:
+Weiter lässt sich mit dieser Architektur die Anforderung nach einer hohen [Verfügbarkeit](content/about/mvp.md#nicht-funktionale-anforderungen) besser umsetzen:
 in Neustart oder Ausfall des Backends unterbricht nicht den Empfang der MQTT-Nachrichten (der Client verfügt über eine Retry-Logik), und umgekehrt beeinflusst ein Fehler im MQTT-Client nicht die Verfügbarkeit der API für das Frontend.
 Die klaren Grenzen zwischen den Diensten erleichtern zudem die Wartung und ggf eine unabhängige Skalierung der Komponenten.
 <br> Ein weiterer Vorteil hinsichtlich der Performance wird im Zuge der Betrachtung des konkreten [Ablaufs](arc.md#allgemeiner-ablauf) ersichtlich.
@@ -44,9 +44,9 @@ Die klaren Grenzen zwischen den Diensten erleichtern zudem die Wartung und ggf e
 ## Sequenzablauf - Data-Flow: Erzeugung -> Ingestion -> Speicherung, Alarmierung
 Folgendes Sequenzdiagramm zeigt den grundsätzlichen funktionalen Ablauf des Systems:
 
-![sequence-diagram](images/arc/ablauf01.png)
+![sequence-diagram](../../images/arc/ablauf01.png)
 
-Ein weitere Anforderung, die durch die Architektur gefördert wird ist die [Performance-Qualitätseigenschaft](mvp.md#nicht-funktionale-anforderungen) hinsichtlich Erkennung und Alarmierung bei kritischen Sensorwerten.
+Ein weitere Anforderung, die durch die Architektur gefördert wird ist die [Performance-Qualitätseigenschaft](content/about/mvp.md#nicht-funktionale-anforderungen) hinsichtlich Erkennung und Alarmierung bei kritischen Sensorwerten.
 <br> Sobald ein neuer Messwert vom MQTT-Client an das Backend übermittelt wird, wird dieser unmittelbar und ohne Verzögerung an den zuständigen Alarm-Service zur Überprüfung weitergeleitet. Die Prüfung auf Grenzwertverletzungen erfolgt somit, auch wenn die Daten noch nicht in der Datenbank gespeichert sind (das persistente Speichern erfolgt parallel).
 <br> Durch diese bewusste Priorisierung wird die Latenz der Alarmierung von der Latenz des Datenbank-Schreibvorgangs entkoppelt. Das System muss nicht auf die Bestätigung der Persistenz warten, um einen möglichen kritischen Zustand zu erkennen und darauf zu reagieren.
 
