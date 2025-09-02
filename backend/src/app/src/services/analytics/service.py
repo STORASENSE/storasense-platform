@@ -1,4 +1,5 @@
 from __future__ import annotations
+from uuid import UUID
 from sqlalchemy.orm import Session
 from fastapi import Depends
 
@@ -15,25 +16,9 @@ class AnalyticsService:
         self._session = session
         self._repo = repo
 
-    def summary(self, window: str):
-        """
-        Get summary of sensor data over a specified time window.
-
-        :param window: str: Time window for the summary
-        :return: List[Dict]: Summary data for the specified window
-        """
-        return self._repo.get_sensor_summary(WINDOW_TO_INTERVAL[window])
-
-    def summary_by_sensor(self, sensor_id, window):
-        """
-        Get summary of sensor data for a specific sensor over a specified time window.
-        :param sensor_id: the sensor id to get the summary for
-        :param window: the time window for the summary
-        :return: List[Dict]: Summary data for the specified sensor and window
-        """
-        sid = str(sensor_id)
-        items = self._repo.get_sensor_summary(WINDOW_TO_INTERVAL[window])
-        return [it for it in items if it.get("sensor_id") == sid]
+    def summary_by_storage(self, storage_id: UUID, window: str):
+        interval = WINDOW_TO_INTERVAL[window]
+        return self._repo.get_sensor_summary_by_storage(storage_id, interval)
 
 
 def inject_analytics_service(

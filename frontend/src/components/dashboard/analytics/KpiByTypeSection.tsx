@@ -1,37 +1,36 @@
-"use client"
+"use client";
 
 import React, {FC, useMemo} from "react";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {useSelector} from "react-redux";
 import {RootState} from "@/redux/store";
-import {useGetAnalyticsSummaryQuery, useGetSensorsQuery} from "@/redux/api/storaSenseApi";
+import {useGetAnalyticsByStorageIdQuery, useGetSensorsQuery} from "@/redux/api/storaSenseApi";
 import {Skeleton} from "@/components/ui/skeleton";
 import {aggregateAnalyticsSummary, humanWindow, KbpiAggregation} from "@/components/dashboard/analytics/analyticsUtils";
 import {AnalyticsTimeWindow} from "@/redux/api/storaSenseApiSchemas";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 
 const KpiByTypeSection: FC = () => {
-    const timeWindow = useSelector((state: RootState) => state.analytics.timeWindow);
-    const activeStorage = useSelector((state: RootState) => state.storage.activeStorage);
+    const timeWindow = useSelector((s: RootState) => s.analytics.timeWindow);
+    const activeStorage = useSelector((s: RootState) => s.storage.activeStorage);
+    const storageId = activeStorage?.id ?? undefined;
 
-    const {data: sensors, isLoading: sensorsLoading} = useGetSensorsQuery(
-        activeStorage ? {storage_id: activeStorage.id} : ({} as any),
-        {skip: !activeStorage}
+    // Hooks ALWAYS at top; use skip to disable
+    const {data: sensors, isLoading: sensorsLoading, isError: sensorsError} = useGetSensorsQuery(
+        {storage_id: storageId as string},
+        {skip: !storageId}
     );
 
-    const sensorId = sensors?.[0]?.id;
-
-    const {data: summaryRaw, isLoading} = useGetAnalyticsSummaryQuery(
-        {sensor_id: sensorId ?? "", window: timeWindow as AnalyticsTimeWindow},
-        {skip: !sensorId}
+    const {data: summaryRaw, isLoading: analyticsLoading, isError: analyticsError} = useGetAnalyticsByStorageIdQuery(
+        {storage_id: storageId as string, window: timeWindow as AnalyticsTimeWindow},
+        {skip: !storageId}
     );
 
     const summary = summaryRaw ?? [];
+    const kpisByType = useMemo<KbpiAggregation[]>(() => aggregateAnalyticsSummary(summary), [summary]);
 
-    const kpisByType = useMemo<KbpiAggregation[]>(() => {
-        return aggregateAnalyticsSummary(summary);
-    }, [summary]);
+    if (!storageId) return null;
 
-    if (sensorsLoading || !sensorId) return <Skeleton className="h-56 w-full"/>;
+    if (sensorsLoading) return <Skeleton className="h-56 w-full"/>;
 
     return (
         <Card>
@@ -41,16 +40,14 @@ const KpiByTypeSection: FC = () => {
             </CardHeader>
             <CardContent>
                 <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {isLoading ? (
+                    {analyticsLoading ? (
                         <>
                             <Skeleton className="h-[100px]"/>
                             <Skeleton className="h-[100px]"/>
                             <Skeleton className="h-[100px]"/>
                         </>
                     ) : kpisByType.length === 0 ? (
-                        <div className="text-sm text-gray-500">
-                            No data in the last {humanWindow[timeWindow]}.
-                        </div>
+                        <div className="text-sm text-gray-500">No data in the last {humanWindow[timeWindow]}.</div>
                     ) : (
                         kpisByType.map(k => (
                             <div key={k.type} className="rounded-xl border p-4">
@@ -76,6 +73,6 @@ const KpiByTypeSection: FC = () => {
             </CardContent>
         </Card>
     );
-}
+};
 
 export default KpiByTypeSection;

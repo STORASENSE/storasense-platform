@@ -167,9 +167,9 @@ export const storaSenseApi = createApi({
             }
         }),
 
-        getAnalyticsSummary: build.query<AnalyticsSummaryResponse, AnalyticsSummaryRequest>({
-          query: ({ sensor_id, window }) => ({
-            url: `/analytics/summaryBySensorId/${sensor_id}`,
+        getAnalyticsByStorageId: build.query<AnalyticsSummaryResponse, AnalyticsSummaryRequest>({
+          query: ({ storage_id, window }) => ({
+              url: `/analytics/byStorageId/${storage_id}`,
             method: "GET",
             params: { window },
           }),
@@ -210,13 +210,12 @@ export const {
     useCreateStorageMutation,
     useDeleteStorageMutation,
     useGetSensorsQuery,
-    useGetMeasurementsQuery,
     useGetMeasurementsFromPastHourQuery,
     useGetHealthQuery,
     useAddSensorMutation,
     useDeleteSensorMutation,
     useGetSensorStatusQuery,
-    useGetAnalyticsSummaryQuery,
+    useGetAnalyticsByStorageIdQuery,
     useGetAlarmsByStorageIdQuery,
     useDeleteAlarmMutation,
 } = storaSenseApi;
