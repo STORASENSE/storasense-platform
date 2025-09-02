@@ -145,7 +145,9 @@ services:
         condition: service_started
 
   mqtt-client:
-    image: ghcr.io/storasense/storasense-platform/storasense-backend-mqtt-client:latest
+    build:
+        context: .
+        dockerfile: ./backend/src/mqtt_client/Dockerfile
     env_file: .env
     restart: on-failure
     networks:
