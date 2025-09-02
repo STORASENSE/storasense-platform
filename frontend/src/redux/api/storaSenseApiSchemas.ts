@@ -185,17 +185,17 @@ export interface DeleteAlarmRequest {
 
 export type AnalyticsTimeWindow = "7d" | "30d" | "365d";
 
-export interface AnalyticsSummaryRequest {
-  sensor_id: string;
-  window: AnalyticsTimeWindow;
-}
-
-export interface AnalyticsSummaryItem {
-  type: SensorType;
+export type AnalyticsSummaryItem = {
+  type: string;
   sensor_id: string;
   avg_value: number;
   min_value: number;
   max_value: number;
-}
+};
 
 export type AnalyticsSummaryResponse = AnalyticsSummaryItem[];
+
+export type AnalyticsSummaryRequest = {
+  storage_id: string;
+  window: AnalyticsTimeWindow;
+};
