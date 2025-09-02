@@ -15,7 +15,7 @@ function HomePageComponent() {
             return;
         }
         if (keycloak?.authenticated) {
-            router.replace("/dashboard");
+            router.replace("/dashboard/storages");
         }
     }, [keycloak, isLoading, isError]);
 

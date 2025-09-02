@@ -30,7 +30,7 @@ export const KeycloakProvider: React.FC<KeycloakProviderProps> = ({ children }) 
             // set function for refreshing token
             keycloak.onTokenExpired = () => {
                 console.log("Keycloak token expired. Attempting to refresh...");
-                keycloak.updateToken(30) // Try to refresh the token 30 seconds before it expires
+                keycloak.updateToken(60) // Try to refresh the token 60 seconds before it expires
                     .then((refreshed) => {
                     if (refreshed) {
                         console.log("Token refreshed successfully.");
