@@ -18,7 +18,7 @@ _logger = get_logger(__name__)
 
 
 @router.get(
-    "/analytics/byStorageId/{storage_id}/",
+    "/analytics/byStorageId/{storage_id}",
     response_model=List[SummaryItem],
     status_code=status.HTTP_200_OK,
     description="Get analytics summary by storage ID",

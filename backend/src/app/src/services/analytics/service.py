@@ -17,6 +17,13 @@ class AnalyticsService:
         self._repo = repo
 
     def summary_by_storage(self, storage_id: UUID, window: str):
+        """
+        Get sensor summary by storage.
+
+        :param storage_id: Storage ID for which to get the summary
+        :param window: Time window (e.g., '7d', '30d', '365d')
+        :return: Sensor summary data
+        """
         interval = WINDOW_TO_INTERVAL[window]
         return self._repo.get_sensor_summary_by_storage(storage_id, interval)
 
