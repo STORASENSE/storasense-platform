@@ -25,16 +25,17 @@ class AlarmRepository(BaseRepository[AlarmModel, UUID]):
 
     def find_alarms_by_storage_id(
         self, storage_id: UUID, page_request: PageRequest
-    ) -> Page[AlarmModel]:
+    ) -> Page[dict]:
         sql = text(
             """
-                SELECT a.*
-                FROM "Alarm" a
-                         JOIN "Sensor" s ON a.sensor_id = s.id
-                WHERE s.storage_id = :storage_id
-                ORDER BY a.created_at DESC LIMIT :limit_plus_one
-                OFFSET :offset
-                """
+            SELECT a.*, s.name AS sensor_name, st.name AS storage_name
+            FROM "Alarm" a
+                     JOIN "Sensor" s ON a.sensor_id = s.id
+                     JOIN "Storage" st ON s.storage_id = st.id
+            WHERE s.storage_id = :storage_id
+            ORDER BY a.created_at DESC LIMIT :limit_plus_one
+            OFFSET :offset
+            """
         )
 
         rows = self.session.execute(
@@ -49,15 +50,13 @@ class AlarmRepository(BaseRepository[AlarmModel, UUID]):
 
         items_data = rows[: page_request.page_size]
 
-        alarm_models = []
+        alarm_dicts = []
         for row in items_data:
-            alarm = AlarmModel()
-            for column in row._mapping:
-                setattr(alarm, column, row._mapping[column])
-            alarm_models.append(alarm)
+            alarm_dict = dict(row._mapping)
+            alarm_dicts.append(alarm_dict)
 
         return Page(
-            items=alarm_models,
+            items=alarm_dicts,
             page_size=page_request.page_size,
             page_number=page_request.page_number,
             total_pages=0,

@@ -10,5 +10,7 @@ class AlarmResponse(BaseModel):
     message: Optional[str] = None
     sensor_id: UUID
     created_at: datetime
+    storage_name: Optional[str] = None
+    sensor_name: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)

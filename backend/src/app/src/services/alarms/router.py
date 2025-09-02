@@ -73,10 +73,13 @@ def find_alarms_by_storage_id(
         )
         return [
             AlarmResponse(
-                id=alarm.id,
-                sensor_id=alarm.sensor_id,
-                message=alarm.message,
-                created_at=alarm.created_at,
+                id=alarm["id"],
+                sensor_id=alarm["sensor_id"],
+                message=alarm["message"],
+                created_at=alarm["created_at"],
+                storage=storage_id,
+                sensor_name=alarm.get("sensor_name"),
+                storage_name=alarm.get("storage_name"),
             )
             for alarm in alarms_page.items
         ]

@@ -123,7 +123,7 @@ class AlarmService:
         storage_id: UUID,
         page_request: PageRequest,
         token_data: TokenData,
-    ) -> Page[AlarmModel]:
+    ) -> Page[dict]:
         """
         Returns all alarms for a given storage (linked via Sensor → Measurements),
         sorted by alarm timestamp in descending order and paginated.

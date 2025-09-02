@@ -1,7 +1,7 @@
 import {FC} from "react";
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
-import {FaGear as Settings, FaClock as Clock, FaMapPin as MapPin, FaEye as Eye, FaDropletSlash as Droplets, FaWaveSquare as Waves, FaThermometer as Thermometer, FaTrash as TrashIcon } from "react-icons/fa6";
+import {FaGear as Settings, FaClock as Clock, FaWarehouse as MapPin, FaEye as Eye, FaDropletSlash as Droplets, FaWaveSquare as Waves, FaThermometer as Thermometer, FaTrash as TrashIcon } from "react-icons/fa6";
 
 interface Sensor {
     id: string;

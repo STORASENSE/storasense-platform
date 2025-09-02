@@ -61,7 +61,7 @@ const AlarmOverview: FC = () => {
 const AlarmStats: FC<{ alarms: any[] }> = ({ alarms }) => (
     <div className="flex items-center gap-4">
         <div className="text-sm text-gray-600">
-            {alarms.length} Alarme
+            {alarms.length} Alarm(s)
         </div>
     </div>
 );
