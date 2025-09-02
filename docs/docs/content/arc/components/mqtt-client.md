@@ -24,3 +24,5 @@ Die Bufferdatenbank wird mithilfe einer Sqlite Datenbank realisiert. Diese wurde
 Datenmenge äusserst gering ist, und die Datenbank einfach zu konfigurieren ist.
 Das Senden der Nachrichten wird mithilfe der request Bibliothek umgesetzt.
 Alle drei Komponenten sind in eigenen Dokumenten umgesetzt.
+Da das Backend auf einem vom Internet erreichbaren Server läuft und dieser nicht auf dem gleichen Server wie der Broker läuft,
+ist der Mqtt Client in einem eigenen Docker Compose umgesetzt.

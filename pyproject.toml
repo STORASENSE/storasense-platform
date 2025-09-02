@@ -124,8 +124,9 @@ skip-magic-trailing-comma = false
 line-ending = "auto"
 
 [tool.pytest.ini_options]
-pythonpath = ["src"]
-testpaths = "tests"
+pythonpath = ["."]
+testpaths = ["test/unit"]
+addopts = "-v --tb=short"
 
 [tool.semantic_release]
 assets = []
