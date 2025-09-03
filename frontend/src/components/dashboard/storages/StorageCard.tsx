@@ -20,7 +20,7 @@ const StorageCard: FC<StorageCardProps> = ({ storage }) => {
     const dispatch = useDispatch();
     const activeStorage = useSelector((state: RootState) => state.storage.activeStorage);
 
-    const [deleteStorage, { isError: isDeleteStorageError, error: deleteStorageError }] = useDeleteStorageMutation();
+    const [deleteStorage] = useDeleteStorageMutation();
 
     const isActive = useMemo<boolean>(() => {
         if (!activeStorage)
