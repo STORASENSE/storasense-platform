@@ -9,11 +9,7 @@ import { FaBoxArchive as StorageIcon } from "react-icons/fa6";
 import { SiGoogleanalytics as AnalyticsIcon } from "react-icons/si";
 import { FaThermometer as SensorsIcon } from "react-icons/fa6";
 import { FaUserPlus as UsersIcon } from "react-icons/fa6";
-import { MdOutlineWarehouse as StorageIcon } from "react-icons/md";
-import { MdOutlineQueryStats as AnalyticsIcon } from "react-icons/md";
-import { MdOutlineDeviceThermostat as SensorsIcon } from "react-icons/md";
-import { MdOutlinePeople as UsersIcon } from "react-icons/md";
-import { MdAlarmOn as AlarmIcon } from "react-icons/md";
+import { IoAlarm as AlarmIcon } from "react-icons/io5";
 import useKeycloak from "@/auth/useKeycloak";
 import { useGetHealthQuery } from "@/redux/api/storaSenseApi";
 
