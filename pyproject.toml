@@ -125,8 +125,12 @@ skip-magic-trailing-comma = false
 line-ending = "auto"
 
 [tool.pytest.ini_options]
-pythonpath = ["src"]
-testpaths = "tests"
+pythonpath = ["."]
+testpaths = "test"
+filterwarnings = [
+    "ignore::pydantic._internal._config.PydanticDeprecatedSince20",
+    "ignore::sqlalchemy.exc.SAWarning"
+]
 
 [tool.semantic_release]
 assets = []
