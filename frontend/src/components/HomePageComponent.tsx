@@ -1,9 +1,11 @@
 'use client';
 
 import useKeycloak from "@/auth/useKeycloak";
-import AuthenticationMessage from "@/components/AuthenticationMessage";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import {Button} from "@/components/ui/button";
+import {Skeleton} from "@/components/ui/skeleton";
+import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 
 
 function HomePageComponent() {
@@ -21,33 +23,29 @@ function HomePageComponent() {
 
     if (isLoading) {
         return (
-            <div className="flex justify-center items-center h-64">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-whale mx-auto mb-4"></div>
-                    <p>Loading Auth...</p>
-                </div>
-            </div>
+            <Skeleton className="w-[80px] h-[40px]"/>
         );
     }
 
     if (isError) {
-        return <></>;
+        return (
+            <Alert variant="destructive">
+                <AlertTitle>
+                    An unknown error occurred.
+                </AlertTitle>
+                <AlertDescription>
+                    Failed to load authentication provider.
+                </AlertDescription>
+            </Alert>
+        );
     }
 
     // Show login page if not authenticated
     if (!keycloak?.authenticated) {
         return(
-            <div className="space-y-6">
-                <AuthenticationMessage/>
-                <div className="text-center -mt-16">
-                    <button
-                        onClick={() => keycloak?.login()}
-                        className="px-4 py-2 bg-blue-whale text-white border-blue-whale"
-                    >
-                        Login
-                    </button>
-                </div>
-            </div>
+            <Button onClick={() => keycloak?.login()}>
+                Login
+            </Button>
         );
     }
 
