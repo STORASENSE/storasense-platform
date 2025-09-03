@@ -23,7 +23,7 @@ const SENSOR_TYPE_OPTIONS = [
     { value: "TEMPERATURE_INSIDE", label: "Temperature (Inside)" },
     { value: "TEMPERATURE_OUTSIDE", label: "Temperature (Outside)" },
     { value: "HUMIDITY", label: "Humidity" },
-    { value: "GAS", label: "Gas" },
+    { value: "CO2", label: "CO2" },
 ] as const;
 
 function mapFormDataToAddSensorRequest(formData: FormData): AddSensorRequest {
@@ -88,7 +88,7 @@ const AddSensorModal: FC<AddSensorModalProps> = ({ isOpen, onClose }) => {
         setErrorMessage(null);
 
         if (!isFormValid(formData)) {
-            setErrorMessage("Bitte füllen Sie alle Pflichtfelder aus.");
+            setErrorMessage("Please fill out the required fields.");
             return;
         }
 

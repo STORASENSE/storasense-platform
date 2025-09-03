@@ -17,11 +17,5 @@ class SensorType(Enum):
 class MeasurementUnit(Enum):
     CELSIUS = "CELSIUS"
     PERCENT = "PERCENT"
-    CENTIMETER = "CM"
+    CENTIMETER = "CENTIMETER"
     PPM = "PPM"
-
-
-class AlarmSeverity(Enum):
-    HIGH = "HIGH"
-    MEDIUM = "MEDIUM"
-    LOW = "LOW"

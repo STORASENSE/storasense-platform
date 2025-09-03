@@ -1,0 +1,102 @@
+@startuml
+!theme vibrant
+top to bottom direction
+
+package "Edge / Datenerfassung" {
+  cloud "IoT-Geräte\n(Sensoren, Aktoren ("Imaginär"))" as devices
+  component "MQTT Broker" as mqtt
+}
+
+package "Streaming-Plattform (Kafka)" {
+  frame "Apache Kafka Cluster" {
+    queue "Topic 'iot-sensordata'" as topic_raw
+    queue "Topic 'alarme'" as topic_alarms
+  }
+
+  package "Kafka Connect" {
+    component "MQTT Source Connector\n(Daten -> Kafka)" as connect_source
+    component "MQTT Sink Connector\n(Kafka -> Geräte)" as connect_sink
+  }
+
+  package "Alarm-Service" {
+    component "Alarmservice\n(Kafka Streams)" as alarmservice
+  }
+}
+
+devices --> mqtt : 1. Sensordaten (MQTT)
+mqtt --> connect_source : 2. Abonniert Topics
+connect_source --> topic_raw : 3. Rohdaten schreiben
+
+topic_raw --> alarmservice : 4. Konsumiert (partition key = sensorId)
+alarmservice --> topic_alarms : 5. Schreibt Alarme
+
+topic_alarms --> connect_sink : 6. Konsumiert Alarme/Befehle
+connect_sink --> mqtt : 7. Schreibt Befehle (MQTT)
+mqtt --> devices : 8. Aktor bekommt MQTT-Message
+
+@enduml
+
+@startuml
+!theme vibrant
+left to right direction
+
+skinparam package {
+  BackgroundColor #E3F2FD
+  BorderColor #1976D2
+  FontColor #0D47A1
+}
+
+skinparam rectangle {
+  BackgroundColor #FFFFFF
+  BorderColor #FF9800
+  FontColor #E65100
+}
+
+package "MQTT Broker" #E3F2FD {
+  [Topic 'iot-sensordata-1'] #FFF3E0
+  [Topic 'iot-sensordata-2'] #FFF3E0
+  [Topic 'iot-sensordata-3'] #FFF3E0
+  ...
+  [Topic 'iot-sensordata-N'] #FFF3E0
+}
+
+package "Kafka Connect - N Connectors" #WHITE {
+  [MQTT Source Connector 1] as sc1 #FFF3E0
+  [MQTT Source Connector 2] as sc2 #FFF3E0
+  [MQTT Source Connector 3] as sc3 #FFF3E0
+  ...
+  [MQTT Source Connector N] as scN #FFF3E0
+}
+
+package "Topic 'iot-sensordata' - N Partitions" #B3E5FC {
+  [Partition 0\nKey: sensorId=1] #FFECB3
+  [Partition 1\nKey: sensorId=2] #FFECB3
+  [Partition 2\nKey: sensorId=3] #FFECB3
+  ...
+  [Partition N-1\nKey: sensorId=N] #FFECB3
+}
+
+package "Alarm-Service" #FFECB3 {
+  [Alarmservice\n(Kafka Streams)] as alarmservice #FFF3E0
+}
+
+[Topic 'iot-sensordata-1'] --> sc1
+[Topic 'iot-sensordata-2'] --> sc2
+[Topic 'iot-sensordata-3'] --> sc3
+[Topic 'iot-sensordata-N'] --> scN
+
+sc1 --> [Partition 0\nKey: sensorId=1]
+sc2 --> [Partition 1\nKey: sensorId=2]
+sc3 --> [Partition 2\nKey: sensorId=3]
+scN --> [Partition N-1\nKey: sensorId=N]
+
+[Partition 0\nKey: sensorId=1] --> alarmservice
+[Partition 1\nKey: sensorId=2] --> alarmservice
+[Partition 2\nKey: sensorId=3] --> alarmservice
+[Partition N-1\nKey: sensorId=N] --> alarmservice
+
+note right of [Partition 0\nKey: sensorId=1]
+Each partition is assigned to a specific sensorId.
+end note
+
+@enduml

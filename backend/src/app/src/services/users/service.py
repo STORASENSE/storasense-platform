@@ -29,6 +29,13 @@ from ...shared.database.engine import open_session
 
 
 def is_technical_user(token_data: TokenData) -> bool:
+    """
+    Helper function to determine if a user is a technical user.
+    A technical user is defined as a user without an email and name.
+
+    :param token_data: The token data containing user information from Keycloak.
+    :return: True if the user is a technical user, False otherwise.
+    """
     if not token_data.email and not token_data.name:
         return True
     return False
@@ -53,6 +60,9 @@ class UserService:
         """
         Looks for a user in the database by their Keycloak ID.
         If the user does not exist, it creates a new user profile with the data provided in the token.
+
+        :param token_data: The token data containing user information from Keycloak.
+        :return: The existing or newly created user profile.
         """
         user = self._user_repository.find_by_keycloak_id(token_data.id)
 
@@ -97,6 +107,14 @@ class UserService:
     def find_all_by_storage_id(
         self, storage_id: UUID, token_data: TokenData
     ) -> list[UserByStorageIdResponse]:
+        """
+        Fetches all users associated with a specific storage, ensuring that the requesting
+        client is authorized to access this information.
+
+        :param storage_id:
+        :param token_data:
+        :return: A list of users associated with the storage, including their roles.
+        """
         principal = self._user_repository.find_by_keycloak_id(token_data.id)
         if principal is None:
             raise UnknownAuthPrincipalError(
@@ -124,6 +142,14 @@ class UserService:
     def _raise_error_if_not_admin(
         self, storage_id: UUID, token_data: TokenData
     ):
+        """
+        Raises an error if the user associated with the provided token data is not an admin
+        of the specified storage.
+
+        :param storage_id:
+        :param token_data:
+        :return: None
+        """
         principal = self._user_repository.find_by_keycloak_id(token_data.id)
         if principal is None:
             raise UnknownAuthPrincipalError(
@@ -140,6 +166,15 @@ class UserService:
     def add_user_to_storage(
         self, username: str, storage_id: UUID, token_data: TokenData
     ):
+        """
+        Adds a user to a storage with the role of CONTRIBUTOR, ensuring that the requesting
+        client hasadmin privileges for the storage (condition).
+
+        :param username: the username of the user to be added to the storage
+        :param storage_id: the ID of the storage to which the user will be added
+        :param token_data: the token data of the requesting client
+        :return: None
+        """
         self._raise_error_if_not_admin(storage_id, token_data)
         user = self._user_repository.find_by_username(username)
         if user is None:
@@ -158,6 +193,15 @@ class UserService:
     def remove_user_from_storage(
         self, username: str, storage_id: UUID, token_data: TokenData
     ):
+        """
+        Removes a user from a storage, ensuring that the requesting client has admin
+        privileges for the storage.
+
+        :param username: the username of the user to be removed from the storage
+        :param storage_id: the ID of the storage from which the user will be removed
+        :param token_data: the token data of the requesting client
+        :return: None
+        """
         self._raise_error_if_not_admin(storage_id, token_data)
         user = self._user_repository.find_by_username(username)
         if user is None:

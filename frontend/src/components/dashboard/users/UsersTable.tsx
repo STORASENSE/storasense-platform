@@ -11,7 +11,7 @@ import {Button} from "@/components/ui/button";
 import {UserRole} from "@/redux/api/storaSenseApiSchemas";
 import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import AddUserToStorageForm from "./AddUserToStorageForm";
-import { FaTrashCan as TrashIcon } from "react-icons/fa6";
+import { FaTrash as TrashIcon } from "react-icons/fa6";
 
 
 const UsersTable: FC = () => {

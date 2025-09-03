@@ -2,7 +2,7 @@
 
 import { FC, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { InfoIcon, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import SensorCard from "./SensorCard";
 import AddSensorModal from "./AddSensorModal";
 import {
@@ -10,15 +10,29 @@ import {
     useDeleteSensorMutation,
     useGetSensorStatusQuery
 } from "@/redux/api/storaSenseApi";
-import { Sensor } from "@/redux/api/storaSenseApiSchemas";
+import {AddSensorRequest, DeleteSensorRequest, Sensor, SensorType} from "@/redux/api/storaSenseApiSchemas";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface EnrichedSensor extends Sensor {
-    status: "online" | "offline" | "warning";
+    status: "online" | "offline";
     lastUpdate?: string;
 }
+
+interface FormData {
+    id: string;
+    storage_id: string;
+}
+
+function mapFormDataToDeleteSensorRequest(formData: FormData): DeleteSensorRequest {
+    return {
+        sensor_id: formData.id,
+        sensor: {
+            storage_id: formData.storage_id,
+        },
+    };
+}
+
 
 // Custom hook to enrich sensor data with status
 const useSensorWithStatus = (sensor: Sensor): EnrichedSensor => {
@@ -32,8 +46,9 @@ const useSensorWithStatus = (sensor: Sensor): EnrichedSensor => {
 
     return useMemo(() => ({
         ...sensor,
-        status: statusData?.is_online ? "online" : "offline" as "online" | "offline" | "warning",
-        lastUpdate: statusData?.last_measurement || undefined
+        status: statusData?.is_online ? "online" : "offline" as "online" | "offline",
+        lastUpdate: statusData?.last_measurement_time || undefined,
+        lastMeasurement: statusData?.last_measurement || undefined,
     }), [sensor, statusData]);
 };
 
@@ -57,9 +72,10 @@ const SensorsOverview: FC = () => {
         refetch();
     };
 
-    const handleDeleteSensor = async (sensorId: string) => {
+    const handleDeleteSensor = async (sensorId: string, storageId: string) => {
         try {
-            await deleteSensor({ sensor_id: sensorId }).unwrap();
+            const request = mapFormDataToDeleteSensorRequest({id: sensorId, storage_id: storageId});
+            await deleteSensor(request).unwrap();
             refetch();
         } catch (error) {
             console.error('Failed to delete sensor:', error);
@@ -85,7 +101,8 @@ const SensorsOverview: FC = () => {
                     <SensorCardWithStatus
                         key={sensor.id}
                         sensor={sensor}
-                        onDelete={handleDeleteSensor}
+                        onDelete={() => handleDeleteSensor(sensor.id, activeStorage.id)}
+                        storageName={activeStorage.name}
                     />
                 ))}
             </main>
@@ -107,9 +124,9 @@ const SensorsOverview: FC = () => {
 };
 
 // Component for Sensor Card with Status
-const SensorCardWithStatus: FC<{ sensor: Sensor; onDelete: (id: string) => void }> = ({ sensor, onDelete }) => {
+const SensorCardWithStatus: FC<{ sensor: Sensor; onDelete: (id: string) => void; storageName: string }> = ({ sensor, onDelete, storageName }) => {
     const enrichedSensor = useSensorWithStatus(sensor);
-    return <SensorCard sensor={enrichedSensor} onDelete={onDelete} />;
+    return <SensorCard sensor={enrichedSensor} onDelete={onDelete} storageName={storageName} />;
 };
 
 // SensorStats Component

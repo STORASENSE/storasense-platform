@@ -94,7 +94,7 @@ def initialize_database():
             "Production mode detected. Creating hypertables and seeding production data..."
         )
         generate_hypertables()
-        # seed_prod_data(session)
+
     else:
         msg = (
             "Unknown environment detected. Aborting database initialization. Have you set the ENVIRONMENT variable "

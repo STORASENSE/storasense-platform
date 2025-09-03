@@ -1,0 +1,242 @@
+# Datendomäne
+
+## Datenmodellierung (Konzeptuell)
+Vor der Auswahl einer spezifischen Datenbanktechnologie wird das fachliche Datenmodell definiert, das alle für das System STORASENSE relevanten Informationen und deren Beziehungen
+zueinander abbildet. Diese ergeben sich aus den definierten [Anforderungen](content/about/mvp.md). <br> Insgesamt basiert das Modell auf **fünf Entitäten**:
+
+* **User**: Stellt eine Person dar, die mit dem System interagiert.
+Ein Benutzer beinhaltet folgende Attribute:
+  * _ID_: Eine eindeutige ID des Benutzers
+  * _Username_: Ein eindeutiger Benutzername
+  * _Passwort_: Ein Passwort (mit Hashing)
+  * _Rolle_: Eine Rolle, die den Zugriff auf ein Lagerort einschränkt
+  * _Beschreibung_: Eine optionale Beschreibung des Benutzers
+  * _Lagerorte_: Referenzen auf zugegriffene Lagerorte <br>
+  <br>
+* **Storage**: Repräsentiert einen physischen Ort (z.B. "Weinkeller A", "Lagerhalle B"), der überwacht wird. Jeder Lagerort besitzt eindeutige Attribute wie eine ID und einen Namen.
+Ein Lagerort beinhaltet folgende Attribute:
+  * _ID_: Eine eindeutige ID des Lagerorts
+  * _Name_: Ein eindeutiger Name des Lagerorts (z\.B\. "Weinkeller A")
+  * _Beschreibung_: Eine optionale Beschreibung des Lagerorts
+  * _Nutzer_: Referenzen auf Nutzer, die auf den Lagerort Zugriff haben <br>
+  <br>
+* **Sensor**: Stellt einen physischen Sensor dar, der Messwerte erfasst.
+Ein Sensor beinhaltet folgende Attribute:
+  * _ID_: Eine eindeutige ID des Sensors
+  * _Typ_: Der Typ des Sensors (z\.B\. Temperatur, Luftfeuchtigkeit)
+  * _Min & Max_: Grenzwerte für den Sensor
+  * _Lagerort_: Eine Referenz auf den Lagerort, an dem sich der Sensor befindet <br>
+  <br>
+* **Measurement**: Repräsentiert eine einzelne, zu einem exakten Zeitpunkt erfasste Messung (z.B. Temperatur, Luftfeuchtigkeit).
+Ein Messwert beinhaltet folgende Attribute:
+  * _ID_: Eine eindeutige ID der Messung
+  * _Erstellungszeit_: Der genaue Zeitpunkt der Messung
+  * _Wert_: Der gemessene Wert
+  * _Einheit_: Die Einheit des Messwertes (z\.B\. Temperatur in °C, Luftfeuchtigkeit in %)
+  * _Sensor_: Eine Referenz auf den Sensor, der die Messung entnommen hat <br>
+  <br>
+* **Alert**: Repräsentiert einen Alarm, der ausgelöst wird, wenn ein Messwert außerhalb eines definierten Schwellenwerts liegt.
+Ein Alarm beinhaltet folgende Attribute:
+  * _ID_: Eine eindeutige ID des Alarms
+  * _Beschreibung_: Eine beschreibung des Alarms (z\.B\. "Temperatur zu hoch")
+  * _Schweregrad_: Der Schweregrad des Alarms (z\.B\. "hoch", "mittel", "niedrig")
+  * _Messung_: Eine Referenz auf die Messung, die den Alarm ausgelöst hat <br>
+
+## Datenvolumen
+Das erwartete Datenvolumen ist moderat, da das System in erster Linie Echtzeitdaten von Sensoren erfasst und speichert.
+
+### Datenmenge
+#### Measurement:
+Wie eingangs im [Projektüberblick](content/about/mvp.md#funktionale-anforderungen) beschrieben, besteht die Sensorik des Systems aus vier Sensoren die täglich für 2.5 Monate alle 30 Sekunden Messwerte erfassen.
+Folgende Rechnung verdeutlicht die erwartete Datenmenge:
+
+* Anzahl der Sensoren: 4
+* Jeder Sensor sendet alle 30 Sekunden einen Messwert.
+* Das ergibt:
+  * Messungen pro Stunde pro Sensor: (60/30) x 60 = 120
+  * Messungen pro Tag pro Sensor: 120 x 24 = 2.880
+  * Messungen pro Tag gesamt (4 Sensoren): 2.880 x 4 = 11.520
+  * Messungen für 2,5 Monate (ca. 75 Tage): 11.520 x 75 = **864.000 Messpunkte**
+
+Insgesamt werden also ca. **864.000 Messpunkte** erwartet, die in der Datenbank gespeichert werden müssen.
+
+#### Weitere Entitäten:
+Die weiteren Entitäten haben eine deutlich geringere Anzahl an Instanzen:
+
+* Wie bereits im [Projektüberblick](content/about/mvp.md#funktionale-anforderungen) beschrieben unterstützt das System bis zu 500 Benutzer und 50 Lagerorte.
+* Weiter sind 2 Rollen vorgesehen, die den Benutzern zugeordnet werden können.
+* Die letzten 500 Alarme eines Lagerorts werden ebenfalls gespeichert. So ergibt sich eine maximale Anzahl von 25.000 Alarm-Einträgen (500 Alarme x 50 Lagerorte).
+
+Insgesamt sind die weiteren Entitäten also zu vernachlässigen, da sie nur eine geringe Anzahl an Instanzen haben. <br>
+**Außerdem gilt es zu beachten, dass der Großteil der Daten der weiteren Entitäten sich in der Regel nicht ständig ändern, sondern einmal angelegt werden und ggf. selten aktualisiert werden.**
+
+
+### Datengröße
+#### Measurement:
+Die Messwerte sind in der Regel numerisch (z.B. Temperatur, Luftfeuchtigkeit) und benötigen daher wenig Speicherplatz. <br>
+
+| Datenfeld     | Typ         | Größe (Bytes) | Beschreibung                        |
+|--------------|-------------|----------|-------------------------------------|
+| timestamp           | Datetime     | 8        | Timestamp           |
+| value         | Float      | 4        | Numerisch                  |
+| unit  | String      | 2        |  Einheit als Kurzstring (z.B. "C")              |
+| sensor_type    | String    | 2-4      | Sensortyp            |
+| storage_id        | Integer       | 2        | Lagerortreferenz                   |
+| Gesamt         | -      | **~18**  | Durchschnittlich pro Messung               |
+
+**Gesamtvolumen:**
+864.000 Messungen × ~ 18 Byte = **~15,5 MB**
+
+#### Weitere Entitäten:
+Der Speicherbedarf der weiteren Entitäten ist ebenfalls gering, da sie nur wenige Attribute haben und in der Regel nicht sehr viele Instanzen existieren. <br>
+
+* Anschaulich lässt sich dies am Beispiel der User-Entität darstellen, die folgende Attribute hat:
+
+| Datenfeld    | Typ      | Größe (Bytes) |
+|--------------|----------|---------------|
+| id           | Integer  | 4             |
+| username     | String   | 20           |
+| password (hash)    | String   | 64            |
+| role_id      | Integer  | 2             |
+| description  | String   | 50          |
+| storage_id   | Integer[]  | 8           |
+| Gesamt       | -        | **~150**      |
+
+**Gesamtvolumen für 500 User:**
+500 User × ~ 150 Byte = **~75 KB**
+
+## Nichtfunktionale Anforderungen <=> Datendomäne
+
+### **Einfluss der nicht-funktionalen Anforderungen auf die Datendomäne**
+
+Die definierten nicht-funktionalen Anforderungen beinflussen ggf. direkt die Auswahl der richtigen Datenbanktechnologie und werden dementsprechend im Folgenden auf die Datendomäne übertragen.
+
+#### **Performance und schnelle Alarmierung**
+
+Die Anforderung, einen Alarm innerhalb von 90 Sekunden auszulösen, *nachdem* ein Grenzwert für über 30 Sekunden verletzt wurde, stellt eine hohe Anforderung an die Datenbank-Performance. Dies erfordert mehr als nur eine schnelle Einzelabfrage. Die Datenbank muss folgende Operationen sehr effizient unterstützen:
+
+1. **Schnelles Schreiben (Ingestion):** Jeder neue `Measurement`-Datensatz muss mit minimaler Latenz gespeichert werden, damit die Alarmierungskette sofort starten kann.
+2.  **Effiziente Zeitfenster-Abfragen:** Um eine 30-sekündige Grenzwertverletzung zu erkennen, muss das System eine Abfrage wie "Gib mir alle Messwerte von `sensor_x` der letzten 30-40 Sekunden" sehr schnell ausführen können. Dies verlangt Indexierungsfähigkeiten, insbesondere auf den Feldern `timestamp` und `sensor_id`.
+
+#### **Hohe Verfügbarkeit**
+
+Die geforderte Verfügbarkeit von 99% über einen Zeitraum von drei Tagen erlaubt eine maximale Ausfallzeit von ca. 43 Minuten.
+
+* **Stabilität und Datenpersistenz:** Die Datenbank muss ein robuster, stabiler Dienst sein, der Daten zuverlässig auf die Festplatte schreibt. Bei einem Neustart dürfen so keine Daten verloren gehen (was beispielsweise reine In-Memory-Datenbanken ausschließt). Basierend auf der Anforderung einer Verfügbarkeit von 99% muss die Technologie stabil innerhalb einer Docker-Umgebung laufen.
+*   **Unterstützung für Resilienz:** Die Anforderung des automatischen Neustarts wird von der Infrastruktur (Docker Compose) umgesetzt. Die Datenbank muss diesen Prozess jedoch zuverlässig unterstützen, d.h. nach einem unerwarteten Herunterfahren schnell und konsistent wieder hochfahren.
+
+#### **Sicherheit (Authentifizierung & Autorisierung)**
+
+Diese Anforderung betrifft primär die Anwendungslogik, aber die Datenbank muss die sichere Implementierung unterstützen:
+
+* **Sichere Datenspeicherung:** Die Datenbank muss sensible Daten wie gehashte Passwörter in der `User`-Entität sicher speichern.
+*   **Unterstützung relationaler Integrität:** Um die Autorisierung (wer darf auf welchen `Storage` zugreifen?) sicherzustellen, muss die Datenbank die Beziehungen zwischen `User`, `Role` und `Storage` zuverlässig abbilden können. Ein System, das diese Beziehungen durch **Constraints** und **Fremdschlüssel** auf Datenbankebene garantiert, ist hier also wichtig, da es das Risiko von Fehlern in der Anwendungslogik reduziert.
+
+## Datenbankauswahl - Kriterien
+Die Auswahl der Datenbanktechnologie erfolgt nun anhand folgender Kriterien:
+
+* **Unterstützung des Datenmodells**: Die Datenbank muss in der Lage sein, die definierten Entitäten und deren Beziehungen ([vgl. Datenmodellierung](data_eva.md#datenmodellierung)) effizient abzubilden. Beispielsweise gilt es die Grundlage für die Sicherheit des Systems zu schaffen (vgl. [Nichtfunktionale Anforderungen <=> Datendomäne](data_eva.md#nicht-funktionale-anforderungen--datendomäne)). <br>
+<br>
+* **Komplexität**: Die Implementierung des Datenmodells sollte sich insbesondere den fachlichen [Rahmenbedingungen](content/about/mvp.md#rahmenbedingungen) des Projekts anpassen. <br> Aufgrund der Projektlaufzeit von 2.5 Monaten und der Teamgröße von 4 Personen gilt es somit unnötige Komplexität zu vermeiden. <br>
+  * *Anmerkung: Das berechnete [Datenvolumen](data_eva.md#datenvolumen) ist mit unter 1 MB pro Woche sehr gering. Daher sind Skalierungsmechanismen (wie z.B. horizontales Sharding) für dieses Projekt nicht relevant. Das Kriterium bewertet stattdessen, wie gut die Datenbanktechnologie mit diesem spezifischen, moderaten Datenvolumen umgeht, ohne unnötigen administrativen oder ressourcentechnischen Overhead zu erzeugen. <br>*
+
+
+* **Performance**: Die Leistungsfähigkeit der Datenbank ist entscheidend für die Realisierung des schnellen Alarmsystems (vgl. [Nichtfunktionale Anforderungen <=> Datendomäne](data_eva.md#nicht-funktionale-anforderungen--datendomäne)). Hierbei gilt es insbesondere die Messdaten, die den Großteil des [Datenvolumens](data_eva.md#datenvolumen) ausmachen, effizient zu verwalten. <br>
+<br>
+
+* **Betriebsstabilität**: Die Datenbank sollte robust im Betrieb sein - entscheidend ist es, einen konsistenten Betrieb mit minimaler Ausfallzeit zu gewährleisten (vgl. [Nichtfunktionale Anforderungen <=> Datendomäne](data_eva.md#nicht-funktionale-anforderungen--datendomäne)). <br>
+<br>
+* **Datenintegrität und Konsistenz**: Dieses Kriterium bewertet die Fähigkeit der Datenbank, die Korrektheit und Widerspruchsfreiheit der Daten sicherzustellen. Weiter ist die Garantie wichtig, dass Daten nach dem Speichern nicht verloren gehen oder korrumpiert werden (Datenpersistenz). Dies ist insbesondere für die Verwaltung der Nutzer mit ihren Rechten wichtig. <br>
+<br>
+* **Abfragemöglichkeiten für Visualisierung**: Die Fähigkeit der Abfragesprache, komplexere Aggregationen (z.B. Durchschnittswerte, Gruppierungen) und Verknüpfungen zu formulieren, die für die Erstellung eines Dashboards wichtig sind. Die Kompatibilität mit Standard-Visualisierungstools ist hier ebenfalls relevant.
+
+## SQL vs NoSQL
+Die folgende Tabelle evaluiert einen relationalen SQL-Ansatz und einen dokumentenorientierten NoSQL-Ansatz anhand der festgelegten Kriterien:
+
+*Anmerkung: Für den Vergleich wird als NoSQL-Typ die dokumentorientierte Datenbank initial ausgewählt, da jeder Measurement-Datensatz eine in sich geschlossene Informationseinheit darstellt (Zeitstempel, Wert, Sensor-ID etc.), die sich nativ als ein JSON-ähnliches Dokument abbilden lässt. Dieser Ansatz ist als einziger NoSQL-Typ flexibel genug, um sowohl die zeitreihenbasierten Measurement-Daten als auch die eher strukturierten Entitäten wie User und Storage in separaten Collections zu verwalten.*
+
+| Kriterium                           | SQL-Ansatz (Relational)                                                                                                                                                                                                                                                                | NoSQL-Ansatz (Dokumentenorientiert)                                                                                                                                                                                                                                                                |
+|--------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Unterstützung des Datenmodells       | Sehr gut. Das relationale Modell eignet sich sehr gut, um die strukturierten Beziehungen zwischen User, Role und Storage durch Foreign Keys abzubilden. Die Measurement-Daten passen in eine separate, nach Zeitstempel indizierte Tabelle.                                        | Okay. Sehr gut für die flexiblen Measurement-Daten. Die Abbildung der relationalen Benutzer- und Zugriffsdaten ist jedoch umständlich. Beziehungen müssen in der Anwendungslogik (über Referenzen oder eingebettete Dokumente) verwaltet werden, was die Komplexität erhöht.                       |
+| Komplexität                         | Gering. Das Datenmodell lässt sich intuitiv auf Tabellen abbilden. Die Datenbank übernimmt die Logik der Beziehungsintegrität. Das moderate Datenvolumen erfordert keinen administrativen Mehraufwand.                                                                                 | Mittel. Während das Speichern der IoT-Daten einfach ist, erfordert die konsistente Abbildung der Benutzer-Zugriffsrechte mehr Entwicklungsaufwand. Der größte Vorteil – die einfache Skalierung bei riesigen Datenmengen – ist hier nicht relevant und führt zu unnötigem konzeptionellen Overhead. |
+| Performance                          | Sehr gut. Moderne SQL-Datenbanken können das moderate Datenvolumen mühelos verarbeiten. Schnelle Schreibvorgänge und effiziente Zeitfenster-Abfragen für die Alarmierung sind durch Standard-Indizes auf den Zeitstempel- und Sensor-Feldern ohne Probleme und performant realisierbar. | Sehr gut. Hohe Schreibleistung ist eine Kernstärke der meisten NoSQL Datenbanken. Die Abfragegeschwindigkeit für die Alarmierung wäre ebenfalls sehr gut. Bei diesem Anwendungsfall mit der geringen Datenmenge ist ein Performancevorteil jedoch fraglich.                                        |
+| Betriebsstabilität                   | Sehr hoch. Etablierte SQL-Datenbanken wie PostgreSQL sind für ihre Robustheit und stabilen Betrieb bekannt. Sie unterstützen einen zuverlässigen Neustart nach Ausfällen und fügen sich nahtlos in Docker-Umgebungen ein.                                                              | Sehr hoch. Moderne NoSQL-Datenbanken sind ebenfalls für den stabilen Dauerbetrieb ausgelegt und für ihre Resilienz in verteilten Systemen bekannt.                                                            |
+| Datenintegrität & Konsistenz         | Sehr hoch (nativ). Durch ACID-Transaktionen und Constraints (UNIQUE, FOREIGN KEY) wird die Konsistenz der Daten auf Datenbankebene erzwungen. Dies ist besonders für die Verwaltung von Benutzerrechten und die Sicherheit des Systems ein entscheidender Vorteil.                     | Mittel. Bietet standardmäßig schwächere Konsistenzmodelle (Eventual Consistency). Obwohl moderne Systeme auch ACID-Transaktionen unterstützen, liegt die Verantwortung für die Datenintegrität bei relationalen Verknüpfungen größtenteils beim Entwickler im Anwendungscode.        |
+| Abfragemöglichkeiten für Visualisierung | Sehr gut. Die standardisierte Abfragesprache SQL ist geeignet für komplexe Aggregationen (GROUP BY) und Verknüpfungen (JOIN), die für Dashboards wichtig sind (z.B. Anzeige von Lagerortnamen zu Messwerten).                                                                          | Gut. Proprietäre Abfragesprachen sind mächtig, aber weniger standardisiert. Das Verknüpfen von Daten aus unterschiedlichen Collections ist oft aufwendiger als ein SQL-JOIN.                                            |
+
+Der Vergleich zeigt, dass der SQL-Ansatz für das Projekt die bessere Wahl ist.
+Die Stärken des relationalen Modells in Bezug auf Datenintegrität, Konsistenz und die einfache Abbildung der Beziehungen zwischen den Entitäten sind entscheidend.
+Insgesamt lässt sich das Datenmodell so leichter (und schneller) umsetzen.
+Performance und Betriebsstabilität sind in beiden Fällen hoch, aber der SQL-Ansatz bietet eine klarere Struktur für die Verwaltung der Benutzerrechte und Zugriffe. <br>
+Weiter lässt sich die Performance, insbesondere hinsichtlich der Measurement-Daten, in der SQL-Datenbank durch Indizes auf beispielsweise den Zeitstempel manuell beziehungsweise durch Nutzung einer spezialisierten SQL-Datenbank (Timeseries) verbessern. <br>
+Auch die Abfragemöglichkeiten im Zuge der Visualisierung mittels eines Dashboards sind im SQL-Ansatz gegeben, da SQL eine standardisierte und mächtige Abfragesprache bietet, die komplexe Aggregationen und Verknüpfungen unterstützt. <br>
+
+## Datenbanktechnologie - PostgreSQl mit TimescaleDB
+Um einerseits die einfachen, zeitabhängigen Messreihen effizient verwalten zu können und andererseits die "relationalen Metadaten" (User, Role, Storage) mit ihren Beziehungen abzubilden, wird die **PostgreSQL**-Datenbank ausgewählt. <br>
+Diese hat sich als eine der leistungsfähigsten Open-Source-Datenbanken etabliert und bietet neben dem klassichen relationalen Ansatz auch Unterstützung für zeitbasierte Daten durch die Erweiterung **TimescaleDB**. <br>
+TimescaleDB ist eine Erweiterung für PostgreSQL, die speziell für die Speicherung und Abfrage von Zeitreihendaten entwickelt wurde. Sie bietet Funktionen wie automatische Partitionierung (Chunking) und Indizierung, die die Performance bei zeitbasierten Abfragen erheblich verbessern [1]. <br>
+Für das Projekt bietet diese Kombination folgende Vorteile, die direkt auf die zuvor definierten Auswahlkriterien abzielen:
+
+* Optimale Performance für die Alarmierung: Die zentrale Anforderung des schnellen Alarmsystems wird durch TimescaleDB ideal unterstützt. Die Measurement-Tabelle wird als sogenannte Hypertable konfiguriert. Dadurch werden die Messdaten im Hintergrund automatisch nach Zeit partitioniert, was Abfragen auf kurzen Zeitfenstern ("alle Werte der letzten 30 Sekunden") extrem performant macht.
+* Hohe Datenintegrität bei geringer Komplexität: Während TimescaleDB die Zeitreihendaten optimiert, kümmert sich der PostgreSQL-Kern um die relationalen Daten. Die Beziehungen zwischen User, Role und Storage werden durch Foreign Keys und ACID-Transaktionen auf Datenbankebene abgesichert. Dies ermöglicht die Datenkonsistenz, reduziert den Entwicklungsaufwand im Backend und vermeidet Komplexität.
+* Python-Entwickler-Unterstützung: PostgreSQL ist im Python-Ökosystem integriert und wird von Bibliotheken wie SQLAlchemy optimal unterstützt. Die Verwendung von standardisiertem SQL erleichtert zudem die Anbindung von Visualisierungs-Tools und die Formulierung komplexer Abfragen für das Analyse-Dashboard.
+* Betriebsstabilität: Obwohl das aktuelle Datenvolumen gering ist, ist das System von Anfang an für ein potenzielles Wachstum der Sensordaten ausgelegt. Die Betriebsstabilität von PostgreSQL ermöglicht zudem die geforderte hohe Verfügbarkeit in einer Docker-Umgebung [2].
+* Open-Source: PostgreSQL ist eine weit verbreitete Open-Source-Datenbank mit einer großen Community. Langfristige Unterstützung, regelmäßige Updates und eine Vielzahl von Ressourcen und Features für Entwickler werden so kostenlos ermöglicht.
+
+### TimescaleDB unter der Haube [1]
+Die TimescaleDB-Erweiterung steigert die Effizienz bei der Verarbeitung von zeitabhängigen Messreihen in PostgreSQL durch einen optimierten Mechanismus: Die automatische Partitionierung von Daten in sogenannte **Hypertables**.
+
+*Grundsätzlich gilt: Je länger die Laufzeit des Systems, desto mehr Messwerte werden erfasst und desto mehr lassen sich die Vorteile von TimescaleDB erkennen.*
+#### 1. Hypertables, Chunks:
+   * Anstatt alle Messwerte in einer einzigen, riesigen Tabelle zu speichern, wandelt TimescaleDB die Tabelle in eine sogenannte Hypertable um.
+   Diese Hypertable ist eine virtuelle Abstraktion, die im Hintergrund aus vielen kleineren, physischen Tabellen (= **Chunks**) besteht.
+   * **Automatische Partitionierung**: TimescaleDB teilt die Daten automatisch nach einem Zeitintervall in diese Chunks auf.
+   Beispielweise kann festlegt werden, dass für jede Woche ein neuer Chunk erstellt wird.
+   Alle Messwerte, die in dieser Woche anfallen, werden ausschließlich in diesen einen Chunk geschrieben.
+
+#### 2. (Mögliche) Effizienzgewinne:
+   * **Schnellere Abfragen (Query Performance)**: Wenn man eine Abfrage startet, die auf einen kurzen Zeitraum begrenzt ist (z.B. "Gib mir alle Temperaturwerte der letzten Minute"), muss PostgreSQL nicht die gesamte Tabelle durchsuchen.
+Stattdessen identifiziert TimescaleDB sofort, welcher Chunk (oder welche wenigen Chunks) die Daten für diesen Zeitraum enthält, und scannt nur diese sehr kleinen Tabellen.
+   * **Schnelleres Schreiben (Ingest Performance)**:
+   Neue Messwerte werden immer nur in den neuesten Chunk geschrieben. Da dieser Chunk relativ klein ist und oft vollständig im Arbeitsspeicher gehalten wird, bleibt der Schreibvorgang konstant schnell, selbst wenn das Gesamtvolumen der historischen Daten auf ssehr viele Einträge (z.B. Millionen) anwächst.
+   Ohne TimescaleDB würden die Indizes einer einzigen großen Tabelle mit der Zeit fragmentieren und Schreibvorgänge verlangsamen.
+   * **Datenverwaltung**:
+     * **Löschen**: Das Löschen alter Daten (z.B. "alle Messwerte älter als ein Jahr") wird effizienter, da durch die Chunks ganze Tabellen auf einmal mit (DROP TABLE) entfernt werden können, anstatt Zeile für Zeile zu löschen.
+     * **Komprimierung - Speicherbedarf**: TimescaleDB bietet auch eine eingebaute Komprimierung für ältere Chunks, die den Speicherbedarf weiter reduziert.
+     * **Komprimierung - Abfragegeschwindigkeit**: TimescaleDB kann auf die Daten im komprimierten Zustand wie in einem spaltenorientierten Format zugreifen. Anstatt eine ganze Zeile mit allen Datenfeldern (timestamp, value, unit etc.) lesen zu müssen (wie es bei klassicher seitenweiser Speicherung der Fall ist), kann die Datenbank gezielt nur die Spalten abrufen, die für die Abfrage benötigt werden – zum Beispiel nur den value.
+
+### Datenbank
+
+Die modellierte Datenbank sieht wie folgt aus:
+
+![](../../images/data_eva/erd.svg)
+
+Hierbei wurden die folgenden Konzepte wahrgenommen:
+
+- Jeder Nutzer hat Zugriff auf mehrere Lagerorte und jeder Lagerort kann von mehreren Nutzern zugegriffen werden.
+  Aus diesem Grund gibt es eine many-to-many Beziehung zwischen Nutzern und Lagerorten, bzw. zwischen der `User`
+  und der `Storage` Tabelle. Der Zugriff auf ein Lagerort erfolgt durch den eindeutigen Namen des Lagerorts und
+  des dazugehörigen Passworts.
+- Unterschiedliche Nutzer sollen adequate Rechte auf diesen haben können. Beispielsweise soll es Administratoren
+  und gewöhnliche Nutze geben. Daher existiert ein Feld `user_role` vom Typ `UserRole` in der Tabelle
+  `UserStorageAccess`. Dieser Datentyp ist lediglich ein ENUM.
+- Ein Lagerort soll mehrere Sensore haben, daher die many-to-one Beziehung zwischen den Tabellen `Sensor` und
+  `Storage`. Zusätzlich hat ein Sensor Grenzwerte, zwischen denen Messungen liegen sollten, um Schäden in den
+  Waren zu vermeiden, daher die Felder `allowed_min` und `allowed_max`.
+- Jeder Sensor nimmt daten auf. Daher wurde eine Tabelle `Measurement` eingeführt, die eine many-to-one Beziehung
+  zur Tabelle `Sensor` hat. Das Feld `unit` ist vom ENUM Typ `MeasurementUnit`, welches alle möglichen Einheiten
+  beinhaltet (z.B. `CELSIUS` und `FAHRENHEIT` für die Temperatur, `PERCENT` für die Luftfeuchtigkeit usw.). Dieser
+  Datentyp soll inkonsistenzen vermeiden, die es bei gewöhnlichem Text gibt (z.B. beziehen sich `Celsius` und `C`
+  auf die selbe Einheit). Das Feld `created_at` bezoeht sich auf den genauen Zeitpunkt der Messung der Daten.
+  Diese Tabelle soll eine Hypertable sein, um die Messungen möglichst effizient abrufen zu können.
+- Messungen, die die Grenzwerte des Sensors überschreiten, lösen ein Alarm aus, daher die Tabelle `Alarm`.
+  das Feld `severity` vom ENUM Typ `AlarmSeverity` beschreibt die Schwere des Alarms (`HIGH`, `MEDIUM`, `LOW`).
+  Das Feld `message` ist eine vom System generierte Nachricht, die den Alarm beschreibt und dem Nutzer angezeigt wird.
+---
+Quellen:
+
+- [1] [PostgreSQL + TimescaleDB: 1,000x Faster Queries, 90 % Data Compression, and Much More](https://www.tigerdata.com/blog/postgresql-timescaledb-1000x-faster-queries-90-data-compression-and-much-more)
+- [2] [Install TimescaleDB from a Docker container](https://docs.tigerdata.com/self-hosted/latest/install/installation-docker/)
+- [Storing IoT Data: 8 Reasons Why You Should Use PostgreSQL](https://www.tigerdata.com/blog/storing-iot-data-why-you-should-use-postgresql)
+- [The benefits of PostgreSQL](https://www.prisma.io/dataguide/postgresql/benefits-of-postgresql#robust-feature-set)
+- [PostgreSQL: a closer look at the object-relational database management system](https://www.ionos.com/digitalguide/server/know-how/postgresql/)

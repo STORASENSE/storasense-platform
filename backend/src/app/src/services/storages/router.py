@@ -25,7 +25,11 @@ from backend.src.app.src.services.storages.service import (
 router = APIRouter(prefix="/storages", tags=["Storages"])
 
 
-@router.get("/myStorages")
+@router.get(
+    "/myStorages",
+    status_code=status.HTTP_200_OK,
+    description="Gets a list of storages associated with the authenticated user.",
+)
 def get_my_storages(
     token_data: TokenData = Depends(auth_service.get_current_user),
     storage_service: StorageService = Depends(inject_storage_service),
@@ -43,19 +47,33 @@ def get_my_storages(
     ]
 
 
-@router.get("/byUserId/{user_id}")
+@router.get(
+    "/byUserId/{user_id}",
+    status_code=status.HTTP_200_OK,
+    description="Gets a list of storages associated with a specific user ID.",
+)
 def storages_by_user_id(
     user_id: UUID,
     storage_service: StorageService = Depends(inject_storage_service),
 ) -> list[StorageResponse]:
-    storages = storage_service.find_storages_by_user_id(user_id)
+    try:
+        storages = storage_service.find_storages_by_user_id(user_id)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=repr(e),
+        )
     return [
         StorageResponse(id=storage.id, name=storage.name)
         for storage in storages
     ]
 
 
-@router.post("")
+@router.post(
+    "",
+    status_code=status.HTTP_201_CREATED,
+    description="Creates a new storage associated with the authenticated user as admin.",
+)
 def create_storage(
     request: CreateStorageRequest,
     token_data: TokenData = Depends(auth_service.get_current_user),
@@ -79,7 +97,11 @@ def create_storage(
         )
 
 
-@router.delete("/{storage_id}")
+@router.delete(
+    "/{storage_id}",
+    status_code=status.HTTP_200_OK,
+    description="Deletes a storage by its ID.",
+)
 def delete_storage(
     storage_id: UUID,
     token_data: TokenData = Depends(auth_service.get_current_user),

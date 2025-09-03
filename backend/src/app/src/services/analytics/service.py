@@ -1,4 +1,5 @@
 from __future__ import annotations
+from uuid import UUID
 from sqlalchemy.orm import Session
 from fastapi import Depends
 
@@ -15,13 +16,16 @@ class AnalyticsService:
         self._session = session
         self._repo = repo
 
-    def summary(self, window: str):
-        return self._repo.get_sensor_summary(WINDOW_TO_INTERVAL[window])
+    def summary_by_storage(self, storage_id: UUID, window: str):
+        """
+        Get sensor summary by storage.
 
-    def summary_by_sensor(self, sensor_id, window):
-        sid = str(sensor_id)
-        items = self._repo.get_sensor_summary(WINDOW_TO_INTERVAL[window])
-        return [it for it in items if it.get("sensor_id") == sid]
+        :param storage_id: Storage ID for which to get the summary
+        :param window: Time window (e.g., '7d', '30d', '365d')
+        :return: Sensor summary data
+        """
+        interval = WINDOW_TO_INTERVAL[window]
+        return self._repo.get_sensor_summary_by_storage(storage_id, interval)
 
 
 def inject_analytics_service(

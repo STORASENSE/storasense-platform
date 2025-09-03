@@ -92,3 +92,85 @@ Backend .up.> MqttBroker : Sendet Alarme\n(MQTT Publish)
 
 @enduml
 ```
+
+
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+HIDE_STEREOTYPE()
+LAYOUT_LEFT_RIGHT()
+
+System_Boundary(storasense_bb, "STORASENSE (Blackbox)") {
+System(storasense_api, "Backend API (FastAPI)", "HTTP/REST")
+System(storasense_connect, "Kafka Connect", "Kafka Connect REST/Workers")
+System(storasense_mqtt_bridge, "MQTT Bridge/Consumer", "MQTT→Kafka Bridge")
+}
+
+' Externe Systeme
+System_Ext(mqtt_broker, "MQTT Broker", "MQTT")
+System_Ext(kafka_cluster, "Apache Kafka", "Broker/Topics")
+System_Ext(timescaledb, "PostgreSQL/TimescaleDB", "JDBC")
+System_Ext(email_push, "E-Mail/Push Provider", "SMTP/HTTPS (optional)")
+System_Ext(auth_provider, "Auth Provider (optional)", "OAuth2/JWT")
+System_Ext(SensorEdge, "Edge Sensoren", "MCU/WiFi")
+
+' Schnittstellen / Flüsse
+Rel(SensorEdge, mqtt_broker, "Messwerte (JSON)", "MQTT")
+Rel(mqtt_broker, storasense_mqtt_bridge, "Subscribe topics", "MQTT")
+Rel(storasense_mqtt_bridge, kafka_cluster, "Publish measurements/alarms", "Kafka Producer")
+Rel(storasense_api, kafka_cluster, "Produce/Consume (optional)", "Kafka Client")
+Rel(kafka_cluster, storasense_connect, "Consume/Produce", "Kafka Connect")
+Rel(storasense_connect, timescaledb, "Upsert Alarms/Measurements", "JDBC (PostgreSQL)")
+Rel(storasense_api, timescaledb, "CRUD/Queries", "SQL/ORM")
+Rel(auth_provider, storasense_api, "Token/OAuth2", "HTTP (optional)")
+Rel(storasense_api, email_push, "Alarm-Benachrichtigungen", "SMTP/HTTPS (optional)")
+
+' Layout-Hinweise
+Lay_Down(storasense_mqtt_bridge, kafka_cluster)
+Lay_Down(kafka_cluster, storasense_connect)
+Lay_Down(storasense_connect, timescaledb)
+
+@enduml
+
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+HIDE_STEREOTYPE()
+LAYOUT_LEFT_RIGHT()
+
+' Externer Client
+Person_Ext(react_app, "React Web App", "Browser-Frontend")
+
+System_Boundary(storasense_bb, "STORASENSE (Blackbox)") {
+System(storasense_api, "Backend API (FastAPI)", "HTTP/REST")
+System(kafka_cluster, "Apache Kafka", "Broker/Topics")
+System(storasense_connect, "Kafka Connect", "Sinks/Sources")
+System(storasense_mqtt_bridge, "MQTT Bridge/Consumer", "MQTT→Kafka Bridge")
+}
+
+' Externe Systeme
+System_Ext(mqtt_broker, "MQTT Broker", "MQTT")
+System_Ext(timescaledb, "PostgreSQL/TimescaleDB", "JDBC")
+System_Ext(email_push, "E-Mail/Push Provider", "SMTP/HTTPS (optional)")
+System_Ext(auth_provider, "Auth Provider (optional)", "OAuth2/JWT")
+System_Ext(SensorEdge, "Edge Sensoren", "MCU/WiFi")
+
+' Schnittstellen / Flüsse
+Rel(react_app, storasense_api, "UI-Aufrufe / Datenabruf", "HTTPS/JSON")
+
+Rel(SensorEdge, mqtt_broker, "Messwerte (JSON)", "MQTT")
+Rel(mqtt_broker, storasense_mqtt_bridge, "Subscribe topics", "MQTT")
+Rel(storasense_mqtt_bridge, kafka_cluster, "Publish measurements/alarms", "Kafka Producer")
+
+Rel(storasense_api, kafka_cluster, "Produce/Consume (optional)", "Kafka Client")
+Rel(kafka_cluster, storasense_connect, "Consume/Produce", "Kafka Connect")
+Rel(storasense_connect, timescaledb, "Upsert Alarms/Measurements", "JDBC (PostgreSQL)")
+Rel(storasense_api, timescaledb, "CRUD/Queries", "SQL/ORM")
+
+Rel(auth_provider, storasense_api, "Token/OAuth2", "HTTP (optional)")
+Rel(storasense_api, email_push, "Alarm-Benachrichtigungen", "SMTP/HTTPS (optional)")
+
+' Layout-Hinweise
+Lay_Down(storasense_mqtt_bridge, kafka_cluster)
+Lay_Down(kafka_cluster, storasense_connect)
+Lay_Down(storasense_connect, timescaledb)
+
+@enduml

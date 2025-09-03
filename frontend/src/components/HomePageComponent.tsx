@@ -17,7 +17,7 @@ function HomePageComponent() {
             return;
         }
         if (keycloak?.authenticated) {
-            router.replace("/dashboard");
+            router.replace("/dashboard/storages");
         }
     }, [keycloak, isLoading, isError]);
 
@@ -43,7 +43,7 @@ function HomePageComponent() {
     // Show login page if not authenticated
     if (!keycloak?.authenticated) {
         return(
-            <Button onClick={() => keycloak?.login()}>
+            <Button id="login-button" onClick={() => keycloak?.login()}>
                 Login
             </Button>
         );

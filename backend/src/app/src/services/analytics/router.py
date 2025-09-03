@@ -13,22 +13,23 @@ from backend.src.app.src.services.analytics.schemas import (
     SummaryItem,
 )
 
-router = APIRouter(tags=["analytics"])
+router = APIRouter(tags=["Analytics"])
 _logger = get_logger(__name__)
 
 
 @router.get(
-    "/analytics/bySensorId/${storage_id}`",  # /analytics/summaryBySensorId# url: `/analytics/bySensorId/${storage_id}`,
+    "/analytics/byStorageId/{storage_id}",
     response_model=List[SummaryItem],
     status_code=status.HTTP_200_OK,
+    description="Get analytics summary by storage ID",
 )
-def analytics_summary_by_sensor_id(
-    sensor_id: UUID,
+def analytics_summary_by_storage_id(
+    storage_id: UUID,
     window: Window = Query("7d"),
     analytics_service: AnalyticsService = Depends(inject_analytics_service),
 ):
     try:
-        return analytics_service.summary_by_sensor(sensor_id, window)
+        return analytics_service.summary_by_storage(storage_id, window)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)

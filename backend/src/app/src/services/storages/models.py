@@ -18,7 +18,7 @@ class StorageModel(BaseModel):
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
 
-    name: Mapped[str] = mapped_column(unique=True)
+    name: Mapped[str] = mapped_column(unique=False)
     description: Mapped[Optional[str]] = mapped_column()
 
     user_associations: Mapped[list["UserStorageAccessModel"]] = relationship(
@@ -30,5 +30,5 @@ class StorageModel(BaseModel):
     )
 
     sensors: Mapped[list["SensorModel"]] = relationship(
-        back_populates="storage"
+        back_populates="storage", cascade="all, delete-orphan"
     )

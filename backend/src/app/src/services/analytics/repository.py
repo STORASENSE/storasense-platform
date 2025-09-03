@@ -1,6 +1,7 @@
 from __future__ import annotations
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 from datetime import datetime, timedelta, timezone
+from uuid import UUID
 
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -15,9 +16,6 @@ class AnalyticsRepository:
 
     @staticmethod
     def _window_start(window_interval: str) -> datetime:
-        """
-        Map a human window string ('7 days' | '30 days' | '365 days') to a UTC start timestamp.
-        """
         days_map = {"7 days": 7, "30 days": 30, "365 days": 365}
         days = days_map.get(window_interval)
         if not days:
@@ -26,40 +24,12 @@ class AnalyticsRepository:
             )
         return datetime.now(timezone.utc) - timedelta(days=days)
 
-    @staticmethod
-    def _is_open(value: float, threshold: float, when: str) -> bool:
+    def get_sensor_summary_by_storage(
+        self, storage_id: UUID, window_interval: str
+    ) -> List[Dict[str, Any]]:
         """
-        Decide if the door is "open" for a measurement value using a threshold.
-        when='lt' -> open if value < threshold
-        when='gt' -> open if value > threshold
-        """
-        return value < threshold if when == "lt" else value > threshold
-
-    def get_ultrasonic_sensor_id(self) -> Optional[str]:
-        row = (
-            self._session.query(SensorModel.id)
-            .filter(SensorModel.type == "ULTRASONIC")
-            .order_by(SensorModel.name.asc())
-            .limit(1)
-            .first()
-        )
-        if row:
-            return str(row[0])
-
-        row = (
-            self._session.query(SensorModel.id)
-            .filter(func.lower(SensorModel.name).like("ultrasonic%"))
-            .order_by(SensorModel.name.asc())
-            .limit(1)
-            .first()
-        )
-        return str(row[0]) if row else None
-
-    def get_sensor_summary(self, window_interval: str) -> List[Dict[str, Any]]:
-        """
-        Per-sensor MIN/AVG/MAX for the given window.
-        Shape matches the frontend:
-        [{ type: str, sensor_id: str, avg_value: float, min_value: float, max_value: float }]
+        Aggregates MIN/AVG/MAX per sensor for a given storage + time window.
+        Shape: [{ type, sensor_id, avg_value, min_value, max_value }]
         """
         start_ts = self._window_start(window_interval)
 
@@ -72,27 +42,26 @@ class AnalyticsRepository:
                 func.max(MeasurementModel.value).label("max_value"),
             )
             .join(SensorModel, SensorModel.id == MeasurementModel.sensor_id)
-            .filter(MeasurementModel.created_at >= start_ts)
+            .filter(SensorModel.storage_id == storage_id)
+            .filter(MeasurementModel.timestamp >= start_ts)
             .group_by(SensorModel.type, MeasurementModel.sensor_id)
             .order_by(SensorModel.type.asc(), MeasurementModel.sensor_id.asc())
             .all()
         )
 
-        out: List[Dict[str, Any]] = []
-        for r in rows:
-            out.append(
-                {
-                    "type": r.type,
-                    "sensor_id": str(r.sensor_id),
-                    "avg_value": (
-                        float(r.avg_value) if r.avg_value is not None else 0.0
-                    ),
-                    "min_value": (
-                        float(r.min_value) if r.min_value is not None else 0.0
-                    ),
-                    "max_value": (
-                        float(r.max_value) if r.max_value is not None else 0.0
-                    ),
-                }
-            )
-        return out
+        return [
+            {
+                "type": r.type,
+                "sensor_id": str(r.sensor_id),
+                "avg_value": (
+                    float(r.avg_value) if r.avg_value is not None else 0.0
+                ),
+                "min_value": (
+                    float(r.min_value) if r.min_value is not None else 0.0
+                ),
+                "max_value": (
+                    float(r.max_value) if r.max_value is not None else 0.0
+                ),
+            }
+            for r in rows
+        ]
