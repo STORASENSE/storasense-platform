@@ -18,6 +18,32 @@ _access_token = None
 _token_expires_at = 0
 
 
+def post_data(token, row):
+    timestamp = datetime.fromtimestamp(row[1]).isoformat()
+    sensor_id = row[2]
+    value = row[3]
+    unit = row[4]
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
+    }
+    backend_url = os.getenv("MQTT_BACKEND_URL")
+    if not backend_url:
+        _logger.error("MQTT_BACKEND_URL environment variable not set")
+        return
+    response = requests.post(
+        f"{backend_url}/{sensor_id}",
+        headers=headers,
+        json={
+            "value": math.floor(value),
+            "created_at": timestamp + "Z",
+            "unit": unit,
+        },
+    )
+
+    return response
+
+
 def get_keycloak_config():
     keycloak_url = os.getenv("MQTT_KEYCLOAK_URL")
     realm_name = os.getenv("KEYCLOAK_REALM")
@@ -107,70 +133,64 @@ def get_valid_token():
     return _access_token
 
 
+def parse_response(row_id, response):
+    response_code = response.status_code
+    expected_code = os.getenv("MQTT_HTTP_RESPONSE_OK", "200")
+    if response_code == int(expected_code) or response_code == 400:
+        connection = get_db_connection()
+        with connection:
+            connection.execute(
+                "DELETE FROM sensor_data WHERE message_id = ?",
+                (row_id,),
+            )
+        if response_code == int(expected_code):
+            _logger.info(f"Successfully sent row id {row_id}")
+        elif response_code == 400:
+            _logger.error(
+                f"Bad request when sending row id {row_id} with error {response.text}, deleting from DB"
+            )
+    else:
+        _logger.error(
+            f"Failed to send row_id {row_id}, response body {response.text}"
+        )
+    return response_code
+
+
 def send_one_value():
     token = get_valid_token()
     if not token:
         _logger.warning(
             "Token was not received. Returning without sending data."
         )
-        return
-
+        return -1
+    # get one row from the database
     connection = get_db_connection()
     with connection:
         row = connection.execute(
             """select message_id, timestamp, sensor_id, value, unit
                from sensor_data limit 1"""
         ).fetchone()
-        if row:
-            row_id = row[0]
-            timestamp = datetime.fromtimestamp(row[1]).isoformat()
-            sensor_id = row[2]
-            value = row[3]
-            unit = row[4]
-            try:
-                headers = {
-                    "Authorization": f"Bearer {token}",
-                    "Content-Type": "application/json",
-                }
-                backend_url = os.getenv("MQTT_BACKEND_URL")
-                if not backend_url:
-                    _logger.error(
-                        "MQTT_BACKEND_URL environment variable not set"
-                    )
-                    return
-                response_code = requests.post(
-                    f"{backend_url}/{sensor_id}",
-                    headers=headers,
-                    json={
-                        "value": math.floor(value),
-                        "created_at": timestamp + "Z",
-                        "unit": unit,
-                    },
-                ).status_code
+    if row:
+        try:
+            # post the data to the backend
+            response = post_data(token, row)
+        except Exception as e:
+            _logger.error(f"Error posting data: {e}")
+            return -1
+        row_id = row[0]
+        return parse_response(row_id, response)
 
-            except requests.exceptions.RequestException:
-                response_code = 404
-
-            expected_code = os.getenv("MQTT_HTTP_RESPONSE_OK", "200")
-            if response_code == int(expected_code) or 400:
-                connection = get_db_connection()
-                with connection:
-                    connection.execute(
-                        "DELETE FROM sensor_data WHERE message_id = ?",
-                        (row_id,),
-                    )
-                if response_code == int(expected_code):
-                    _logger.info(f"Successfully sent {value}")
-                elif response_code == 400:
-                    _logger.error(
-                        f"Bad request when sending value {value}, deleting from DB"
-                    )
+    return 0
 
 
 def start_rest_client(stop_event):
     while not stop_event.is_set():
         try:
-            send_one_value()
-            time.sleep(5)  # Wait for 5 seconds before retrying
+            response_code = send_one_value()
+            if (
+                response_code != int(os.getenv("MQTT_HTTP_RESPONSE_OK"))
+                and response_code != 400
+            ):
+                time.sleep(5)  # Wait for 5 seconds before retrying
         except Exception as e:
             _logger.error(e)

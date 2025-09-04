@@ -55,9 +55,12 @@ def get_my_storages(
 def storages_by_user_id(
     user_id: UUID,
     storage_service: StorageService = Depends(inject_storage_service),
+    token_data: TokenData = Depends(auth_service.get_current_user),
 ) -> list[StorageResponse]:
     try:
-        storages = storage_service.find_storages_by_user_id(user_id)
+        storages = storage_service.find_storages_by_user_id(
+            user_id, token_data
+        )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
