@@ -2,6 +2,406 @@
 
 <!-- version list -->
 
+## v1.3.0 (2025-09-04)
+
+### Bug Fixes
+
+- Added toast for when storage deletion fails
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Bug fixes ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Edited info within readme ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- End-of-file problems ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Fixed alarm ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Fixed alarm-card ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Fixed analytics ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Fixed analytics page ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Fixed api endpoint for fetching measurements
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Fixed authentication bugs ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Fixed authentication issues ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Fixed deployment ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Fixed deserialization errors when reading measurements
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Fixed dev-seeding ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Fixed docker-compose ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Fixed docker-composes ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Fixed frontend build ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Fixed imports ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Fixed issues with storage overview
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Fixed measurement unit enum in alarm service
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Fixed mqtt-connect ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Fixed sensor-issue ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Fixed things ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Fixed weird bug in analytics ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Mqtt-client auth ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Overview page now polls correctly
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Quick UI-sidebar fix ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Refactored kafka-mqtt-client ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Refactored mqtt-client auth process
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Refactored rest sender for mqtt ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Refactored user_storage_access usages
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Removed alarm severity ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Removed duplicate lockfile ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Removed open-door-hours per day ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Replaced headless ui with shadcn
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Secured docker-setup ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Text slightly modified ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Unified alarm models in backend and alarm service
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Updated ESLint rules ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+### Documentation
+
+- Added docs ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Added docu ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Added documentation ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Added documentation for alarm ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Extended readme for deployment-workflow
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Refactored docs ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+### Features
+
+- Add resillience ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Add storages-page ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Added alarm-service-be ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Added analytics page ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Added analytics page with Data ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Added API methods for retrieving storages and sensors
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Added auth ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Added auth for endpoints ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Added backup-strategy ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Added docker-publish-workflow ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Added frontend availability tests
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Added frontend-auth and made design-changes
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Added offline-icon ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Added poetry.lock ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Added router-tags ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Added sensors-page ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Added service-docu ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Added storage creation page ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Added storages page ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Added subscription to all topics
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Added tests ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Added users page ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Alarm service now logs deserialization errors
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Alarms now streamed with their JSON schema
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Configured app-scaling ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Docker setup ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Documented all endpoints ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Established dual db setup within timescaledb
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Established volume-backup-strategy
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Extended readme for deployment-workflow
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Finished integration tests ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Finished testing ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Ignore Alarm Topic ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Initial storages overview feature
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Integrated frontend-docker-container
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Intial kafka-setup ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Introduced authentication with keycloack
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Merged dev ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Merged unit-tests ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Mqtt client now deletes false messages
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Refacoted welcome-msg ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Refactored .env.example ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Refactored .justfile ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Refactored auth using keycloack ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Refactored service ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Refactored welcome-page ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Secured traefik ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Set up initial Kafka Streams application
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Storage admin can now add other users
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Storage admin can now remove other non-admin users
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Storage can now me selected in sensor creation dialog
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Storages can now be deleted ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Storages can now be managed across the whole application
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- UI now displays an overview of all sensors in a storage
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Uniformed icons ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Updated alarms icon in sidebar ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Updated color palette ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Updated home page ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Updated links in sidebar ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+### Refactoring
+
+- Added component for requiring active storage
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Created separate service for UserStorageAccess
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Minor code style refactoring ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Moved components into appropriate directories
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Put health check card into separate component
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Refactored .env.example ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Refactored .justfile ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Refactored wrapper for required authentication
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Removed redundant code ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Replace raw SQL with SQLAlchemy ORM
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Sensors page now uses ActiveStorageRequired
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Solved merge conflicts ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+- Split analytics page into separate components
+  ([#63](https://github.com/STORASENSE/storasense-platform/pull/63),
+  [`280238d`](https://github.com/STORASENSE/storasense-platform/commit/280238d2aa6efb4a723ccfd07d5908a24dd0519d))
+
+
 ## v1.2.0 (2025-08-09)
 
 ### Bug Fixes
