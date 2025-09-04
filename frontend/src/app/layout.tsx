@@ -3,6 +3,7 @@ import {FC, ReactNode} from "react";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Providers from "@/components/Providers";
+import {Toaster} from "@/components/ui/sonner";
 
 
 // fonts
@@ -30,6 +31,7 @@ const RootLayout: FC<{ children: ReactNode }> = ({ children }) => {
         <html lang="en">
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased box-border`}>
                 <Providers>
+                    <Toaster />
                     {children}
                 </Providers>
             </body>

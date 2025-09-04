@@ -18,7 +18,7 @@ interface AlarmCardProps {
     key?: unknown
 }
 
-const AlarmCard: FC<AlarmCardProps> = ({alarm, onDelete, key}) => {
+const AlarmCard: FC<AlarmCardProps> = ({alarm, onDelete}) => {
     const handleDelete = () => {
         if (onDelete && window.confirm("Do you really want to delete the alarm?")) {
             onDelete(alarm.id);

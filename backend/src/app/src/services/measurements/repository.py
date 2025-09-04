@@ -55,7 +55,7 @@ class MeasurementRepository(BaseRepository[MeasurementModel, UUID]):
             self.session.query(MeasurementModel)
             .filter(MeasurementModel.sensor_id == sensor_id)
             .filter(MeasurementModel.timestamp >= max_date)
-            .order_by(MeasurementModel.timestamp.desc())
+            .order_by(MeasurementModel.timestamp.asc())
         )
         return query.all()
 

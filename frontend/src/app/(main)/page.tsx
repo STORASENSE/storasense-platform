@@ -7,8 +7,9 @@ import Image from "next/image";
 const HomePage: FC = () => {
     return (
         <div className="min-h-screen flex items-center justify-center">
-            <div className="flex items-center gap-16">
-                <div className="flex items-center gap-8">
+            <div className="flex flex-col items-center gap-16">
+
+                <header className="flex items-center gap-8">
                     <Image
                         src="/logo-animated.gif"
                         alt="StoraSense Logo Animation"
@@ -23,11 +24,11 @@ const HomePage: FC = () => {
                         </h1>
                         <p className="text-gray-500">Welcome to your storage guardian!</p>
                     </div>
-                </div>
-                <div className="h-32 w-px bg-gray-300"></div>
+                </header>
                 <div>
                     <HomePageComponent />
                 </div>
+
             </div>
         </div>
     );
