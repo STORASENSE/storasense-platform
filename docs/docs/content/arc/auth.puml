@@ -1,0 +1,80 @@
+@startuml
+
+title OIDC Authorization Code Flow (Keycloak) – Nutzer
+
+skinparam shadowing true
+skinparam participant {
+BackgroundColor #E3F2FD
+BorderColor #1976D2
+}
+skinparam actor {
+BackgroundColor #F5F7FA
+BorderColor #4A90E2
+}
+skinparam note {
+BackgroundColor #FFFDE7
+BorderColor #FBC02D
+}
+
+actor User as user
+participant "React Web App\n(Browser)" as spa
+participant "Backend API\n(FastAPI)" as api
+participant "Keycloak\n(OIDC Provider)" as kc
+
+== Zugriff anfordern ==
+user -> spa: Öffnet UI (geschützte Seite)
+spa -> api: GET /protected\n(kein/abgelaufener Token)
+api -> spa: 401 Unauthorized\n(WWW-Authenticate: redirect-to-OIDC)
+
+== Redirect zum Login ==
+spa -> kc: GET /auth?response_type=code\n&client_id=frontend\n&redirect_uri=https://storasense.de/callback\n&scope=openid profile email
+kc -> user: Login-Formular (Username/Passwort)
+user -> kc: Credentials eingeben
+kc -> kc: Authentifizierung
+kc -> spa: 302 Redirect\nhttps://storasense.de/callback?code=AUTH_CODE
+
+== Code gegen Tokens tauschen ==
+spa -> kc: POST /token\n(grant_type=authorization_code,\ncode=AUTH_CODE,\nclient_id=frontend,\nclient_secret=...)
+kc --> spa: id_token + access_token + refresh_token
+
+== Zugriff auf API mit Token ==
+spa -> api: GET /protected\nAuthorization: Bearer access_token
+api -> kc: Introspect/JWKS Cache\n(Signatur/Claims prüfen)
+kc --> api: Keys/Introspection ok
+api --> spa: 200 OK (geschützte Daten)
+@enduml
+
+Client Credentials Flow (Technischer Client)
+@startuml
+title OAuth2 Client Credentials Flow (Keycloak) – Technischer Client (z.B. MQTT-Client)
+
+skinparam shadowing true
+skinparam participant {
+BackgroundColor #E3F2FD
+BorderColor #1976D2
+}
+skinparam actor {
+BackgroundColor #F5F7FA
+BorderColor #4A90E2
+}
+skinparam note {
+BackgroundColor #FFFDE7
+BorderColor #FBC02D
+}
+
+actor "Technischer Client\n(z.B. MQTT-Client)" as svc
+participant "Backend API\n(FastAPI)" as api
+participant "Keycloak\n(OIDC Provider)" as kc
+
+== Token anfordern ==
+svc -> kc: POST /token\ngrant_type=client_credentials\nclient_id=mqtt-client\nclient_secret=...
+kc --> svc: access_token
+
+== Ressourcenzugriff ==
+svc -> api: POST /measurements\nAuthorization: Bearer access_token
+api -> kc:  Introspect/JWKS\n(Signatur/Issuer/Audience prüfen)
+kc --> api: OK
+api --> svc: 200 OK / Ergebnis
+
+
+@enduml

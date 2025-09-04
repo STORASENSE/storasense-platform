@@ -36,7 +36,8 @@ export const KeycloakProvider: React.FC<KeycloakProviderProps> = ({ children }) 
                         console.log("Token refreshed successfully.");
                         dispatch(setToken(keycloak.token));
                     } else {
-                        console.warn('Token could not be refreshed, session may have expired.');
+                        console.warn('Token could not be refreshed, session may have expired.')
+                        dispatch(setToken(undefined));
                     }
                     }).catch(() => {
                     console.error('Failed to refresh token.');
