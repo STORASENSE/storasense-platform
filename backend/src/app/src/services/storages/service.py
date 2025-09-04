@@ -45,7 +45,9 @@ class StorageService:
         self.user_repository = user_repository
         self.user_storage_access_repository = user_storage_access_repository
 
-    def find_storages_by_user_id(self, user_id: UUID) -> list[StorageModel]:
+    def find_storages_by_user_id(
+        self, user_id: UUID, token_data: TokenData
+    ) -> list[StorageModel]:
         """
         Find all storages that belong to a specific user.
         Condition: The user must be either an admin or a contributor of the storage.
@@ -53,6 +55,11 @@ class StorageService:
         :param user_id: The ID of the user whose storages are to be retrieved.
         :return: A list of StorageModel instances associated with the user.
         """
+        user = self.user_repository.find_by_keycloak_id(token_data.id)
+        if user is None:
+            raise UnknownAuthPrincipalError(
+                "Requesting authentication principal does not exist"
+            )
         return self.storage_repository.find_all_by_user_id(user_id)
 
     def find_my_storages(self, token_data: TokenData) -> list[StorageModel]:

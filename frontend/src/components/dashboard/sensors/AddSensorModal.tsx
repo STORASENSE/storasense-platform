@@ -54,7 +54,7 @@ const AddSensorModal: FC<AddSensorModalProps> = ({ isOpen, onClose }) => {
 
     //////////////////////////////////////////////////////////////////////////////////////
 
-    const { data: storages, isLoading: isStoragesLoading, isError: isStoragesError, error: storagesError } = useGetMyStoragesQuery();
+    const { data: storages, isLoading: isStoragesLoading } = useGetMyStoragesQuery();
     const [selectedStorage, setSelectedStorage] = useState<StoraSenseStorge | undefined>(undefined);
 
     function handleStorageSelected(storageJson: string) {

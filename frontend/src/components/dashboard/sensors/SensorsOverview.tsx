@@ -10,7 +10,7 @@ import {
     useDeleteSensorMutation,
     useGetSensorStatusQuery
 } from "@/redux/api/storaSenseApi";
-import {AddSensorRequest, DeleteSensorRequest, Sensor, SensorType} from "@/redux/api/storaSenseApiSchemas";
+import {DeleteSensorRequest, Sensor} from "@/redux/api/storaSenseApiSchemas";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 

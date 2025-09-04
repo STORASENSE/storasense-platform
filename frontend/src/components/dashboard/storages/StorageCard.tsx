@@ -9,6 +9,7 @@ import {setActiveStorage} from "@/redux/slices/storageSlice";
 import { Button } from "@/components/ui/button";
 import { FaTrash as TrashIcon, FaBuilding as StorageIcon } from "react-icons/fa6";
 import { useDeleteStorageMutation } from "@/redux/api/storaSenseApi";
+import {toast} from "sonner";
 
 
 interface StorageCardProps {
@@ -49,12 +50,19 @@ const StorageCard: FC<StorageCardProps> = ({ storage }) => {
                     case 404:
                         message = 'Error: storage does not exist';
                         break;
-                    case 409:
+                    case 401:
                         message = 'Error: only admins can delete storages';
                         break;
                 }
             }
             console.error(message, error);
+            toast("Error while deleting storage.", {
+                description: message,
+                action: {
+                    label: "Dismiss",
+                    onClick: () => {}
+                }
+            });
         });
     }
 

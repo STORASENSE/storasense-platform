@@ -10,13 +10,17 @@ import {RootState} from "@/redux/store";
 
 
 interface AuthenticationRequiredProps {
+    noMessage?: boolean;
     children: ReactNode;
 }
 
-const AuthenticationRequired: FC<AuthenticationRequiredProps> = ({ children }) => {
+const AuthenticationRequired: FC<AuthenticationRequiredProps> = ({ noMessage, children }) => {
     const token = useSelector((state: RootState) => state.auth.token);
     const { keycloak, isLoading, isError } = useKeycloak();
     if (!token || isLoading || isError || !keycloak?.authenticated) {
+        if (noMessage) {
+            return <></>;
+        }
         return (
             <header className="mt-5 flex flex-col items-center">
                 <h1 className="flex items-center gap-2 text-blue-whale text-xl font-semibold">

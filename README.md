@@ -115,6 +115,9 @@ or
 ```bash
     just reset-db # if you have installed the `just` command line tool.
 ```
+### Run Tests
+-
+- Integration tests```docker-compose --profile integration-tests up --abort-on-container-exit --exit-code-from integration-tests```
 
 ---
 
@@ -125,14 +128,14 @@ or
 - Verify `.env` configuration (root directory) - checkout `.env.example` for reference.
 ### 3. Docker Configuration
 - Ensure Docker is installed and running on your system.
-- Make the db-init script executable:
+- Unix User - Make the db-init script executable:
 ```bash
-chmod +x ./db-scripts/db-scripts.sh
+chmod +x ./db-scripts/db-init.sh
 ```
 - Build the Docker-Compose Setup: `docker-compose up -d --build`
 ### 4. Kafka Setup
 - Add Kafka-Connector resources (.jsons) to ./Kafka/connectors -> see [here](./kafka/README.md) for more information.
-- Make the kafka scripts executable:
+- Unix User - Make the kafka scripts executable:
 ```bash
 chmod +x ./kafka/scripts -r
 ```
@@ -173,6 +176,19 @@ chmod +x ./kafka/scripts -r
   * Configure optionally identity providers (e.g., Google, GitHub).
   * Make sure that the **User profile attributes** (go to `Realm settings` -> `User profile`) match with our database schema (except the intern managed attributes - such as the ids).
   * Remove the temporary admin user from the `docker-compose.yml` file after the initial setup is completed.
+
+---
+## Utilities:
+- Install just (command line tool for running predefined commands) and use the pre-defined commands in the `justfile`
+
+- Reset the database (especially when switching from PROD <=> DEV):
+```bash
+just reset-db
+```
+or
+```bash
+docker compose exec timescaledb /docker-entrypoint-initdb.d/reset-app-db.sh
+```
 ---
 ## Accessing the system:
 | URL Type                                   | URL                                                                                                                             |
@@ -181,6 +197,3 @@ chmod +x ./kafka/scripts -r
 | Backend-API Documentation <br> (SwaggerUI) | [https://api.storasense.de/docs](https://api.storasense.de/docs)                                                                |
 | Keycloak-Configuration / Admin-Console     | [https://auth.storasense.de](https://auth.storasense.de) / [https://auth.storasense.de/admin](https://auth.storasense.de/admin) |
 | Traefik Dashboard                           | [https://traefik.storasense.de](https://traefik.storasense.de)                                                                  |
-
-## Run Tests
-- Integration tests```docker-compose --profile integration-tests up --abort-on-container-exit --exit-code-from integration-tests```

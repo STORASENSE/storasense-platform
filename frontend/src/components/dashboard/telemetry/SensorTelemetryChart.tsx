@@ -39,9 +39,9 @@ const SensorTelemetryChart: FC<SensorTelemetryChartProps> = (props) => {
                     minTickGap={32}
                     tickFormatter={(dateStr: string) => {
                         const date = new Date(dateStr);
-                        return date.toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
+                        return date.toLocaleTimeString("en-GB", {
+                            hour: "numeric",
+                            minute: "numeric"
                         });
                     }}
                 />

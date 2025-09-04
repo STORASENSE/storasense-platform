@@ -245,14 +245,17 @@ class SensorService:
 
         # Important: Commit only after Kafka message is sent successfully and database operation is successful
         try:
-            self._sensor_repository.create(sensor)
             producer.produce(
                 "sensor_values",
                 key=sensorID.encode("utf-8"),
                 value=json.dumps(sensor_data).encode("utf-8"),
             )
             producer.flush()
+
+            # if Kafka was successful, create the sensor in the database
+            self._sensor_repository.create(sensor)
             self._session.commit()
+
         except Exception:
             self._session.rollback()
             raise RuntimeError("Failed to create sensor")
@@ -294,6 +297,8 @@ class SensorService:
         Only used when system is started after shutdown to initialize the alarm system with all sensors.
         """
         KAFKA_HOST = os.getenv("KAFKA_HOST")
+        if not KAFKA_HOST:
+            raise ValueError("KAFKA_HOST environment variable is not set.")
         producer = Producer(
             {"bootstrap.servers": KAFKA_HOST, "partitioner": "murmur2"}
         )
