@@ -127,7 +127,7 @@ or
 - Ensure Docker is installed and running on your system.
 - Make the db-init script executable:
 ```bash
-chmod +x ./db-scripts/db-scripts.sh
+chmod +x ./db-scripts/db-init.sh
 ```
 - Build the Docker-Compose Setup: `docker-compose up -d --build`
 ### 4. Kafka Setup

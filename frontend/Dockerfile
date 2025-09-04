@@ -26,7 +26,6 @@ COPY --from=builder ./frontend/public ./public
 COPY --from=builder ./frontend/.next/standalone ./
 COPY --from=builder ./frontend/.next/static ./.next/static
 
-USER nextjs
 
 EXPOSE 3000
 ENV PORT=3000
