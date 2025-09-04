@@ -11,7 +11,7 @@ from backend.src.app.src.shared.database.pagination import (
     Page,
     paginate,
 )
-from backend.src.app.src.shared.repositories.base_repository import (
+from backend.src.app.src.shared.database.base_repository import (
     BaseRepository,
 )
 
@@ -26,6 +26,16 @@ class SensorRepository(BaseRepository[SensorModel, UUID]):
     def find_all(self, page_request: PageRequest) -> Page[SensorModel]:
         query = self.session.query(SensorModel).order_by(SensorModel.name)
         return paginate(query, page_request)
+
+    def find_all_unpaginated(self) -> list[SensorModel]:
+        return self.session.query(SensorModel).order_by(SensorModel.name).all()
+
+    def find_all_by_storage_id(self, storage_id: UUID) -> list[SensorModel]:
+        return (
+            self.session.query(SensorModel)
+            .where(SensorModel.storage_id == storage_id)
+            .all()
+        )
 
 
 def inject_sensor_repository(session: Session = Depends(open_session)):

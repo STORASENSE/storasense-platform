@@ -1,27 +1,34 @@
 from typing import TYPE_CHECKING, Optional
+from uuid import UUID, uuid4
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.src.app.src.shared.database.base_model import BaseModel
-from backend.src.app.src.shared.database.join_tables.user_storage import (
-    user_storage_access,
-)
 
 if TYPE_CHECKING:
     from backend.src.app.src.services.sensors.models import SensorModel
     from backend.src.app.src.services.users.models import UserModel
+    from backend.src.app.src.services.user_storage_access.models import (
+        UserStorageAccessModel,
+    )
 
 
 class StorageModel(BaseModel):
     __tablename__ = "Storage"
 
-    name: Mapped[str] = mapped_column(unique=True)
-    password_hash: Mapped[str] = mapped_column()
-    password_salt: Mapped[str] = mapped_column()
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+
+    name: Mapped[str] = mapped_column(unique=False)
     description: Mapped[Optional[str]] = mapped_column()
-    accessing_users: Mapped[list["UserModel"]] = relationship(
-        secondary=user_storage_access, back_populates="accessed_storages"
+
+    user_associations: Mapped[list["UserStorageAccessModel"]] = relationship(
+        back_populates="storage", cascade="all, delete-orphan"
     )
+    accessing_users: Mapped[list["UserModel"]] = relationship(
+        secondary="UserStorageAccess",
+        back_populates="accessed_storages",
+    )
+
     sensors: Mapped[list["SensorModel"]] = relationship(
-        back_populates="storage"
+        back_populates="storage", cascade="all, delete-orphan"
     )

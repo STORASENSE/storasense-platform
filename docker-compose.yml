@@ -1,56 +1,327 @@
 services:
-  app:
-    build:
-        context: .
-        dockerfile: ./backend/src/app/Dockerfile
-    env_file:
-      - .env
-    restart: always
+
+  traefik:
+    image: "traefik:v3.5"
+    container_name: "traefik"
+    restart: unless-stopped
+    command:
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
     ports:
-      - "8000:8000"
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
     networks:
       - storasense-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.storasense.de`)"
+      - "traefik.http.routers.dashboard.tls=true"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.middlewares=dashboard-auth"
+      - "traefik.http.middlewares.dashboard-auth.basicauth.users=${TRAEFIK_HASHED}"
+      # Global Middleware for HTTPS redirection
+      - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.https-redirect.redirectscheme.permanent=true"
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak
+    restart: always
+    healthcheck:
+      test: ['CMD-SHELL', '[ -f /tmp/HealthCheck.java ] || echo "public class HealthCheck { public static void main(String[] args) throws java.lang.Throwable { System.exit(java.net.HttpURLConnection.HTTP_OK == ((java.net.HttpURLConnection)new java.net.URL(args[0]).openConnection()).getResponseCode() ? 0 : 1); } }" > /tmp/HealthCheck.java && java /tmp/HealthCheck.java http://localhost:9000/health/live']
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    environment:
+      - KC_DB=postgres
+      - KC_DB_URL_HOST=${POSTGRES_HOST} # Use timescaledb as the database
+      - KC_DB_URL_DATABASE=${POSTGRES_KC_DB_NAME}
+      - KC_DB_USERNAME=${POSTGRES_KC_DB_USER}
+      - KC_DB_PASSWORD=${POSTGRES_KC_DB_PASSWORD}
+      - KC_HTTP_ENABLED=true
+      - KC_HOSTNAME=auth.storasense.de
+      - KC_PROXY=edge
+      - KC_PROXY_HEADERS=xforwarded
+      - KC_CACHE=local
+      - KC_HEALTH_ENABLED=true
+    command: start
+    networks:
+      storasense-network:
+        aliases:
+          - auth.storasense.de # use url auth.storasense.de for internal communication
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.keycloak-http.rule=Host(`auth.storasense.de`)"
+      - "traefik.http.routers.keycloak-http.entrypoints=web"
+      - "traefik.http.routers.keycloak-http.middlewares=https-redirect@docker"
+
+      - "traefik.http.routers.keycloak-https.rule=Host(`auth.storasense.de`)"
+      - "traefik.http.routers.keycloak-https.entrypoints=websecure"
+      - "traefik.http.routers.keycloak-https.tls=true"
+      - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
+
+      - "traefik.http.routers.keycloak-https.middlewares=secure-headers"
+      - "traefik.http.middlewares.secure-headers.headers.contenttypenosniff=true"
+      - "traefik.http.middlewares.secure-headers.headers.browserxssfilter=true"
     depends_on:
-      - timescaledb
-
-  mqtt-client:
-    build:
-        context: .
-        dockerfile: ./backend/src/mqtt_client/Dockerfile
-    restart: always
-    env_file:
-      - .env
-    networks:
-        - storasense-network
-
-  frontend:
-    build:
-      context: .
-      dockerfile: ./frontend/Dockerfile
-    restart: always
-    ports:
-      - "3000:3000"
-    networks:
-      - storasense-network
+      timescaledb:
+        condition: service_healthy
 
   timescaledb:
     image: timescale/timescaledb:latest-pg15
     container_name: timescaledb
     restart: always
     environment:
+      - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
-    ports:
-      - "5432:5432"
+      - POSTGRES_KC_DB_NAME=${POSTGRES_KC_DB_NAME}
+      - POSTGRES_KC_DB_USER=${POSTGRES_KC_DB_USER}
+      - POSTGRES_KC_DB_PASSWORD=${POSTGRES_KC_DB_PASSWORD}
     volumes:
       - storasense_data_volume:/var/lib/postgresql/data
+      - ./db-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - storasense-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backup:
+    image: offen/docker-volume-backup
+    container_name: storasense-backup
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - storasense_data_volume:/volume/storasense_data_volume:ro # Mount the data volume to back-up
+      - ./storasense_data_volume_backup:/backup # Location to store backups (here: local directory)
+      - storasense_data_kafka_volume:/volume/storasense_data_kafka_volume:ro # Mount the data volume to back-up
+      - ./storasense_data_kafka_volume_backup:/backup # Location to store backups (here: local directory)
+    networks:
+      - storasense-network
+    environment:
+      - "BACKUP_CRON_EXPRESSION=0 3 * * *" # Every day at 3 AM
+      - "BACKUP_SOURCES=/volume/storasense_data_volume" # Source to back-up
+      - "BACKUP_FILENAME=storasense_db_backup-%Y-%m-%d_%H-%M-%S.tar.gz"
+      - "BACKUP_PRUNE_AFTER_DAYS=7" # Delete backups older than 7 days
+      - "BACKUP_TARGET=file:///backup" # Backup destination (here: local directory)
+    depends_on:
+      - frontend # Start after the whole system is up
+
+  app:
+    #image: ghcr.io/storasense/storasense-platform/storasense-backend-app:latest
+    build:
+        context: .
+        dockerfile: ./backend/src/app/Dockerfile
+    env_file: .env
+    restart: always
+    networks:
+      - storasense-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.app-http.rule=Host(`api.storasense.de`)"
+      - "traefik.http.routers.app-http.entrypoints=web"
+      - "traefik.http.routers.app-http.middlewares=https-redirect@docker"
+
+      - "traefik.http.routers.app-https.rule=Host(`api.storasense.de`)"
+      - "traefik.http.routers.app-https.entrypoints=websecure"
+      - "traefik.http.routers.app-https.tls=true"
+      - "traefik.http.services.app.loadbalancer.server.port=8000"
+
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+      alarmservice:
+        condition: service_started
+
+  mqtt-client:
+    #image: ghcr.io/storasense/storasense-platform/storasense-backend-mqtt-client:latest
+    build:
+        context: .
+        dockerfile: ./backend/src/mqtt_client/Dockerfile
+    env_file: .env
+    restart: on-failure
+    networks:
+      - storasense-network
+    depends_on:
+      - app
+
+  frontend:
+    #image: ghcr.io/storasense/storasense-platform/storasense-frontend:latest
+    build:
+        context: .
+        dockerfile: ./frontend/Dockerfile
+    restart: always
+    networks:
+      - storasense-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend-http.rule=Host(`storasense.de`)"
+      - "traefik.http.routers.frontend-http.entrypoints=web"
+      - "traefik.http.routers.frontend-http.middlewares=https-redirect@docker"
+
+      - "traefik.http.routers.frontend-https.rule=Host(`storasense.de`)"
+      - "traefik.http.routers.frontend-https.entrypoints=websecure"
+      - "traefik.http.routers.frontend-https.tls=true"
+      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+    depends_on:
+      keycloak:
+        condition: service_healthy
+      app:
+        condition: service_started
+
+  integration-tests:
+    image: ghcr.io/storasense/storasense-platform/storasense-integration-tests:latest
+    environment:
+      - OPERATING_MODE=INSIDE # Use INSIDE mode for integration tests
+    env_file: .env
+    networks:
+      - storasense-network
+    depends_on:
+        app:
+          condition: service_started
+        keycloak:
+          condition: service_healthy
+    profiles:
+     - integration-tests
+
+  alarmservice:
+    #image: ghcr.io/storasense/storasense-platform/storasense-alarm-service:latest
+    build:
+      context: .
+      dockerfile: ./Alarm-Service/Dockerfile
+    container_name: storasense-alarmservice
+    restart: unless-stopped
+    environment:
+      - BOOTSTRAP_SERVERS=kafka:9092
+      - APPLICATION_ID=storasense-alarmservice
+      - INPUT_TOPIC=iot-sensordata
+      - OUTPUT_TOPIC=alarms
+    depends_on:
+      - kafka
     networks:
       - storasense-network
 
+  # Apache Kafka in KRAFT mode and in PLAINTEXT-Communication mode (no TLS)
+  kafka:
+    image: bitnami/kafka:latest
+    container_name: storasense-kafka
+    restart: always
+    environment:
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=false
+      - KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_CFG_TRANSACTION_STATE_LOG_MIN_ISR=1
+    volumes:
+      - storasense_data_kafka_volume:/bitnami/kafka
+    networks:
+      - storasense-network
+
+  # Kafka Connect Instance with included MQTT-Connectors
+  kafka-connect:
+    #image: ghcr.io/storasense/storasense-platform/storasense-kafka-connect:latest
+    build:
+      context: .
+      dockerfile: ./kafka/Dockerfile
+    container_name: storasense-kafka-connect
+    restart: always
+    environment:
+      - CONNECT_BOOTSTRAP_SERVERS=kafka:9092
+      - CONNECT_REST_ADVERTISED_HOST_NAME=storasense-kafka-connect
+      - CONNECT_REST_PORT=8083
+      - CONNECT_GROUP_ID=connect-cluster
+      - CONNECT_CONFIG_STORAGE_TOPIC=_connect-configs
+      - CONNECT_OFFSET_STORAGE_TOPIC=_connect-offsets
+      - CONNECT_STATUS_STORAGE_TOPIC=_connect-status
+      - CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR=1
+      - CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR=1
+      - CONNECT_STATUS_STORAGE_REPLICATION_FACTOR=1
+      - CONNECT_KEY_CONVERTER=org.apache.kafka.connect.storage.StringConverter
+      - CONNECT_VALUE_CONVERTER=org.apache.kafka.connect.json.JsonConverter
+      - CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE=false
+      - CONNECT_PLUGIN_PATH=/usr/share/confluent-hub-components,/usr/share/java
+    depends_on:
+      - kafka
+    networks:
+      - storasense-network
+
+  # Kafka UI (Redpanda Console)
+  kafka-ui:
+    image: redpandadata/console:latest
+    container_name: storasense-kafka-ui
+    restart: unless-stopped
+    environment:
+      - KAFKA_BROKERS=kafka:9092
+    depends_on:
+      - kafka
+    networks:
+      - storasense-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kafka-ui-http.rule=Host(`kafka-ui.storasense.de`)"
+      - "traefik.http.routers.kafka-ui-http.entrypoints=web"
+      - "traefik.http.routers.kafka-ui-http.middlewares=https-redirect@docker"
+
+      - "traefik.http.routers.kafka-ui-https.rule=Host(`kafka-ui.storasense.de`)"
+      - "traefik.http.routers.kafka-ui-https.entrypoints=websecure"
+      - "traefik.http.routers.kafka-ui-https.tls=true"
+      - "traefik.http.services.kafka-ui.loadbalancer.server.port=8080"
+
+  # Initial container for creating topics (iot-data, alarms) on Kafka Broker
+  kafka-init-topics:
+    image: bitnami/kafka:latest
+    container_name: storasense-kafka-init-topics
+    volumes:
+      - ./kafka/scripts/topics:/opt/scripts:ro
+    environment:
+      - BOOTSTRAP=kafka:9092
+      - IOT_PARTITIONS=5
+      - ALARM_PARTITIONS=1
+    depends_on:
+      - kafka
+    networks:
+      - storasense-network
+    command: [ "/bin/bash", "-c", "/opt/scripts/wait-for-kafka.sh kafka 9092 90 && /opt/scripts/create-topics.sh" ]
+    init: true
+
+  # Initial container for creating connectors (source, sink) on Kafka Connect Instance
+  kafka-init-connectors:
+    image: bitnami/kafka:latest
+    container_name: storasense-kafka-init-connectors
+    volumes:
+      - ./kafka/connectors:/opt/connectors:ro
+      - ./kafka/scripts/connectors:/opt/scripts:ro
+    depends_on:
+      - kafka-connect
+    networks:
+      - storasense-network
+    command: [ "/bin/bash", "-c", "/opt/scripts/wait-for-connect.sh http://kafka-connect:8083/connector-plugins 60 2 && /opt/scripts/apply-all.sh http://kafka-connect:8083 /opt/connectors" ]
+    init: true
+
 volumes:
   storasense_data_volume:
+  storasense_data_kafka_volume:
 
 networks:
   storasense-network:
     driver: bridge
+  host: # Needed for hosts vpn connection
+    external: true
+    name: host

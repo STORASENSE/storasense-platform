@@ -13,6 +13,11 @@ export interface Page<T> {
 /// Enums
 /////////////////////////////////////////////////////////////////////////
 
+export enum UserRole {
+    ADMIN = "ADMIN",
+    CONTRIBUTOR = "CONTRIBUTOR",
+}
+
 export enum MeasurementUnit {
     CELSIUS,
     FAHRENHEIT,
@@ -24,12 +29,41 @@ export enum SensorType {
     TEMPERATURE_OUTSIDE = 'TEMPERATURE_OUTSIDE',
     HUMIDITY = 'HUMIDITY',
     ULTRASONIC = 'ULTRASONIC',
-    GAS = 'GAS',
+    CO2 = 'CO2',
 }
 
 /////////////////////////////////////////////////////////////////////////
 /// Model Types
 /////////////////////////////////////////////////////////////////////////
+
+export interface StoraSenseUser {
+    id: string;
+    keycloak_id: string;
+    username: string;
+    email?: string;
+    name?: string;
+}
+
+export interface StoraSenseStorge {
+    id: string;
+    name: string;
+}
+
+export interface Sensor {
+    id: string;
+    name: string;
+    type: SensorType;
+    storage_id: string;
+    allowed_min: number;
+    allowed_max: number;
+}
+
+export interface Alarm {
+    id: string;
+    sensor_id: string;
+    message: string;
+    created_at: Date;
+}
 
 export interface Measurement {
     id: string;
@@ -42,6 +76,85 @@ export interface Measurement {
 /// Requests & Responses
 /////////////////////////////////////////////////////////////////////////
 
+export interface GetUsersByStorageIdRequest {
+    storage_id: string;
+}
+
+export type GetUsersByStorageIdResponse = Array<{
+    id: string;
+    username: string;
+    role: UserRole;
+}>;
+
+/////////////////////////////////////////////////////////////////////////
+
+export interface AddUserToStorageRequest {
+    username: string;
+    storage_id: string;
+}
+
+/////////////////////////////////////////////////////////////////////////
+
+export interface RemoveUserFromStorageRequest {
+    username: string;
+    storage_id: string;
+}
+
+/////////////////////////////////////////////////////////////////////////
+
+export interface GetStoragesByUserIdRequest {
+    user_id: string;
+}
+
+export type GetStoragesByUserIdResponse = StoraSenseStorge[];
+
+/////////////////////////////////////////////////////////////////////////
+
+export interface GetSensorsByStorageIdRequest {
+    storage_id: string;
+}
+
+export type GetSensorsByStorageIdResponse = Sensor[];
+
+/////////////////////////////////////////////////////////////////////////
+
+export interface AddSensorRequest {
+    sensor_id: string;
+    sensor: {
+        name: string;
+        type: SensorType;
+        storage_id: string;
+        allowed_min: number;
+        allowed_max: number;
+    };
+}
+
+export interface AddSensorResponse {
+    sensor_id: string;
+    name: string;
+    type: SensorType;
+    storage_id: string;
+    allowed_min: number;
+    allowed_max: number;
+    location?: string;
+}
+
+export interface DeleteSensorRequest {
+    sensor_id: string;
+    sensor: {
+        storage_id: string;
+    }
+}
+
+export interface SensorStatusResponse {
+  sensor_id: string;
+  is_online: boolean;
+  last_measurement: string | null;
+  last_measurement_time: string | null;
+}
+
+/////////////////////////////////////////////////////////////////////////
+
 export interface GetMeasurementsRequest {
     sensor_id: string;
     max_date: string;
@@ -50,3 +163,39 @@ export interface GetMeasurementsRequest {
 export interface GetMeasurementsResponse {
     measurements: Measurement[];
 }
+
+/////////////////////////////////////////////////////////////////////////
+
+export interface CreateStorageRequest {
+    name: string;
+}
+
+//////////////////////////////////////////////////////////////////////////
+export interface GetAlarmsByStorageIdRequest {
+    storage_id: string;
+}
+
+export interface DeleteAlarmRequest {
+    alarm_id: string;
+}
+//////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////////
+
+
+export type AnalyticsTimeWindow = "7d" | "30d" | "365d";
+
+export type AnalyticsSummaryItem = {
+  type: string;
+  sensor_id: string;
+  avg_value: number;
+  min_value: number;
+  max_value: number;
+};
+
+export type AnalyticsSummaryResponse = AnalyticsSummaryItem[];
+
+export type AnalyticsSummaryRequest = {
+  storage_id: string;
+  window: AnalyticsTimeWindow;
+};

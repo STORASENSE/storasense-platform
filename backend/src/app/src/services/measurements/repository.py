@@ -12,7 +12,7 @@ from backend.src.app.src.shared.database.pagination import (
     PageRequest,
     paginate,
 )
-from backend.src.app.src.shared.repositories.base_repository import (
+from backend.src.app.src.shared.database.base_repository import (
     BaseRepository,
 )
 
@@ -26,7 +26,7 @@ class MeasurementRepository(BaseRepository[MeasurementModel, UUID]):
 
     def find_all(self, page_request: PageRequest) -> Page[MeasurementModel]:
         query = self.session.query(MeasurementModel).order_by(
-            MeasurementModel.created_at.desc()
+            MeasurementModel.timestamp.desc()
         )
         return paginate(query, page_request)
 
@@ -43,8 +43,8 @@ class MeasurementRepository(BaseRepository[MeasurementModel, UUID]):
         """
         query = (
             self.session.query(MeasurementModel)
-            .where(MeasurementModel.sensor_id == sensor_id)
-            .order_by(MeasurementModel.created_at.desc())
+            .filter(MeasurementModel.sensor_id == sensor_id)
+            .order_by(MeasurementModel.timestamp.desc())
         )
         return paginate(query, page_request)
 
@@ -53,11 +53,40 @@ class MeasurementRepository(BaseRepository[MeasurementModel, UUID]):
     ) -> list[MeasurementModel]:
         query = (
             self.session.query(MeasurementModel)
-            .where(MeasurementModel.sensor_id == sensor_id)
-            .where(MeasurementModel.created_at <= max_date)
-            .order_by(MeasurementModel.created_at.desc())
+            .filter(MeasurementModel.sensor_id == sensor_id)
+            .filter(MeasurementModel.timestamp >= max_date)
+            .order_by(MeasurementModel.timestamp.asc())
         )
         return query.all()
+
+    def find_all_by_min_date(
+        self, min_date: datetime, page_request: PageRequest
+    ) -> Page[MeasurementModel]:
+        query = (
+            self.session.query(MeasurementModel)
+            .where(MeasurementModel.timestamp >= min_date)
+            .order_by(
+                MeasurementModel.sensor_id.desc(),
+                MeasurementModel.timestamp.desc(),
+            )
+        )
+        return paginate(query, page_request)
+
+    def find_latest_by_sensor_id(
+        self, sensor_id: UUID
+    ) -> MeasurementModel | None:
+        """
+        Finds the latest measurement for a given sensor.
+
+        :param sensor_id: The ID of the sensor.
+        :return: The latest measurement or None if no measurements exist.
+        """
+        return (
+            self.session.query(MeasurementModel)
+            .filter(MeasurementModel.sensor_id == sensor_id)
+            .order_by(MeasurementModel.timestamp.desc())
+            .first()
+        )
 
 
 def inject_measurement_repository(session: Session = Depends(open_session)):

@@ -1,28 +1,51 @@
+import os
 from contextlib import asynccontextmanager
 
 import uvicorn
-from fastapi import FastAPI
+from dotenv import load_dotenv
+from fastapi import FastAPI, Depends
+
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.src.shared.logging import logging
+from backend.src.app.src.services.auth.schemas import TokenData
+from backend.src.app.src.services.auth.service import auth_service
+from backend.src.app.src.shared.logger import (
+    get_logger,
+    add_request_middleware,
+)
 
 # ... DB imports ...
 from backend.src.app.src.shared.database.model_discovery import discover_models
 from backend.src.app.src.db_init import initialize_database
 
 # ... Router imports ...
-# from .services.users.router import router as users_router
-# from .services.storages.router import router as storages_router
+from .services.users.router import router as users_router
 from backend.src.app.src.services.measurements.router import (
     router as measurements_router,
 )
 from backend.src.app.src.services.sensors.router import (
     router as sensors_router,
 )
+from backend.src.app.src.services.analytics.router import (
+    router as analytics_router,
+)
+from backend.src.app.src.services.storages.router import (
+    router as storages_router,
+)
+from backend.src.app.src.services.alarms.router import (
+    router as alarms_router,
+)
 
 discover_models()
+load_dotenv()
 
-_logger = logging.getLogger(__name__)
+_logger = get_logger(__name__)
+
+CLIENT_ID = os.environ.get("KEYCLOAK_CLIENT_ID")
+if not CLIENT_ID:
+    raise RuntimeError(
+        "Keycloak is not configured correctly. Please check environment variables."
+    )
 
 
 @asynccontextmanager
@@ -34,23 +57,36 @@ async def lifespan(app: FastAPI):
     _logger.info("Initializing database...")
     initialize_database()
     _logger.info("Database initialization completed successfully!")
+    # _logger.info("Initializing services...")
+    # push_all_sensors_to_kafka()
+
     yield
+    _logger.info("Shutting down application...")
 
 
 app = FastAPI(
     title="STORASENSE-Platform-Backend API",
     version="1.0.0",
-    description="STORASENSE-Platform-Backend API for IoT-Datamanagement",
+    description="STORASENSE-Platform-Backend API",
     lifespan=lifespan,
+    swagger_ui_init_oauth={"clientId": CLIENT_ID, "appName": "Storasense API"},
 )
 
-# app.include_router(users_router)
-# app.include_router(storages_router)
+add_request_middleware(app)
+
+app.include_router(users_router)
 app.include_router(measurements_router)
 app.include_router(sensors_router)
+app.include_router(storages_router)
+app.include_router(analytics_router)
+app.include_router(alarms_router)
 
-# configure CORS
-origins = ["http://localhost:3000"]
+# configure CORS-middleware
+origins = [
+    "https://storasense.de",
+    "http://localhost:3000",
+    "https://api.storasense.de",
+]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -61,10 +97,9 @@ app.add_middleware(
 
 
 @app.get("/health", tags=["Root"])
-def read_root():
-    """
-    # checks if the API is running
-    """
+async def read_root(
+    current_user: TokenData = Depends(auth_service.get_current_user),
+):
     return {
         "status": "ok",
         "message": "welcome to STORASENSE-Platform-Backend API!",

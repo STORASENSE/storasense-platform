@@ -1,30 +1,34 @@
+import os
 import random
 from datetime import datetime, timedelta
 
 from sqlalchemy.orm import Session
 from uuid import UUID
 
-from backend.src.shared.logging import logging
+from backend.src.app.src.services.alarms.models import AlarmModel
+from backend.src.app.src.services.user_storage_access.models import (
+    UserStorageAccessModel,
+)
+from backend.src.app.src.services.users.models import UserModel
+from backend.src.app.src.shared.logger import get_logger
 from backend.src.app.src.services.measurements.models import MeasurementModel
 from backend.src.app.src.services.sensors.models import SensorModel
 from backend.src.app.src.services.storages.models import StorageModel
 from backend.src.app.src.shared.database.enums import (
     SensorType,
     MeasurementUnit,
+    UserRole,
 )
 
 
-_logger = logging.getLogger(__name__)
-
-
-def seed_users(session: Session):
-    pass
+_logger = get_logger(__name__)
 
 
 def seed_storages(session: Session):
     storages: list[StorageModel] = [
         StorageModel(
-            name="MyStorage", password_hash="1234", password_salt="1234"
+            id=UUID("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"),
+            name="MyStorage",
         )
     ]
     session.add_all(storages)
@@ -34,16 +38,15 @@ def seed_storages(session: Session):
 def seed_sensors(session: Session):
     for storage in session.query(StorageModel).all():
         temp_inside = SensorModel(
-            id=UUID("3f8f788a-a6d0-34ee-9cc0-2a762338cfda"),
             name="Temperature (Inside)",
-            type=SensorType.TEMPERATURE,
+            type=SensorType.TEMPERATURE_INSIDE,
             storage_id=storage.id,
             allowed_min=1.0,
             allowed_max=5.0,
         )
         temp_outside = SensorModel(
             name="Temperature (Outside)",
-            type=SensorType.TEMPERATURE,
+            type=SensorType.TEMPERATURE_OUTSIDE,
             storage_id=storage.id,
             allowed_min=10.0,
             allowed_max=30.0,
@@ -64,7 +67,7 @@ def seed_sensors(session: Session):
         )
         air = SensorModel(
             name="Air Quality",
-            type=SensorType.AIR,
+            type=SensorType.GAS,
             storage_id=storage.id,
             allowed_min=10.0,
             allowed_max=20.0,
@@ -97,7 +100,7 @@ def seed_measurements(session: Session):
                     value=value,
                     unit=MeasurementUnit.CELSIUS,
                     sensor_id=sensor.id,
-                    created_at=datetime.now() - timedelta(seconds=30 * i),
+                    timestamp=datetime.now() - timedelta(seconds=30 * i),
                 )
             )
 
@@ -106,7 +109,55 @@ def seed_measurements(session: Session):
 
 
 def seed_alarms(session: Session):
-    pass
+    sensor = session.query(SensorModel).first()
+    if not sensor:
+        _logger.warning("Kein Sensor gefunden, Alarm-Seeding übersprungen.")
+        return
+
+    alarm = AlarmModel(
+        message="Testalarm: Temperatur out of range",
+        sensor_id=sensor.id,
+        created_at=datetime.now(),
+    )
+    session.add(alarm)
+    _logger.info(f"Alarm for sensor {sensor.name} created.")
+
+
+def seed_users(session: Session):
+    keycloak_user_id = UUID(os.environ.get("TEST_USER_KEYCLOAK_ID"))
+    email = os.environ.get("TEST_USER_EMAIL")
+    name = os.environ.get("TEST_USER_NAME")
+    username = os.environ.get("TEST_USER")
+
+    if not keycloak_user_id and not email and not name and not username:
+        raise RuntimeError(
+            "Seeding dev environment is not configured correctly. Please check environment variables."
+        )
+
+    user = (
+        session.query(UserModel)
+        .filter_by(keycloak_id=str(keycloak_user_id))
+        .first()
+    )
+    if not user:
+        user = UserModel(
+            keycloak_id=str(keycloak_user_id),
+            email=email,
+            name=name,
+            username=username,
+        )
+        session.add(user)
+        session.flush()
+
+    storage = session.query(StorageModel).first()
+    if storage:
+        user_storage = UserStorageAccessModel(
+            user_id=user.id,
+            storage_id=storage.id,
+            role=UserRole.ADMIN,
+        )
+        session.add(user_storage)
+        session.flush()
 
 
 def seed_dev_data(session: Session):
@@ -120,6 +171,7 @@ def seed_dev_data(session: Session):
         seed_sensors(session)
         seed_measurements(session)
         seed_alarms(session)
+        seed_users(session)
         session.commit()
         _logger.info("Seeding successful!")
     except Exception as e:

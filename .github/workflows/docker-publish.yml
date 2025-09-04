@@ -1,0 +1,74 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+
+#    paths:
+#      - 'Dockerfile'
+#      - '**/Dockerfile'
+#      - '.github/workflows/docker-publish.yml'
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Note: Build context is always the root of the repository
+      - name: Build and push frontend image
+        run: |
+          REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE_NAME=ghcr.io/$REPO_NAME/storasense-frontend:latest
+          docker build -f frontend/Dockerfile -t $IMAGE_NAME .
+          docker push $IMAGE_NAME
+
+      - name: Build and push backend-app image
+        run: |
+          REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE_NAME=ghcr.io/$REPO_NAME/storasense-backend-app:latest
+          docker build -f backend/src/app/Dockerfile -t $IMAGE_NAME .
+          docker push $IMAGE_NAME
+
+      - name: Build and push backend-mqtt-client image
+        run: |
+          REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE_NAME=ghcr.io/$REPO_NAME/storasense-backend-mqtt-client:latest
+          docker build -f backend/src/mqtt_client/Dockerfile -t $IMAGE_NAME .
+          docker push $IMAGE_NAME
+      - name: Build and push availability-test image
+        run: |
+          REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE_NAME=ghcr.io/$REPO_NAME/storasense-availability-test:latest
+          docker build -f test/availability/Dockerfile -t $IMAGE_NAME .
+          docker push $IMAGE_NAME
+      - name: Build and push integration-tests image
+        run: |
+          REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE_NAME=ghcr.io/$REPO_NAME/storasense-integration-tests:latest
+          docker build -f test/integration/Dockerfile -t $IMAGE_NAME .
+          docker push $IMAGE_NAME
+      - name: Build and push alarm-service image
+        run: |
+          REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE_NAME=ghcr.io/$REPO_NAME/storasense-alarm-service:latest
+          docker build -f ./Alarm-Service/Dockerfile -t $IMAGE_NAME .
+          docker push $IMAGE_NAME
+      - name: Build and push kafka-connect image
+        run: |
+          REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE_NAME=ghcr.io/$REPO_NAME/storasense-kafka-connect:latest
+          docker build -f ./kafka/Dockerfile -t $IMAGE_NAME .
+          docker push $IMAGE_NAME

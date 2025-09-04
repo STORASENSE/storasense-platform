@@ -1,7 +1,19 @@
+from datetime import datetime
+from typing import Optional
 from uuid import UUID
 from pydantic import BaseModel, ConfigDict
 
 from backend.src.app.src.shared.database.enums import SensorType
+
+
+class SensorMetadata(BaseModel):
+    id: UUID
+    type: SensorType
+    name: Optional[str]
+    allowed_min: float
+    allowed_max: float
+
+    model_config = ConfigDict()
 
 
 class CreateSensorRequest(BaseModel):
@@ -12,6 +24,10 @@ class CreateSensorRequest(BaseModel):
     allowed_max: float | None = None
 
 
+class DeleteSensorRequest(BaseModel):
+    storage_id: UUID
+
+
 class SensorResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -19,3 +35,10 @@ class SensorResponse(BaseModel):
     name: str | None
     type: SensorType
     storage_id: UUID
+
+
+class SensorStatusResponse(BaseModel):
+    sensor_id: str
+    is_online: bool
+    last_measurement: float | None
+    last_measurement_time: datetime | None

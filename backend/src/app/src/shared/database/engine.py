@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from dotenv import load_dotenv
 
 from backend.src.app.src.shared.database.model_discovery import discover_models
-from backend.src.shared.logging import get_logger
+from backend.src.app.src.shared.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -21,7 +21,7 @@ if "pytest" in sys.modules:
         _database_url, echo=False, connect_args={"check_same_thread": False}
     )
 
-# connect to postgres database when being run in production
+# connect to postgres database when being run in production / dev
 else:
     max_retries = 3
     retry_delay = 1  # Initial delay in seconds

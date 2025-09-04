@@ -18,7 +18,7 @@ pre-commit = "^4.2.0"
 ruff = "^0.12.4"
 fastapi-events = "^0.12.2"
 alembic = "^1.16.4"
-pydantic = "^2.11.7"
+pydantic = {extras = ["email"], version = "^2.11.7"}
 pydantic-settings = "^2.10.1"
 pyjwt = "^2.10.1"
 fastapi-limiter = "^0.1.6"
@@ -29,12 +29,23 @@ pytest-dotenv = "^0.5.2"
 structlog = "^25.4.0"
 paho-mqtt = "^2.1.0"
 python-dotenv = "^1.1.1"
-pysqlite3 = "^0.5.4"
+#pysqlite3 = "^0.5.4"
 sqlalchemy = "^2.0.41"
 pg8000 = "^1.31.4"
+authlib = "^1.6.1"
+itsdangerous = "^2.2.0"
+urllib3 = "^2.5.0"
+psycopg2-binary = "^2.9.10"
 
 [tool.poetry.group.dev.dependencies]
 commitizen = "^4.8.3"
+
+
+[tool.poetry.group.test.dependencies]
+selenium = "^4.35.0"
+psycopg2-binary = "^2.9.10"
+pytest-dependency = "^0.6.0"
+numpy = "^2.3.2"
 
 [tool.commitizen]
 name = "cz_conventional_commits"
@@ -114,8 +125,12 @@ skip-magic-trailing-comma = false
 line-ending = "auto"
 
 [tool.pytest.ini_options]
-pythonpath = ["src"]
-testpaths = "tests"
+pythonpath = ["."]
+testpaths = "test"
+filterwarnings = [
+    "ignore::pydantic._internal._config.PydanticDeprecatedSince20",
+    "ignore::sqlalchemy.exc.SAWarning"
+]
 
 [tool.semantic_release]
 assets = []

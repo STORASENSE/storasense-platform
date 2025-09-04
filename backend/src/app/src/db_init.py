@@ -10,42 +10,27 @@ import sqlalchemy
 from sqlalchemy import text
 from sqlalchemy.orm import sessionmaker
 
-from backend.src.shared.logging import logging
+from backend.src.app.src.shared.logger import get_logger
 from backend.src.app.src.seed_dev import seed_dev_data
-from backend.src.app.src.seed_prod import seed_prod_data
 from backend.src.app.src.shared.database.base_model import BaseModel
 from backend.src.app.src.shared.database.engine import db_engine
 from backend.src.app.src.shared.database.model_discovery import discover_models
 
 discover_models()
+_logger = get_logger(__name__)
 
 _environment = os.getenv("ENVIRONMENT")  # TEST / DEV / PROD
-
-_logger = logging.getLogger(__name__)
 
 _LocalSessionMaker = sessionmaker(
     bind=db_engine, autoflush=False, autocommit=False
 )
 
 
-# if __name__ == "__main__":
-#    print("Dropping tables...")
-#    BaseModel.metadata.drop_all(db_engine)
-#    print("Done")
-#    print("Creating tables...")
-#    BaseModel.metadata.create_all(db_engine)
-#    print("Done")
-
-
-def is_prod_initialized() -> bool:
+def is_db_initialized() -> bool:
     """
     This function is used to check if the production database has already been
     initialized. If the environment is not PROD, raises an error.
     """
-    if _environment != "PROD":
-        raise EnvironmentError(
-            f"PROD environment expected, but was '{_environment}'!"
-        )
     return sqlalchemy.inspect(db_engine).has_table("Storage")
 
 
@@ -61,9 +46,9 @@ def generate_hypertables():
                 sql = text(
                     f"""
                         SELECT create_hypertable(
-                            '"{table_name}"',
-                            '{time_column}',
-                            if_not_exists => TRUE
+                        '"{table_name}"',
+                        '{time_column}',
+                        if_not_exists => TRUE
                         );
                     """
                 )
@@ -81,9 +66,9 @@ def initialize_database():
     2. Converts marked tables into Hypertables (only when not in test mode).
     """
     session = _LocalSessionMaker()
-    if _environment == "PROD" and is_prod_initialized():
+    if _environment != "TEST" and is_db_initialized():
         _logger.info(
-            "Production database already initialized. Skipping further initialization."
+            "Database already initialized. Skipping further initialization."
         )
         return
 
@@ -109,7 +94,7 @@ def initialize_database():
             "Production mode detected. Creating hypertables and seeding production data..."
         )
         generate_hypertables()
-        seed_prod_data(session)
+
     else:
         msg = (
             "Unknown environment detected. Aborting database initialization. Have you set the ENVIRONMENT variable "

@@ -7,19 +7,15 @@ class UserRole(Enum):
 
 
 class SensorType(Enum):
-    TEMPERATURE = "TEMPERATURE"
+    TEMPERATURE_INSIDE = "TEMPERATURE_INSIDE"
+    TEMPERATURE_OUTSIDE = "TEMPERATURE_OUTSIDE"
     HUMIDITY = "HUMIDITY"
+    GAS = "CO2"
     ULTRASONIC = "ULTRASONIC"
-    AIR = "AIR"
 
 
 class MeasurementUnit(Enum):
     CELSIUS = "CELSIUS"
-    FAHRENHEIT = "FAHRENHEIT"
     PERCENT = "PERCENT"
-
-
-class AlarmSeverity(Enum):
-    HIGH = "HIGH"
-    MEDIUM = "MEDIUM"
-    LOW = "LOW"
+    CENTIMETER = "CENTIMETER"
+    PPM = "PPM"
