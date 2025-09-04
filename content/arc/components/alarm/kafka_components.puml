@@ -1,0 +1,63 @@
+@startuml
+title "Deployment"
+skinparam linetype ortho
+skinparam node {
+  BackgroundColor #F5F5F5
+  BorderColor #333
+  FontColor #222
+  FontSize 14
+}
+skinparam component {
+  BackgroundColor #E3F2FD
+  BorderColor #1976D2
+  FontColor #0D47A1
+  FontSize 13
+}
+skinparam database {
+  BackgroundColor #FFF3E0
+  BorderColor #FF9800
+  FontColor #E65100
+  FontSize 13
+}
+skinparam rectangle {
+  BackgroundColor #WHITE
+  BorderColor #000000
+  FontSize 12
+}
+left to right direction
+
+node "Host" {
+  node "Docker Network [Compose]" {
+    node "Kafka\n🟦 <<Container>>" as kafka {
+      component "Broker"
+    }
+    node "Kafka-Connect\n🟩 <<Container>>" as connect {
+      component "MQTT Sources x5\n<<Plugin>>"
+      component "MQTT Sink x1\n<<Plugin>>" as mqtt_sink
+      component "JDBC Sink x1\n<<Plugin>>" as jdbc
+    }
+    node "Alarm Service\n[Java; Kafka Streams]\n🟧 <<Container>>" as alarm {
+      component "Alarm Service Logic"
+    }
+    node "MQTT Broker\n[Mosquitto]\n🟨 <<Container>>" as mqtt {
+      component "MQTT Service"
+    }
+    database "Postgres\n🟫 <<Container>>" as db
+
+    rectangle "⚡ Init: Kafka Topics \n <<Container>>" as init_topics
+    rectangle "⚡ Init: Connect Plugins \n <<Container>>" as init_connectors
+  }
+}
+
+init_topics -down[#black,thickness=2]-> kafka : Topics setup
+init_connectors -down[#black,thickness=2]-> connect : Plugins setup
+
+mqtt -right[#blue,thickness=2]-> connect : MQTT → Source Pulls
+connect -right[#blue,thickness=2]-> kafka : Source → Topic
+kafka -down[#green,thickness=2]-> alarm : Stream
+alarm -up[#green,thickness=2]-> kafka : Produce Alarms
+kafka -left[#purple,thickness=2]-> connect : Broker → Sink Read
+jdbc -up[#purple,thickness=2]-> db : Sink Write \n → DB
+connect -left[#purple,thickness=2]-> mqtt : Sink → MQTT Push
+
+@enduml

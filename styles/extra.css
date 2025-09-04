@@ -1,0 +1,11 @@
+/* Sidebar smaller */
+.md-sidebar--primary {
+  width: 8px;
+  min-width: 230px;
+}
+
+/* Sidebar smaller */
+.md-sidebar--secondary {
+  width: 8px;
+  min-width: 230px;
+}

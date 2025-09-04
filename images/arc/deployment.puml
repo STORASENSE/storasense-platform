@@ -1,0 +1,242 @@
+```puml
+
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+HIDE_STEREOTYPE()
+LAYOUT_LEFT_RIGHT()
+
+Person_Ext(react_app, "React Web App", "Browser-Frontend")
+
+System_Boundary(storasense_bb, "STORASENSE (Backend)") {
+System(storasense_api, "Backend API (FastAPI)", "HTTP/REST")
+System(kafka_cluster, "Apache Kafka", "Broker/Topics")
+System(alarm_streams, "Alarm Service (Kafka Streams)", "Kafka Streams")
+System(storasense_connect, "Kafka Connect", "Sinks/Sources")
+System(timescaledb, "TimescaleDB (PostgreSQL)", "SQL/JDBC")
+System(storasense_mqtt_bridge, "MQTT Client", "MQTT→BE-API")
+}
+
+System_Ext(mqtt_broker, "MQTT Broker", "MQTT")
+System_Ext(auth_provider, "Auth Provider (Keycloak)", "OIDC/JWT")
+System_Ext(SensorEdge, "STORASENSE-Sensoric \n (Arduino, Sensoren)", "WiFi/MQTT")
+System_Ext(IotActor, "IoT-Devices \n(*Imaginary Actor*)", "WiFi/MQTT")
+
+' Frontend -> Backend
+Rel(react_app, storasense_api, "UI-/API-Calls", "HTTPS/JSON")
+
+' Sensor -> MQTT Broker
+Rel(SensorEdge, mqtt_broker, "Publish Measurements (JSON)", "MQTT")
+
+' Broker -> interner MQTT-Client
+Rel(mqtt_broker, storasense_mqtt_bridge, "Deliver subscribed sensor-topic", "MQTT")
+Rel(mqtt_broker, IotActor, "Deliver subscribed alarms-topic", "MQTT")
+
+' MQTT-Client -> Backend API
+Rel(storasense_mqtt_bridge, storasense_api, "POST measurements", "HTTP/JSON")
+
+' Backend API -> Kafka (produzierte Events, z. B. Min/Max Werte)
+Rel(storasense_api, kafka_cluster, "Produce sensor events (Min/Max)", "Kafka Client")
+
+' Alarm Streams <-> Kafka (consume/produce)
+Rel(kafka_cluster, alarm_streams, "Consume topics", "Kafka Streams")
+Rel(alarm_streams, kafka_cluster, "Produce alarms/aggregates", "Kafka Streams")
+
+' Kafka -> Connect -> DB
+Rel(kafka_cluster, storasense_connect, "Consume (sink tasks)", "Kafka Connect")
+Rel(storasense_connect, timescaledb, "Upsert Alarms", "JDBC")
+Rel(storasense_connect, mqtt_broker, "Upsert Alarms", "MQTT")
+
+' Backend API ->  DB (Reads/Writes)
+Rel(storasense_api, timescaledb, "CRUD/Queries", "SQL/ORM")
+
+' Auth: Clients/API holen Tokens beim Provider
+Rel(react_app, auth_provider, "OIDC Auth (token/code flow)", "HTTPS/JSON")
+Rel(storasense_mqtt_bridge, auth_provider, "OIDC Auth (client credentials)", "HTTPS/JSON")
+
+' Provider validiert/liefert Tokens, die API entgegennimmt
+Rel(auth_provider, storasense_api, "Validate/Introspect Tokens", "HTTP")
+
+Lay_Down(storasense_mqtt_bridge, storasense_api)
+Lay_Down(kafka_cluster, storasense_connect)
+Lay_Down(storasense_connect, timescaledb)
+
+@enduml
+
+@startuml
+!theme spacelab
+
+skinparam shadowing true
+skinparam actorStyle awesome
+skinparam defaultTextColor #000000
+skinparam arrowFontColor #333333
+
+skinparam node {
+FontColor #000000
+borderRadius 10
+BackgroundColor #F0F4C3
+BorderColor #8BC34A
+}
+skinparam component {
+FontColor #000000
+borderRadius 10
+BackgroundColor #E3F2FD
+BorderColor #1976D2
+}
+skinparam database {
+FontColor #000000
+borderRadius 10
+BackgroundColor #FDF6E3
+BorderColor #E67E22
+}
+skinparam package {
+FontColor #000000
+borderColor #333333
+borderStyle dashed
+BackgroundColor #F8F9FA
+}
+
+left to right direction
+skinparam ranksep 30
+skinparam nodesep 25
+
+actor "Clients (Browser, Tools, IoT)" as Clients
+
+node "Server-Node\n(Ubuntu)" as Host {
+package "Docker Compose" as Net {
+
+
+' Reverse Proxy / Edge
+node "Traefik-Container" as TraefikNode {
+  component "Traefik v3.5\n- \n EntryPoints: web(80), websecure(443), mqtt(1883/tcp), websock(8883/tcp)\n- ACME Let's Encrypt\n- Docker provider\n- Dashboard: traefik.storasense.de" as Traefik
+}
+
+' MQTT Broker
+node "Mosquitto-Container" as MqttNode {
+  component "Eclipse Mosquitto\n- TCP 1883 (intern)\n- WS 8083 (intern)\n- Volumes: mosquitto-conf/log/data" as Mqtt
+}
+
+' Identity Provider
+node "Keycloak-Container" as KeycloakNode {
+  component "Keycloak (latest)\n- Hostname: auth.storasense.de\n- Health: /health/live\n- DB: Timescale" as Keycloak
+}
+
+' Backend API
+node "Backend-App-Container" as AppNode {
+  component "Backend API (FastAPI)\n- Image: storasense-backend-app:latest\n- via Traefik api.storasense.de → :8000" as App
+}
+
+' Frontend
+node "Frontend-Container" as FrontendNode {
+  component "Frontend (Next.js)\n- Image: storasense-frontend:latest\n- via Traefik storasense.de → :3000" as Frontend
+}
+
+' MQTT Bridge / Client (interne Weitergabe zur API)
+node "MQTT-Client-Container" as MqttClientNode {
+  component "MQTT Client (Backend-Bridge)\n- Image: storasense-backend-mqtt-client:latest\n- POST → Backend API" as MqttClient
+}
+
+' Alarm Service (Kafka Streams)
+node "AlarmService-Container" as AlarmSvcNode {
+  component "Alarm Service (Kafka Streams)\n- APP_ID=storasense-alarmservice\n- INPUT=iot-sensordata\n- OUTPUT=alarms\n- BOOTSTRAP=kafka:9092" as AlarmSvc
+}
+
+' Kafka Broker (aktiv)
+node "Kafka-Container (PLAINTEXT, KRaft)" as KafkaNode {
+  component "Apache Kafka\n- :9092 (PLAINTEXT)\n- Data: storasense_data_kafka_volume" as Kafka
+}
+
+' Kafka Connect (aktiv)
+node "Kafka Connect-Container" as ConnectNode {
+  component "Kafka Connect\n- REST :8083\n- Plugins: Confluent Hub, /usr/share/java\n- JSON (schemas=false)" as Connect
+}
+
+' Kafka Init (Topics & Connectors)
+node "Kafka Init-Container" as KafkaInitNode {
+  component "Init: Topics & Connectors\n- create-topics.sh\n- apply-all.sh" as KafkaInit
+}
+
+' Timescale/PostgreSQL
+node "TimescaleDB-Container" as PgNode {
+  database "TimescaleDB (PostgreSQL 15) - CLUSTER\n- Volume: storasense_data_volume\n- Init: ./db-scripts" as PG
+}
+
+' Backup
+node "Backup-Container" as BackupNode {
+  component "docker-volume-backup\n- CRON: 17 02 * * *\n- Sources: storasense_data_volume\n- Target: ./storasense_data_volume_backup" as Backup
+}
+}
+
+' Volumes (Persistenz)
+node "Volumes" as Vols {
+component "storasense_data_volume\n(PostgreSQL Data)" as VolDB
+component "storasense_data_kafka_volume\n(Kafka Data)" as VolKafka
+component "mosquitto-conf\n(bind: ./mosquitto/config)" as VolMConf
+component "mosquitto-log\n(bind: ./mosquitto/log)" as VolMLog
+component "mosquitto-data\n(bind: ./mosquitto/data)" as VolMData
+}
+}
+
+' Externe Zugriffe via Traefik
+Clients -down-> Traefik : HTTPS 80/443 (TLS)\nHosts: storasense.de, api.storasense.de, auth.storasense.de
+Clients -right-> Traefik : MQTT over TLS SNI (8883)\nTCP Router HostSNI(storasense.de)
+Clients -right-> Traefik : MQTT over WebSocket (wss)\nHost(storasense.de) → websock
+
+' Traefik Routing (HTTP/S)
+Traefik -right-> Frontend : Host(storasense.de) → :3000
+Traefik -down-> App : Host(api.storasense.de) → :8000
+Traefik -down-> Keycloak : Host(auth.storasense.de) → :8080
+Traefik ..> Traefik : Dashboard (basic auth)\ntraefik.storasense.de
+
+' Traefik Routing (TCP/HTTP für MQTT)
+Traefik -left-> Mqtt : via TCP 1883  / HTTP 8083
+
+' MQTT Client konsumiert Broker und postet zur API
+Mqtt --> MqttClient : Subscribe topics (MQTT)
+MqttClient --> App : POST /measurements (HTTP)
+
+' App Abhängigkeiten
+App -down-> PG : JDBC (psql)\nhealthcheck depends_on
+App --> Keycloak : OIDC/JWT (auth/introspect)
+App ..> AlarmSvc : Kafka events (optional direct)
+
+' Frontend Abhängigkeiten
+Frontend --> App : HTTPS API
+Frontend --> Keycloak : OIDC (Auth flows)
+
+' Keycloak DB
+Keycloak --> PG : JDBC (KC schema)
+
+' Kafka Pfad
+AlarmSvc --> Kafka : BOOTSTRAP=kafka:9092\nConsume/Produce
+Connect --> Kafka : bootstrap servers
+KafkaInit --> Kafka : create topics
+Connect --> PG : JDBC Sinks (optional Alarms/Measurements)
+
+' Backup mounted volumes
+Backup -left- VolDB : ro mount
+
+' Volumes zu Containern
+PG -down- VolDB
+Kafka -down- VolKafka
+Mqtt -down- VolMConf
+Mqtt -down- VolMLog
+Mqtt -down- VolMData
+
+' Depends_on
+Keycloak ..> PG : depends_on: timescaledb(healthy)
+App ..> Keycloak : depends_on(healthy)
+App ..> AlarmSvc : depends_on(started)
+MqttClient ..> App : depends_on(started)
+Backup ..> Frontend : starts after system up
+
+note right of Net
+storasense-network (bridge)
+
+alle Container verbunden
+
+interne DNS: Service-Namen
+
+Traefik EntryPoints: web(80), websecure(443), mqtt(1883), websock(8883)
+end note
+
+@enduml
